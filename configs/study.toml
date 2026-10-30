@@ -1,6 +1,7 @@
 # Study over the committed per-trial tables in results/trials (see configs/sources.toml).
 # Run: uv run evalnoise study --profile quick   (writes results/study/)
-# Scores are multiplied by `scale` first, so every component is in squared `unit`s.
+# Scores are multiplied by `scale` first, so every component is in squared `unit`s;
+# `bounds` (after scaling) caps the run-variance interval at (range / 2)^2.
 
 trials_dir = "results/trials"
 
@@ -57,6 +58,7 @@ name = "agent-ab: Haiku 5.5, control vs no-tests (pass rate)"
 table = "agent-ab-no-tests"
 score = "passed"
 scale = 100
+bounds = [0, 100]
 unit = "pp"
 targets = [5, 10]
 
@@ -75,6 +77,7 @@ name = "agent-ab: Haiku 5.5 vs Sonnet 5.5 (pass rate)"
 table = "agent-ab-haiku-vs-sonnet"
 score = "passed"
 scale = 100
+bounds = [0, 100]
 unit = "pp"
 targets = [5, 10]
 
@@ -84,6 +87,7 @@ name = "overclaim study 1: model x effort (pass rate)"
 table = "overclaim-setups"
 score = "passed"
 scale = 100
+bounds = [0, 100]
 unit = "pp"
 targets = [10, 20]
 
@@ -94,6 +98,7 @@ table = "overclaim-interventions"
 score = "passed"
 pairs = [["stop-hook", "control"], ["stop-audit", "control"], ["ask-verify", "control"]]
 scale = 100
+bounds = [0, 100]
 unit = "pp"
 targets = [10, 20]
 
@@ -109,6 +114,7 @@ pairs = [
   ["haiku55-short", "haiku55-long"],
 ]
 scale = 100
+bounds = [0, 100]
 unit = "pp"
 targets = [10, 20]
 note = "Only 5 tasks: item components are very imprecise. Replicate runs exist for the 3 hook arms, on different hook builds."
@@ -120,6 +126,7 @@ table = "ruleproof-pressure"
 score = "all_rules"
 pairs = [["haiku45-long-hook", "haiku45-long"], ["haiku45-long-control", "haiku45-long"]]
 scale = 100
+bounds = [0, 100]
 unit = "pp"
 targets = [10, 20]
 note = "Only 5 tasks; opus-long has one repeat per task."

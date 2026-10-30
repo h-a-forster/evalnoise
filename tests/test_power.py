@@ -96,6 +96,34 @@ def test_tasks_needed_is_minimal_and_unreachable_is_none():
     assert tasks_needed(r, 12.0, runs=1) is None
 
 
+def test_design_effect_scales_the_tasks_needed():
+    # No run term, z method: tasks needed scale exactly with the item-level variance.
+    c = Components(item=1.0, item_arm=60.0, run=0.0, item_run=0.0, within=300.0)
+    z = stats.norm.ppf(0.975) + stats.norm.ppf(0.8)
+    for deff in (1.0, 1.5):
+        exact = 2 * 360.0 * deff * z**2 / 5.0**2
+        assert tasks_needed(resolve(c, design_effect=deff), 5.0, method="z") == math.ceil(exact)
+    with pytest.raises(ValueError, match="design_effect"):
+        resolve(c, design_effect=0.8)
+
+
+def test_pass_fail_mde_uses_the_variance_at_the_shifted_rate():
+    # 90% pass in pp: a loss raises the variance (towards 50%), so it is harder to detect
+    # than a gain, which keeps the base-rate variance; the MDE is the loss.
+    c = Components(item=400.0, item_arm=40.0, run=0.0, item_run=0.0, within=500.0)
+    d = Design(50, 1, 3)
+    r = resolve(c, pass_rate=0.9, pass_score=100.0)
+    m = mde(r, d)
+    assert m > mde(resolve(c), d)
+    assert power_at(r, d, -m) == pytest.approx(0.8, abs=1e-6)
+    assert mde(r, d, direction=1) == pytest.approx(mde(resolve(c), d))
+    assert power_at(r, d, m) > 0.85
+    # At 50% every shift moves away from 50%: the base-rate variance (and MDE) stand.
+    assert mde(resolve(c, pass_rate=0.5, pass_score=100.0), d) == pytest.approx(mde(resolve(c), d))
+    with pytest.raises(ValueError, match="pass_rate"):
+        resolve(c, pass_rate=1.0)
+
+
 def test_naive_false_positive_rate():
     no_run = resolve(Components(item=1.0, item_arm=1.0, run=0.0, item_run=0.5, within=1.0))
     assert naive_false_positive_rate(no_run, Design(20)) == pytest.approx(0.05)

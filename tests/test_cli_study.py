@@ -1,4 +1,5 @@
 import json
+import math
 
 import numpy as np
 import pandas as pd
@@ -68,6 +69,14 @@ def test_power_cli_from_components(capsys):
     out = capsys.readouterr().out
     assert "unreachable" in out  # one run per arm cannot reach 12
     assert "4 run(s) x 1 repeat(s):" in out
+    # A design effect and a pass rate near the ceiling both raise the MDE.
+    assert main(args[:-2] + ["--json"]) == 0
+    base = json.loads(capsys.readouterr().out)["grid"]
+    adj = ["--design-effect", "1.5", "--pass-rate", "0.9", "--pass-score", "100", "--json"]
+    assert main(args[:-2] + adj) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert all(a["mde"] > b["mde"] for a, b in zip(out["grid"], base, strict=True))
+    assert out["components"]["design_effect"] == 1.5
 
 
 def test_power_cli_requires_run_variance_for_single_run_data(tmp_path, capsys):
@@ -88,6 +97,8 @@ def test_power_cli_requires_run_variance_for_single_run_data(tmp_path, capsys):
         ["power", "--components", "item=-1"],
         # Regression: omitted item_run / within were silently taken as 0.
         ["power", "--components", "item_arm=70,run=17", "--tasks", "120"],
+        ["power", "--components", "item_arm=1,run=0,item_run=0,within=1", "--design-effect", "0.5"],
+        ["power", "--components", "item_arm=1,run=0,item_run=0,within=1", "--pass-rate", "1"],
         ["components", "missing.csv"],
     ],
 )
@@ -249,6 +260,55 @@ def test_bartlett_matches_scipy():
     ref = stats.bartlett(*groups)
     assert got["statistic"] == pytest.approx(ref.statistic)
     assert got["p"] == pytest.approx(ref.pvalue)
+
+
+def test_brown_forsythe_holds_its_size_with_heavy_tails_and_two_run_arms():
+    # Equal t(3) residuals in an mm-arena-like layout (runs 2, 2, 4): Bartlett rejects far
+    # too often; the item-level Brown-Forsythe test should not (a cell-level one would:
+    # with two runs an item's residuals are equal and opposite).
+    from evalnoise.components import estimate
+
+    rng = np.random.default_rng(5)
+    n_items, sims, rej_bf, rej_bart = 80, 200, 0, 0
+    for _ in range(sims):
+        parts = []
+        for arm, runs in (("a", 2), ("b", 2), ("c", 4)):
+            item = np.repeat(np.arange(n_items), runs)
+            run = np.tile(np.arange(runs), n_items)
+            y = rng.normal(0, 3, n_items)[item] + rng.normal(0, 1, runs)[run]
+            y = y + rng.standard_t(3, len(item))
+            parts.append(pd.DataFrame({"item": item, "arm": arm, "run": run, "score": y}))
+        df = pd.concat(parts, ignore_index=True)
+        df = df.assign(item="t" + df["item"].astype(str), run="r" + df["run"].astype(str))
+        df = df.assign(repeat=0, cluster=df["item"])
+        terms = list(estimate(df).run_terms.values())
+        for t in terms:
+            assert float(t.residuals @ t.residuals) == pytest.approx(t.rss)
+        rej_bf += study._brown_forsythe(terms)["p"] < 0.05
+        rej_bart += study._bartlett([(t.rss / t.df_res, t.df_res) for t in terms])["p"] < 0.05
+    assert rej_bf / sims < 0.05 + 3 * math.sqrt(0.05 * 0.95 / sims)
+    assert rej_bart / sims > 0.3
+
+
+def test_run_interval_is_capped_by_the_score_bounds():
+    # Pass/fail in pp, four tasks, two runs that disagree a lot: the upper end of the run
+    # variance interval exceeds what a 0-100 score allows, 50^2.
+    items = [f"t{j}" for j in range(4)]
+    base = pd.DataFrame({"item": items, "repeat": 0, "cluster": items})
+    df = pd.concat(
+        [
+            base.assign(arm="a", run="r0", score=[0.0, 0.0, 100.0, 0.0]),
+            base.assign(arm="a", run="r1", score=[100.0, 100.0, 100.0, 0.0]),
+            base.assign(arm="b", run="r0", score=[0.0, 100.0, 100.0, 0.0]),
+        ],
+        ignore_index=True,
+    )
+    assert study.analyse(df, DATASET, PROFILE, {})["run_interval"][1] > 2500
+    res = study.analyse(df, dict(DATASET, bounds=[0, 100]), PROFILE, {})
+    assert res["run_interval"][1] == 2500
+    assert res["run_by_arm"]["arms"]["a"]["run_interval"][1] == 2500
+    with pytest.raises(DataError, match="outside bounds"):
+        study.analyse(df, dict(DATASET, bounds=[0, 1]), PROFILE, {})
 
 
 def test_analyse_flags_pairs_that_differ_on_few_items():

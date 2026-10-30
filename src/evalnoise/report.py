@@ -68,7 +68,7 @@ def component_cell(unit: dict[str, Any], name: str, digits: int = 1) -> str:
 
 
 def run_cell(v: float | None, interval: Sequence[float | None], digits: int = 1) -> str:
-    """Run SD with its chi-square interval; a degenerate interval is labelled, not [0, 0]."""
+    """Run SD with its MLS interval; a degenerate interval is labelled, not [0, 0]."""
     if v is None:
         return "n/i"
     lo, hi = interval
@@ -85,12 +85,13 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "",
         "Standard deviations (square roots of the variance components) in each dataset's",
         "unit, with 95% intervals: percentile bootstrap over clusters for item-level",
-        "components, a chi-square interval for the run component. `n/i`: not identified by",
+        "components, a Burdick-Graybill (MLS) interval for the run component, capped at",
+        "(range / 2)^2 for bounded scores. `n/i`: not identified by",
         "the layout; `(in X)`: folded into component X. `<0`: the moment estimate is",
         "negative (planning uses 0); `upper bound < 0`: so is the upper end of its bootstrap",
         "interval, a hint that the model may overstate the noise of cell means there (with few",
         "informative items the draws resample the same items). `[degenerate]`: no run variance",
-        "fits the chi-square interval (the runs agree more closely than the residual allows, or",
+        "fits the MLS interval (the runs agree more closely than the residual allows, or",
         "runs and residual are both exactly 0, which carries no information).",
         "",
         "## Datasets",
@@ -153,12 +154,18 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         if hom:
             p = "-" if hom["p"] is None else f"{hom['p']:.2g}"
             rows.append([f"`{u['id']}`", "Bartlett test, equal item x run", f"p = {p}"] + [""] * 4)
+        bf = by_arm.get("residual_homogeneity_bf")
+        if bf:
+            p = "-" if bf["p"] is None else f"{bf['p']:.2g}"
+            rows.append(
+                [f"`{u['id']}`", "Brown-Forsythe test, equal item x run", f"p = {p}"] + [""] * 4
+            )
     parts.append(
         table(
             [
                 "dataset",
                 "arm",
-                "run SD [chi-square]",
+                "run SD [MLS]",
                 "df",
                 "item x run SD",
                 "df",
@@ -171,8 +178,10 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
     parts += [
         "",
         "Arms with two or more runs, each fitted alone. The pooled run and item x run terms",
-        "assume these arms share one variance; the Bartlett test checks that for item x run.",
-        "It assumes normal residuals, so with heavy-tailed residuals its p-value is too small.",
+        "assume these arms share one variance; the Bartlett and Brown-Forsythe tests check that",
+        "for item x run. Bartlett's assumes normal residuals, so with heavy-tailed residuals its",
+        "p-value is too small; the Brown-Forsythe test (absolute deviations from the arm's",
+        "median residual, averaged per item, compared by one-way ANOVA) does not need that.",
         "",
     ]
     rows = []
@@ -278,7 +287,9 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "Satterthwaite df). Where identified, the run variance is borrowed from this",
         "dataset with its degrees of freedom, so the MDE is large when the dataset has few",
         "replicate runs. Where it is not identified the MDE assumes it is zero, which",
-        "understates the MDE if runs vary.",
+        "understates the MDE if runs vary. Pass/fail datasets: the larger of the smallest",
+        "detectable gain and loss, with the shifted arm's variance at its own pass rate where",
+        "that is larger.",
         "Naive false-positive rate: how often a paired test over items, which ignores run",
         "effects, declares a difference between single runs of two arms with equal mean",
         "scores (their item x arm effects still differ; identical arms give a higher rate).",
@@ -302,6 +313,9 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
     parts += [
         "",
         f"`never`: the run term alone exceeds the target at that number of runs. {FEW}: as above.",
+        "Where items are clustered the item-level variance is multiplied by the median design",
+        "effect over pairs (see the planning notes). Pass/fail datasets use the variance at the",
+        "shifted pass rate where it is larger (losses near 100%, gains near 0%).",
         "",
         "## Planning notes",
         "",

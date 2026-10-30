@@ -91,6 +91,12 @@ class RunTerm:
     rss: float = 0.0  # residual sum of squares of the item + run fit
     df_res: int = 0
     n_harmonic: float = NAN  # harmonic mean trials per cell in those arms
+    # Residuals of the item + run fit on cell means and their item codes (one arm only;
+    # ``pool`` leaves them empty).
+    residuals: np.ndarray = field(default_factory=lambda: np.empty(0), repr=False, compare=False)
+    residual_items: np.ndarray = field(
+        default_factory=lambda: np.empty(0, dtype=np.int64), repr=False, compare=False
+    )
 
     @classmethod
     def pool(cls, terms: Iterable[RunTerm]) -> RunTerm:
@@ -113,26 +119,41 @@ class RunTerm:
             return NAN
         return (self.ss - self.df * self.rss / self.df_res) / self.k
 
-    def interval(self, level: float = 0.95) -> tuple[float, float]:
-        """Interval for the run variance, treating the residual variance as known.
+    def interval(self, level: float = 0.95, max_var: float = math.inf) -> tuple[float, float]:
+        """Burdick-Graybill modified large-sample (MLS) interval for the run variance.
 
-        Uses ss / E[ms] ~ chi2(df) / df, which is exact for balanced normal data; the
-        residual variance has many more degrees of freedom than the run term here. When
-        even the upper end falls below zero (the runs agree more closely than the residual
-        allows), no run variance fits and the interval is degenerate: (nan, nan), not a
-        zero-width [0, 0].
+        The estimate is ``c (ms_run - ms_res)`` with ``c = df / k``; the MLS interval for a
+        difference of mean squares accounts for the uncertainty of both (it reduces to the
+        chi-square interval ``ss / E[ms] ~ chi2(df) / df`` when the residual df are large),
+        and is exact in the limit for balanced normal data. ``max_var`` caps both ends, e.g.
+        at ``(range / 2) ** 2`` for scores bounded to a range. When even the upper end falls
+        below zero (the runs agree more closely than the residual allows), no run variance
+        fits and the interval is degenerate: (nan, nan), not a zero-width [0, 0].
         """
         if not self.identified():
             return (NAN, NAN)
-        s2 = self.rss / self.df_res
-        alpha = 1.0 - level
-        hi_q = stats.chi2.ppf(1 - alpha / 2, self.df)
-        lo_q = stats.chi2.ppf(alpha / 2, self.df)
-        lo = (self.ss / hi_q - s2) * self.df / self.k
-        hi = (self.ss / lo_q - s2) * self.df / self.k
+        if not max_var > 0:
+            raise ValueError("max_var must be positive")
+        a = (1.0 - level) / 2
+        n1, n2 = self.df, self.df_res
+        m1, m2 = self.ss / n1, self.rss / n2
+        c = n1 / self.k
+        # F quantiles with infinite denominator df are chi2 / df; "u" leaves a to the right.
+        f1u, f1l = stats.chi2.ppf(1 - a, n1) / n1, stats.chi2.ppf(a, n1) / n1
+        f2u, f2l = stats.chi2.ppf(1 - a, n2) / n2, stats.chi2.ppf(a, n2) / n2
+        fu, fl = stats.f.ppf(1 - a, n1, n2), stats.f.ppf(a, n1, n2)
+        g1, h1 = 1 - 1 / f1u, 1 / f1l - 1
+        g2, h2 = 1 - 1 / f2u, 1 / f2l - 1
+        g12 = ((fu - 1) ** 2 - g1**2 * fu**2 - h2**2) / fu
+        h12 = ((1 - fl) ** 2 - h1**2 * fl**2 - g2**2) / fl
+        v_lo = g1**2 * m1**2 + h2**2 * m2**2 + g12 * m1 * m2
+        v_hi = h1**2 * m1**2 + g2**2 * m2**2 + h12 * m1 * m2
+        est = c * (m1 - m2)
+        lo = est - c * math.sqrt(max(v_lo, 0.0))
+        hi = est + c * math.sqrt(max(v_hi, 0.0))
         if hi <= 0:
             return (NAN, NAN)
-        return (max(lo, 0.0), hi)
+        return (min(max(lo, 0.0), max_var), min(hi, max_var))
 
 
 @dataclass
@@ -195,11 +216,11 @@ def _cells(a: np.ndarray, i: np.ndarray, r: np.ndarray, y: np.ndarray) -> tuple[
 
 def _run_fit(
     cell_item: np.ndarray, cell_run: np.ndarray, m: np.ndarray
-) -> tuple[float, int, float, float, int, dict[int, float]]:
+) -> tuple[float, int, float, float, int, dict[int, float], np.ndarray]:
     """Henderson III for one arm: item + run fixed-effects fit on cell means.
 
-    Returns (ss_run, df_run, k, rss_full, df_res, run_effects) where run effects are
-    centred to mean zero over runs.
+    Returns (ss_run, df_run, k, rss_full, df_res, run_effects, residuals) where run effects
+    are centred to mean zero over runs and residuals are those of the full fit, per cell.
     """
     items, i_idx = np.unique(cell_item, return_inverse=True)
     runs, r_idx = np.unique(cell_run, return_inverse=True)
@@ -228,7 +249,10 @@ def _run_fit(
     rss_full = max(rss_item - ss_run, 0.0)
     df_res = len(m) - len(items) - rank
     effects = {int(runs[j]): float(w[j] - w.mean()) for j in range(n_r)}
-    return ss_run, rank, k, rss_full, df_res, effects
+    # Full-fit residuals: item-centred cell means minus the item-centred run effects.
+    zw = w[r_idx]
+    resid = dev - (zw - (np.bincount(i_idx, weights=zw) / n_i)[i_idx])
+    return ss_run, rank, k, rss_full, df_res, effects, resid
 
 
 def estimate(
@@ -263,9 +287,9 @@ def _estimate_coded(
         sel = ca == arm
         if len(np.unique(cr[sel])) < 2:
             continue
-        ss, dfr, k, rss, dfe, eff = _run_fit(ci[sel], cr[sel], cm[sel])
+        ss, dfr, k, rss, dfe, eff, resid = _run_fit(ci[sel], cr[sel], cm[sel])
         n_h = 1.0 / float(np.mean(1.0 / cn[sel]))
-        run_terms[coded.arm_names[arm]] = RunTerm(ss, dfr, k, rss, dfe, n_h)
+        run_terms[coded.arm_names[arm]] = RunTerm(ss, dfr, k, rss, dfe, n_h, resid, ci[sel])
         run_effect.update(eff)
         inv_n.extend((1.0 / cn[sel]).tolist())
     rt = RunTerm.pool(run_terms.values())

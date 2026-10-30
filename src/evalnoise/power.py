@@ -12,6 +12,12 @@ the variance of the difference in arm means under the model in
 The run term does not shrink with more items or repeats: only more runs per arm reduce it.
 A component that the data could not separate is handled conservatively (see
 :func:`resolve`), so the reported MDE is never smaller than the model implies.
+
+Two optional adjustments (see :func:`resolve`): a design effect multiplies the item-level
+term (items that share a cluster carry less information than independent ones), and for
+pass/fail scores the shifted arm's half of the variance grows with ``p (1 - p)`` when its
+pass rate moves towards 50%, so a loss near a 100% pass rate (or a gain near 0%) needs a
+larger effect than the base-rate variance suggests; the MDE is the larger of gain and loss.
 """
 
 from __future__ import annotations
@@ -56,6 +62,11 @@ class Resolved:
     # Degrees of freedom of the run-variance estimate available besides the experiment's
     # own replicate runs (e.g. from a pilot); inf = known exactly, 0 = none.
     run_df: float = math.inf
+    # Multiplies the item-level variance term (clustered items); 1 = independent items.
+    design_effect: float = 1.0
+    # Pass/fail scores: base pass rate (0 to 1) and the score of a pass (e.g. 100 for pp).
+    pass_rate: float | None = None
+    pass_score: float = 1.0
 
 
 def resolve(
@@ -64,6 +75,9 @@ def resolve(
     run: float | None = None,
     paired: bool = True,
     run_df: float = math.inf,
+    design_effect: float = 1.0,
+    pass_rate: float | None = None,
+    pass_score: float = 1.0,
 ) -> Resolved:
     """Turn estimated components into planning inputs.
 
@@ -71,6 +85,15 @@ def resolve(
     ``run_df`` is the degrees of freedom of the run-variance estimate the analysis can
     borrow (a pilot's pooled runs minus one); the analysis pools it with the experiment's
     own ``2 (R - 1)``. The default treats the run variance as known exactly.
+    ``design_effect`` (at least 1) multiplies the item-level term, e.g. the squared ratio
+    of cluster-robust to item-level SEs; it is taken as constant across designs, and the
+    item-level df stay ``T - 1``. ``pass_rate`` (strictly between 0 and 1) marks pass/fail
+    scores worth ``pass_score`` per pass: the components are taken as estimated at that
+    rate, and the arm shifted by an effect has its half of the variance scaled by
+    ``max(1, p' (1 - p') / (p (1 - p)))`` at its own rate ``p'``. The scale is not allowed
+    below 1: a shift on the logit scale moves items by different amounts, which adds
+    variance that offsets the Bernoulli variance's fall (in trial runs of the ``binary-*``
+    validation checks, scaling it down made the plan optimistic at about 60% pass).
     Unidentified residual parts are set to zero only when they are already folded into a
     component that does not shrink with repeats or runs, which errs towards a larger MDE.
     """
@@ -123,25 +146,57 @@ def resolve(
         )
     if not run_df >= 0:
         raise ValueError("run_df must be non-negative (inf = run variance known)")
-    return Resolved(item, item_arm, run_v, item_run, within, tuple(notes), float(run_df))
+    if not (math.isfinite(design_effect) and design_effect >= 1):
+        raise ValueError("design_effect must be a finite number of at least 1")
+    if pass_rate is not None and not 0 < pass_rate < 1:
+        raise ValueError("pass_rate must be strictly between 0 and 1")
+    if not (math.isfinite(pass_score) and pass_score > 0):
+        raise ValueError("pass_score must be positive")
+    if design_effect > 1:
+        notes.append(f"item-level variance multiplied by a design effect of {design_effect:.3g}")
+    if pass_rate is not None:
+        notes.append(
+            f"pass/fail scores at a {pass_rate:.1%} pass rate: the shifted arm's variance is "
+            "taken at its own rate where that is larger, and the MDE is the larger of gain "
+            "and loss"
+        )
+    return Resolved(
+        item,
+        item_arm,
+        run_v,
+        item_run,
+        within,
+        tuple(notes),
+        float(run_df),
+        float(design_effect),
+        pass_rate,
+        float(pass_score),
+    )
 
 
-def variance_terms(r: Resolved, d: Design) -> tuple[float, float]:
-    """(item-level term, run term) of the variance of the estimated difference."""
+def variance_terms(r: Resolved, d: Design, effect: float = 0.0) -> tuple[float, float]:
+    """(item-level term, run term) of the variance of the estimated difference when one arm
+    is shifted by ``effect`` (which matters only for pass/fail scores)."""
     per_item = r.item_arm + r.item_run / d.runs + r.within / (d.runs * d.repeats)
     if not d.paired:
         per_item += r.item
-    return 2.0 * per_item / d.tasks, 2.0 * r.run / d.runs
+    v_items, v_run = 2.0 * per_item * r.design_effect / d.tasks, 2.0 * r.run / d.runs
+    if r.pass_rate is not None and effect != 0:
+        p = r.pass_rate
+        shifted = min(max(p + effect / r.pass_score, 0.0), 1.0)
+        f = (1.0 + max(shifted * (1.0 - shifted) / (p * (1.0 - p)), 1.0)) / 2.0
+        v_items, v_run = v_items * f, v_run * f
+    return v_items, v_run
 
 
-def se_difference(r: Resolved, d: Design) -> float:
-    v_items, v_run = variance_terms(r, d)
+def se_difference(r: Resolved, d: Design, effect: float = 0.0) -> float:
+    v_items, v_run = variance_terms(r, d, effect)
     return math.sqrt(v_items + v_run)
 
 
-def _df(r: Resolved, d: Design) -> float:
+def _df(r: Resolved, d: Design, effect: float = 0.0) -> float:
     """Satterthwaite degrees of freedom of the variance estimate the analysis would use."""
-    v_items, v_run = variance_terms(r, d)
+    v_items, v_run = variance_terms(r, d, effect)
     df_items = (d.tasks - 1) if d.paired else 2 * (d.tasks - 1)
     terms = [(v_items, df_items)]
     if v_run > 0:
@@ -164,11 +219,11 @@ def power_at(
     _check_level(alpha, "alpha")
     if method not in ("t", "z"):
         raise ValueError("method must be 't' or 'z'")
-    se = se_difference(r, d)
+    se = se_difference(r, d, effect)
     if se == 0:
         return 1.0 if effect != 0 else alpha
     ncp = abs(effect) / se
-    df = _df(r, d) if method == "t" else math.inf
+    df = _df(r, d, effect) if method == "t" else math.inf
     if math.isinf(df):
         zc = stats.norm.ppf(1 - alpha / 2)
         return float(stats.norm.sf(zc - ncp) + stats.norm.cdf(-zc - ncp))
@@ -198,25 +253,44 @@ def _t_power_quad(tc: float, df: float, ncp: float) -> float:
 
 
 def mde(
-    r: Resolved, d: Design, *, alpha: float = 0.05, power: float = 0.8, method: str = "t"
+    r: Resolved,
+    d: Design,
+    *,
+    alpha: float = 0.05,
+    power: float = 0.8,
+    method: str = "t",
+    direction: int = 0,
 ) -> float:
-    """Smallest absolute effect detected with probability ``power`` at level ``alpha``."""
+    """Smallest absolute effect detected with probability ``power`` at level ``alpha``.
+
+    For pass/fail scores (``r.pass_rate`` set) the gain (``direction=1``) and the loss
+    (``-1``) differ; the default (0) is the larger, so a two-sided plan holds either way.
+    """
+    if direction not in (-1, 0, 1):
+        raise ValueError("direction must be -1, 0 or 1")
     _check_level(alpha, "alpha")
     _check_level(power, "power")
     se = se_difference(r, d)
     z = stats.norm.ppf(1 - alpha / 2) + stats.norm.ppf(power)
     if se == 0:
         return 0.0
-    if method == "z":
-        return float(z * se)
-    if method != "t":
+    if method not in ("t", "z"):
         raise ValueError("method must be 't' or 'z'")
-    hi = z * se
-    while power_at(r, d, hi, alpha=alpha) < power:
-        hi *= 2.0
-    return float(
-        optimize.brentq(lambda e: power_at(r, d, e, alpha=alpha) - power, 0.0, hi, xtol=1e-12)
-    )
+    if method == "z" and r.pass_rate is None:
+        return float(z * se)
+
+    def solve(sign: float) -> float:
+        def gap(e: float) -> float:
+            return power_at(r, d, sign * e, alpha=alpha, method=method) - power
+
+        hi = z * se
+        while gap(hi) < 0:
+            hi *= 2.0
+        return float(optimize.brentq(gap, 0.0, hi, xtol=1e-12))
+
+    if r.pass_rate is None:
+        return solve(1.0)
+    return solve(float(direction)) if direction else max(solve(1.0), solve(-1.0))
 
 
 def tasks_needed(

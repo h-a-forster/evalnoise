@@ -197,10 +197,28 @@ def test_run_interval_is_degenerate_not_zero_width():
     t = RunTerm(ss=1e-6, df=1, k=10.0, rss=100.0, df_res=10)
     lo, hi = t.interval()
     assert math.isnan(lo) and math.isnan(hi)
-    lo, hi = RunTerm(ss=500.0, df=1, k=10.0, rss=100.0, df_res=10).interval()
+    # With a residual known exactly (huge df) the interval is the chi-square one:
     # ss / E[ms] ~ chi2(1), E[ms] = s2 + run k / df, s2 = rss / df_res = 10.
-    assert lo == pytest.approx((500.0 / stats.chi2.ppf(0.975, 1) - 10.0) / 10.0)
-    assert hi == pytest.approx((500.0 / stats.chi2.ppf(0.025, 1) - 10.0) / 10.0)
+    lo, hi = RunTerm(ss=500.0, df=1, k=10.0, rss=10.0 * 10**9, df_res=10**9).interval()
+    assert lo == pytest.approx((500.0 / stats.chi2.ppf(0.975, 1) - 10.0) / 10.0, rel=1e-4)
+    assert hi == pytest.approx((500.0 / stats.chi2.ppf(0.025, 1) - 10.0) / 10.0, rel=1e-4)
+    # A bounded score range caps both ends.
+    assert RunTerm(ss=500.0, df=1, k=10.0, rss=100.0, df_res=10).interval(max_var=25.0)[1] == 25.0
+
+
+def test_run_interval_covers_with_an_uncertain_residual():
+    # Few residual df and a residual far larger than the run term: treating the residual
+    # as known (the chi-square interval) covers about 0.82 here; the MLS interval ~0.95.
+    rng = np.random.default_rng(0)
+    run, s2, df, k, df_res, sims = 1.0, 20.0, 4, 8.0, 4, 2000
+    hits = 0
+    for _ in range(sims):
+        ss = (s2 + run * k / df) * rng.chisquare(df)
+        lo, hi = RunTerm(
+            ss=ss, df=df, k=k, rss=s2 * rng.chisquare(df_res), df_res=df_res
+        ).interval()
+        hits += int(lo <= run <= hi) if math.isfinite(lo) else 0
+    assert abs(hits / sims - 0.95) < 3 * math.sqrt(0.95 * 0.05 / sims)
 
 
 def test_estimates_do_not_depend_on_the_score_offset():

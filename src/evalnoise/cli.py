@@ -196,7 +196,7 @@ def cmd_components(args: argparse.Namespace) -> int:
             continue
         if name == "run":
             lo, hi = est.run_term.interval()
-            ci, how = fmt_ci(sd(lo), sd(hi), 3), f"chi-square, {est.run_term.df} df"
+            ci, how = fmt_ci(sd(lo), sd(hi), 3), f"MLS, {est.run_term.df} df"
         elif boot:
             lo, hi = boot.components[name]
             ci, how = fmt_ci(sd(lo), sd(hi), 3), f"bootstrap, {boot.draws} draws"
@@ -259,7 +259,15 @@ def cmd_power(args: argparse.Namespace) -> int:
         if args.run_df is None and args.run_var is None and math.isfinite(comps.run):
             # The run variance comes from these replicate runs: use its degrees of freedom.
             run_df = float(est.run_term.df)
-    r = resolve(comps, run=args.run_var, paired=paired, run_df=run_df)
+    r = resolve(
+        comps,
+        run=args.run_var,
+        paired=paired,
+        run_df=run_df,
+        design_effect=args.design_effect,
+        pass_rate=args.pass_rate,
+        pass_score=args.pass_score,
+    )
     rows = plan(
         r,
         args.tasks,
@@ -431,6 +439,21 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         help="degrees of freedom of the run-variance estimate (default: from the data's "
         "replicate runs; inf when the variance is given)",
+    )
+    w.add_argument(
+        "--design-effect",
+        type=float,
+        default=1.0,
+        help="multiply the item-level variance (clustered items; at least 1)",
+    )
+    w.add_argument(
+        "--pass-rate",
+        type=float,
+        help="pass/fail scores: base pass rate (0-1); the shifted arm's variance is taken at "
+        "its own rate where larger, and the MDE is the larger of gain and loss",
+    )
+    w.add_argument(
+        "--pass-score", type=float, default=1.0, help="score of a pass (e.g. 100 for pp)"
     )
     w.add_argument("--method", choices=["t", "z"], default="t")
     w.add_argument("--task-cost", type=float, help="cost of a new task in trials: optimal repeats")

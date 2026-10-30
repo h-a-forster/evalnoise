@@ -42,7 +42,7 @@ from evalnoise.sources import sha256
 
 COMPONENTS = ("item", "item_arm", "run", "item_run", "within")
 # Bump when the unit format or any computation in analyse() changes, so cached units rerun.
-SCHEMA = 7
+SCHEMA = 8
 # Pairs whose arms differ on fewer items than this get a reliability note.
 MIN_ITEMS_DIFFERING = 10
 
@@ -67,6 +67,14 @@ def load_study(path: Path) -> tuple[Path, dict[str, Any]]:
             v = d[key]
             if not isinstance(v, str) or not v or not all(ch.isalnum() or ch in "-_" for ch in v):
                 raise DataError(f"{path}: dataset {key} {v!r} must be alphanumeric, - or _")
+        b = d.get("bounds")
+        if b is not None and not (
+            isinstance(b, list)
+            and len(b) == 2
+            and all(isinstance(x, (int, float)) for x in b)
+            and b[0] < b[1]
+        ):
+            raise DataError(f"{path}: dataset {d['id']!r} bounds must be [low, high], low < high")
     return path.resolve().parent.parent, cfg
 
 
@@ -156,7 +164,19 @@ def analyse(
         rm = {"error": str(exc)}
     comps = est.components
     clipped = comps.clipped()
-    run_ci = est.run_term.interval()
+    # Scores bounded to [low, high] (after scaling) cannot vary by more than (range / 2)^2.
+    max_var = math.inf
+    # Pass/fail scores (every score at a bound): MDEs use the variance at the shifted rate.
+    rate_kw: dict[str, float] = {}
+    if "bounds" in d:
+        low, high = d["bounds"]
+        if df["score"].min() < low or df["score"].max() > high:
+            raise DataError(f"dataset {d['id']}: scores fall outside bounds {d['bounds']}")
+        max_var = ((high - low) / 2) ** 2
+        rate = (float(df["score"].mean()) - low) / (high - low)
+        if df["score"].isin([low, high]).all() and 0 < rate < 1:
+            rate_kw = {"pass_rate": rate, "pass_score": float(high - low)}
+    run_ci = est.run_term.interval(max_var=max_var)
 
     alpha = float(d.get("alpha", defaults.get("alpha", 0.05)))
     target_power = float(d.get("power", defaults.get("power", 0.8)))
@@ -167,7 +187,7 @@ def analyse(
     run_identified = math.isfinite(comps.run)
     # The analysis borrows the run variance estimated here, with its degrees of freedom.
     run_df = float(est.run_term.df) if run_identified else math.inf
-    by_arm = _run_by_arm(est)
+    by_arm = _run_by_arm(est, max_var)
     pair_est = _pairs_with_run_term(est.pairs, pairs, df, comps, run_df)
     if "family" in df.columns:
         by_arm["shifts"] = _run_shifts(df)
@@ -189,9 +209,13 @@ def analyse(
     paired_ok = len(arms) >= 2
     if paired_ok:
         planning["run_df"] = run_df
-        res_est = resolve(comps, run=None if run_identified else 0.0, run_df=run_df)
+        res_est = resolve(comps, run=None if run_identified else 0.0, run_df=run_df, **rate_kw)
         planning["run_assumption"] = "estimated" if run_identified else "zero (not identified)"
         planning["notes"] = list(res_est.notes) + _data_notes(by_arm, pair_est, planning)
+        # Task counts count a cluster's items as worth 1 / design effect independent ones.
+        deff = max(planning.get("design_effect", 1.0), 1.0)
+        res_tasks = dataclasses.replace(res_est, design_effect=deff)
+        planning["targets_design_effect"] = deff
         # Reference design: the observed tasks and repeats with one run per arm, which is
         # how the source studies compared arms. Its SE includes the run variance estimated
         # here, as an analyst who knows it from this study would.
@@ -201,7 +225,7 @@ def analyse(
         planning["reference_design"] = {"tasks": ref.tasks, "runs": 1, "repeats": ref.repeats}
         planning["reference_mde"] = mde(res_est, ref, alpha=alpha, power=target_power)
         planning["reference_mde_bootstrap_ci"] = _mde_boot_ci(
-            boot.samples, comps, ref, alpha, target_power, run_identified, run_df
+            boot.samples, comps, ref, alpha, target_power, run_identified, run_df, rate_kw
         )
         v_items, v_run = variance_terms(res_est, ref)
         planning["reference_se"] = math.sqrt(v_items + v_run)
@@ -212,7 +236,12 @@ def analyse(
             )
             # A degenerate run interval (nan ends) leaves these ends undefined.
             planning["reference_mde_run_ci"] = [
-                mde(resolve(comps, run=v, run_df=run_df), ref, alpha=alpha, power=target_power)
+                mde(
+                    resolve(comps, run=v, run_df=run_df, **rate_kw),
+                    ref,
+                    alpha=alpha,
+                    power=target_power,
+                )
                 if math.isfinite(v)
                 else math.nan
                 for v in run_ci
@@ -233,7 +262,7 @@ def analyse(
                     "runs": r,
                     "repeats": k,
                     "tasks": tasks_needed(
-                        res_est, float(tg), runs=r, repeats=k, alpha=alpha, power=target_power
+                        res_tasks, float(tg), runs=r, repeats=k, alpha=alpha, power=target_power
                     ),
                 }
                 for r, k in itertools.product(grid_runs, grid_reps)
@@ -241,7 +270,13 @@ def analyse(
             for tg in targets
         }
         planning["reference_mde_unpaired"] = mde(
-            resolve(comps, run=None if run_identified else 0.0, paired=False, run_df=run_df),
+            resolve(
+                comps,
+                run=None if run_identified else 0.0,
+                paired=False,
+                run_df=run_df,
+                **rate_kw,
+            ),
             Design(ref.tasks, 1, ref.repeats, False),
             alpha=alpha,
             power=target_power,
@@ -330,9 +365,10 @@ def _t_p(diff: float, terms: list[tuple[float, float]]) -> float:
     return float(2 * stats.t.sf(abs(diff) / se, _satterthwaite(terms)))
 
 
-def _run_by_arm(est: Estimate) -> dict[str, Any]:
+def _run_by_arm(est: Estimate, max_var: float = math.inf) -> dict[str, Any]:
     """Run and item x run estimates per replicated arm, leave-one-arm-out run estimates,
-    and Bartlett's test that the arms share one item x run (residual) variance."""
+    and Bartlett's and a Brown-Forsythe test that the arms share one item x run (residual)
+    variance."""
     terms = est.run_terms
     if not terms:
         return {}
@@ -342,7 +378,7 @@ def _run_by_arm(est: Estimate) -> dict[str, Any]:
         s2 = t.rss / t.df_res if t.df_res >= 1 else math.nan
         arms[arm] = {
             "run": t.variance(),
-            "run_interval": list(t.interval()),
+            "run_interval": list(t.interval(max_var=max_var)),
             "run_df": t.df,
             "item_run": s2 - within / t.n_harmonic if math.isfinite(within) else s2,
             "residual_df": t.df_res,
@@ -354,13 +390,14 @@ def _run_by_arm(est: Estimate) -> dict[str, Any]:
             rest = RunTerm.pool(t for a, t in terms.items() if a != arm)
             loo[arm] = {
                 "run": rest.variance(),
-                "run_interval": list(rest.interval()),
+                "run_interval": list(rest.interval(max_var=max_var)),
                 "run_df": rest.df,
             }
         out["leave_one_out"] = loo
         out["residual_homogeneity"] = _bartlett(
             [(t.rss / t.df_res, t.df_res) for t in terms.values() if t.df_res >= 1]
         )
+        out["residual_homogeneity_bf"] = _brown_forsythe(list(terms.values()))
     return out
 
 
@@ -406,18 +443,47 @@ def _bartlett(groups: list[tuple[float, int]]) -> dict[str, float]:
     return {"statistic": stat, "df": k - 1, "p": float(stats.chi2.sf(stat, k - 1))}
 
 
+def _brown_forsythe(terms: list[RunTerm]) -> dict[str, Any]:
+    """Brown-Forsythe test of equal residual variances across arms, with items as units.
+
+    Each arm's residuals are scaled by ``sqrt(cells / df_res)`` (a residual's variance is
+    about the residual variance times ``df_res / cells``) and centred at the arm's median;
+    each item's mean absolute deviation is one observation, and a one-way ANOVA compares
+    the arms. Items, not cells, are the units because an item's residuals within an arm
+    are dependent (with two runs they are equal and opposite), which makes a cell-level
+    test far too liberal. Items in only one run of an arm have zero residuals there and
+    are left out.
+    """
+    groups = []
+    for t in terms:
+        if t.df_res < 1 or len(t.residuals) == 0:
+            continue
+        e = t.residuals * math.sqrt(len(t.residuals) / t.df_res)
+        _, idx, n_cells = np.unique(t.residual_items, return_inverse=True, return_counts=True)
+        z = np.bincount(idx, weights=np.abs(e - np.median(e))) / n_cells
+        z = z[n_cells >= 2]
+        if len(z) >= 2:
+            groups.append(z)
+    k = len(groups)
+    n = sum(len(g) for g in groups)
+    if k < 2 or all(np.ptp(g) == 0 for g in groups):
+        return {"statistic": math.nan, "df": [k - 1, n - k], "p": math.nan}
+    res = stats.f_oneway(*groups)
+    return {"statistic": float(res.statistic), "df": [k - 1, n - k], "p": float(res.pvalue)}
+
+
 def _data_notes(
     by_arm: dict[str, Any], pair_est: dict[str, dict[str, float]], planning: dict[str, Any]
 ) -> list[str]:
     """Warnings about assumptions the data contradict."""
     notes = []
-    hom = by_arm.get("residual_homogeneity")
+    hom = by_arm.get("residual_homogeneity_bf")
     if hom and hom["p"] < 0.05:
         sds = ", ".join(
             f"{a} {math.sqrt(max(x['item_run'], 0)):.3g}" for a, x in by_arm["arms"].items()
         )
         notes.append(
-            f"the replicated arms do not share one item x run variance (Bartlett p = "
+            f"the replicated arms do not share one item x run variance (Brown-Forsythe p = "
             f"{hom['p']:.2g}; SD by arm: {sds}): pooled components describe an average arm"
         )
     ratios = [
@@ -431,8 +497,8 @@ def _data_notes(
         if deff > 1.05:
             notes.append(
                 f"items are clustered (median design effect {deff:.2f} over pairs): the "
-                f"planner treats items as independent, so its task counts are about "
-                f"{deff:.2f}x too small"
+                "tasks-needed counts multiply the item-level variance by it; the grid and "
+                "reference-design MDEs treat items as independent"
             )
     fam = [
         (p["se_families"] / p["se_items"]) ** 2
@@ -507,6 +573,7 @@ def _mde_boot_ci(
     power: float,
     run_identified: bool,
     run_df: float,
+    rate_kw: dict[str, float],
 ) -> list[float]:
     """Percentile interval of the MDE over bootstrap draws (run variance held at its estimate)."""
     vals = []
@@ -520,7 +587,7 @@ def _mde_boot_ci(
             within=float(samples["within"][j]) if len(samples["within"]) else math.nan,
             absorbed=comps.absorbed,
         )
-        r = resolve(c, run=None if run_identified else 0.0, run_df=run_df)
+        r = resolve(c, run=None if run_identified else 0.0, run_df=run_df, **rate_kw)
         vals.append(mde(r, d, alpha=alpha, power=power))
     lo, hi = np.quantile(np.asarray(vals), [0.025, 0.975])
     return [float(lo), float(hi)]

@@ -15,11 +15,15 @@ the shards are then pooled into ``<out>/units/<check>.json``. Checks:
   including near the ceiling with the effect in either direction.
 - ``borrowed-*``: one run per arm, with the run variance borrowed from a small pilot (its
   own few run df), analysed by the Satterthwaite t-test the study's MDEs assume.
-- ``coverage-*``: coverage of the bootstrap and chi-square intervals for the components.
+- ``coverage-*``: coverage of the bootstrap and run-variance (MLS) intervals.
+- ``pairs-*``: an mm-arena-like layout (setups with 2 to 4 runs, one partial replicate
+  run, item x run variances differing sixfold, items in clusters of two): size of the
+  study's run-aware pair test and coverage of the pooled run-variance interval.
 """
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 import math
@@ -33,6 +37,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 from scipy import stats
 
 from evalnoise import __version__
@@ -54,7 +59,7 @@ PROFILES: dict[str, dict[str, int]] = {
     },
 }  # fmt: skip
 # Bump when a check's computation changes, so cached shards rerun.
-SCHEMA = 4
+SCHEMA = 5
 
 
 @dataclass(frozen=True)
@@ -117,6 +122,15 @@ CHECKS = [
     ),
     Check("coverage-t40-a2-k3", "coverage", BASE, Design(40, 1, 3)),
     Check("coverage-t60-a3-r3", "coverage", RUNNY, Design(60, 3, 1), {"arms": 3}),
+    # Four setups as in mm-arena-replicated: runs 2, 2, 2, 4 (arm0's second run covers half
+    # the items), item x run variance per setup; no item effect (it cancels in pairs).
+    Check(
+        "pairs-t120-mm",
+        "pairs",
+        dataclasses.replace(RUNNY, item=0.0),
+        Design(120, 2, 1),
+        {"runs": [2, 2, 2, 4], "item_run": [50.0, 100.0, 150.0, 300.0], "partial": 0.5},
+    ),
 ]
 
 
@@ -288,10 +302,12 @@ def _prep_binary(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
         chk.comps, tasks=3000, repeats=max(d.repeats, 2), mean=mean, binary=True, seed=rng
     )
     est = estimate(pilot).components
-    target = mde(resolve(est, run=0.0), d)
-    # Logit shift whose average effect on the pass probability equals the target, in the
+    # Planned at the pilot's pass rate, with the variance at the shifted rate, for the
     # check's direction (+1: arm 1 passes more often, -1: less often).
-    sign = float(chk.params.get("direction", 1))
+    sign = int(chk.params.get("direction", 1))
+    r = resolve(est, run=0.0, pass_rate=float(pilot["score"].mean()))
+    target = mde(r, d, direction=sign)
+    # Logit shift whose average effect on the pass probability equals the target.
     eta = mean + rng.normal(0, math.sqrt(chk.comps.item + chk.comps.item_arm), 200_000)
     base = float(np.mean(1 / (1 + np.exp(-eta))))
 
@@ -301,11 +317,14 @@ def _prep_binary(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
     lo, hi = 0.0, 1.0
     while gap(hi) < 0:
         hi *= 2
+        if hi > 64:
+            raise ValueError(f"{chk.name}: no logit shift moves the pass rate by {target:.3g}")
     for _ in range(60):
         mid = (lo + hi) / 2
         lo, hi = (mid, hi) if gap(mid) < 0 else (lo, mid)
     return {
         "mde": target,
+        "mde_base_rate": mde(resolve(est, run=0.0), d),
         "logit_shift": sign * (lo + hi) / 2,
         "base_pass": base,
         "pilot": est.to_dict(),
@@ -375,7 +394,7 @@ def _coverage_names(chk: Check) -> list[str]:
 def _prep_coverage(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
     nominal = {n: 0.95 for n in _coverage_names(chk)}
     if chk.design.runs > 1:
-        nominal["run (chi-square)"] = 0.95
+        nominal["run (MLS)"] = 0.95
     return {"nominal": nominal}
 
 
@@ -391,7 +410,43 @@ def _count_coverage(chk, ctx, sims, rng, prof) -> dict[str, int]:  # type: ignor
             hits[n] += int(lo <= getattr(chk.comps, n) <= hi)
         if d.runs > 1:
             lo, hi = estimate(df).run_term.interval()
-            hits["run (chi-square)"] += int(lo <= chk.comps.run <= hi)
+            hits["run (MLS)"] += int(lo <= chk.comps.run <= hi)
+    return hits
+
+
+# --------------------------------------------------------------------------- pairs
+
+
+def _prep_pairs(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
+    return {"nominal": {"null (run-aware pair test)": 0.05, "run (MLS)": 0.95}}
+
+
+def _count_pairs(chk, ctx, sims, rng, prof) -> dict[str, int]:  # type: ignore[no-untyped-def]
+    """Simulate the layout, then the study's pair test of arm0 (partial run) vs arm3."""
+    from evalnoise.study import _pairs_with_run_term
+
+    hits = {q: 0 for q in ctx["nominal"]}
+    pair = [("arm0", "arm3")]
+    for _ in range(sims):
+        parts = []
+        for a, (runs, v) in enumerate(zip(chk.params["runs"], chk.params["item_run"], strict=True)):
+            c = dataclasses.replace(chk.comps, item_run=v)
+            parts.append(
+                simulate(c, tasks=chk.design.tasks, arms=1, runs=runs, seed=rng).assign(
+                    arm=f"arm{a}"
+                )
+            )
+        df = pd.concat(parts, ignore_index=True)
+        n_keep = int(chk.design.tasks * chk.params["partial"])
+        partial = (df["arm"] == "arm0") & (df["run"] == "r1")
+        df = df[~partial | (df["item"].str[1:].astype(int) < n_keep)]
+        df = df.assign(cluster="g" + (df["item"].str[1:].astype(int) // 2).astype(str))
+        est = estimate(df, pairs=pair)
+        run_df = float(est.run_term.df)
+        p = _pairs_with_run_term(est.pairs, pair, df, est.components, run_df)["arm0 - arm3"]
+        hits["null (run-aware pair test)"] += int(p["p_with_run"] < 0.05)
+        lo, hi = est.run_term.interval()
+        hits["run (MLS)"] += int(lo <= chk.comps.run <= hi)
     return hits
 
 
@@ -402,6 +457,7 @@ RUNNERS: dict[str, tuple[Prepare, Count, str]] = {
     "binary": (_prep_binary, _count_binary, "binary_sims"),
     "borrowed": (_prep_borrowed, _count_borrowed, "run_sims"),
     "coverage": (_prep_coverage, _count_coverage, "coverage_sims"),
+    "pairs": (_prep_pairs, _count_pairs, "run_sims"),
 }
 
 
