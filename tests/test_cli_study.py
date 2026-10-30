@@ -68,6 +68,8 @@ def test_power_cli_requires_run_variance_for_single_run_data(tmp_path, capsys):
     [
         ["power"],
         ["power", "--components", "item=-1"],
+        # Regression: omitted item_run / within were silently taken as 0.
+        ["power", "--components", "item_arm=70,run=17", "--tasks", "120"],
         ["components", "missing.csv"],
     ],
 )
@@ -99,6 +101,11 @@ def test_study_resumes_and_invalidates_on_schema_change(tmp_path, table, monkeyp
     first = study.run_study(cfg, out)
     assert first[0]["planning"]["run_assumption"] == "estimated"
     assert (out / "units" / "sim.json").is_file()
+    # Regression: result files store nan as null, which from_dict could not read back.
+    unit = json.loads((out / "units" / "sim.json").read_text(encoding="utf-8"))
+    unit["components"]["within"] = None
+    back = Components.from_dict(unit["components"])
+    assert back.item == unit["components"]["item"] and back.within != back.within
     study.run_study(cfg, out)
     log = (out / "progress.log").read_text(encoding="utf-8")
     assert "up to date, skipped" in log

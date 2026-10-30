@@ -59,7 +59,10 @@ class Components:
             raise ValueError(f"unknown component(s): {', '.join(sorted(extra))}")
         values: dict[str, Any] = {}
         for k, v in data.items():
-            values[k] = dict(v) if k == "absorbed" else float(v)  # type: ignore[call-overload,arg-type]
+            if k == "absorbed":
+                values[k] = dict(v)  # type: ignore[call-overload]
+            else:  # None: not identified (how result files store nan)
+                values[k] = NAN if v is None else float(v)  # type: ignore[arg-type]
         return cls(**values)
 
     def clipped(self) -> Components:

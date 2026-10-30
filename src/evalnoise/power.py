@@ -98,6 +98,12 @@ def resolve(
     if not paired and not math.isfinite(c.item):
         raise ValueError("unpaired planning needs the item variance")
     item = c.item if math.isfinite(c.item) else 0.0
+    for name in ("item_run", "within"):
+        if not math.isfinite(getattr(c, name)) and name not in c.absorbed:
+            raise ValueError(
+                f"{name} is missing and not folded into another component; give it "
+                "(0 if it is known to be absent)"
+            )
     item_run = c.item_run if math.isfinite(c.item_run) else 0.0
     within = c.within if math.isfinite(c.within) else 0.0
     if c.absorbed.get("within") == "item_run":
