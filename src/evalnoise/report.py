@@ -6,6 +6,8 @@ import math
 from collections.abc import Sequence
 from typing import Any
 
+from evalnoise.study import MIN_ITEMS_DIFFERING
+
 LABELS = {
     "item": "item",
     "item_arm": "item x arm",
@@ -87,8 +89,9 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "the layout; `(in X)`: folded into component X. `<0`: the moment estimate is",
         "negative (planning uses 0); `upper bound < 0`: so is the upper end of its bootstrap",
         "interval, a hint that the model may overstate the noise of cell means there (with few",
-        "informative items the draws resample the same items). `[degenerate]`: the runs agree",
-        "more closely than the residual allows, so no run variance fits the chi-square interval.",
+        "informative items the draws resample the same items). `[degenerate]`: no run variance",
+        "fits the chi-square interval (the runs agree more closely than the residual allows, or",
+        "runs and residual are both exactly 0, which carries no information).",
         "",
         "## Datasets",
         "",
@@ -243,7 +246,7 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         fpr_ci = p.get("naive_fpr_run_ci", [None, None])
         rows.append(
             [
-                f"`{u['id']}`",
+                _few(u),
                 f"{o['tasks']} x {o['repeats']}",
                 fmt(p["reference_se_items_only"], dg),
                 fmt(p["reference_se"], dg) if est else "-",
@@ -279,6 +282,8 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "Naive false-positive rate: how often a paired test over items, which ignores run",
         "effects, declares a difference between single runs of two arms with equal mean",
         "scores (their item x arm effects still differ; identical arms give a higher rate).",
+        f"{FEW}: a pair of arms differs on fewer than {MIN_ITEMS_DIFFERING} items, so these",
+        "numbers rest on those few items (see the planning notes).",
         "",
         "## Tasks per arm needed for a target MDE",
         "",
@@ -291,11 +296,11 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
             for e in entries:
                 t = e["tasks"]
                 cells.append(f"R{e['runs']} K{e['repeats']}: {t if t is not None else 'never'}")
-            rows.append([f"`{u['id']}`", f"{tg} {u['unit']}", "; ".join(cells)])
+            rows.append([_few(u), f"{tg} {u['unit']}", "; ".join(cells)])
     parts.append(table(["dataset", "target", "tasks needed (R runs, K repeats)"], rows, "lll"))
     parts += [
         "",
-        "`never`: the run term alone exceeds the target at that number of runs.",
+        f"`never`: the run term alone exceeds the target at that number of runs. {FEW}: as above.",
         "",
         "## Planning notes",
         "",
@@ -364,6 +369,15 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "",
     ]
     return "\n".join(parts)
+
+
+FEW = "(few)"
+
+
+def _few(u: dict[str, Any]) -> str:
+    """Dataset cell, marked when some pair differs on too few items to trust its numbers."""
+    few = (u.get("planning") or {}).get("few_items_differing")
+    return f"`{u['id']}` {FEW}" if few else f"`{u['id']}`"
 
 
 def _p(x: float | None) -> str:

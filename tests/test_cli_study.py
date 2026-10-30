@@ -9,6 +9,7 @@ from evalnoise import study
 from evalnoise.cli import main
 from evalnoise.components import Components
 from evalnoise.data import DataError
+from evalnoise.report import study_markdown
 from evalnoise.simulate import simulate
 
 
@@ -255,6 +256,8 @@ def test_analyse_flags_pairs_that_differ_on_few_items():
     res = study.analyse(df, DATASET, PROFILE, {})
     assert res["pair_estimates"]["a - b"]["items_differing"] == 3
     assert res["planning"]["few_items_differing"] == {"a - b": 3}
+    planning = study_markdown([res], "quick").split("## Planning: paired", 1)[1]
+    assert "`x` (few)" in planning.split("## Planning notes")[0]
 
 
 def test_binary_check_direction(tmp_path, monkeypatch):
