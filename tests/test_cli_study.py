@@ -3,6 +3,7 @@ import json
 import numpy as np
 import pandas as pd
 import pytest
+from scipy import stats
 
 from evalnoise import study
 from evalnoise.cli import main
@@ -31,8 +32,21 @@ def test_components_cli_json(table, capsys):
 
 def test_components_cli_text_with_reml(table, capsys):
     assert main(["components", str(table), "--bootstrap", "20", "--reml"]) == 0
-    out = capsys.readouterr().out
-    assert "item x arm" in out and "REML" in out and "chi-square" in out
+    capsys.readouterr()
+    assert main(["components", str(table), "--bootstrap", "20", "--reml", "--json"]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert set(out["reml"]) >= {"item", "item_arm", "run", "item_run", "within"}
+    lo, hi = out["run_interval"]
+    assert out["bootstrap"]["draws"] == 20 and lo <= hi
+
+
+def test_power_cli_borrows_the_run_df_of_replicate_runs(table, capsys):
+    from evalnoise.components import estimate
+    from evalnoise.data import load_trials
+
+    assert main(["power", str(table), "--json"]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["run_df"] == estimate(load_trials(table)).run_term.df > 0
 
 
 def test_power_cli_from_components(capsys):
@@ -200,6 +214,11 @@ def test_analyse_reports_per_arm_run_terms_and_unequal_residuals():
     b = simulate(Components(4.0, 1.0, 0.5, 3.0, 0.0), tasks=60, arms=1, runs=3, seed=2)
     df = pd.concat([a, b.assign(arm="arm1")], ignore_index=True)
     res = study.analyse(df, DATASET, PROFILE, {})
+    pl = res["planning"]
+    lo, hi = pl["reference_mde_bootstrap_ci"]
+    assert lo < pl["reference_mde"] < hi
+    se_i, run = pl["reference_se_items_only"], res["components"]["run"]
+    assert pl["reference_se"] ** 2 == pytest.approx(se_i**2 + 2 * run)  # one run per arm
     by_arm = res["run_by_arm"]
     assert by_arm["residual_homogeneity"]["p"] < 0.001
     assert any("do not share one item x run variance" in n for n in res["planning"]["notes"])
@@ -211,6 +230,15 @@ def test_analyse_reports_per_arm_run_terms_and_unequal_residuals():
     # Sensitivity: the same test with the run variance of each arm left out in turn.
     assert set(p["p_with_run_without"]) == {"arm0", "arm1"}
     assert all(0 < x <= 1 for x in p["p_with_run_without"].values())
+
+
+def test_bartlett_matches_scipy():
+    rng = np.random.default_rng(0)
+    groups = [rng.normal(0, s, n) for s, n in ((1.0, 12), (2.0, 30), (1.5, 8))]
+    got = study._bartlett([(float(np.var(g, ddof=1)), len(g) - 1) for g in groups])
+    ref = stats.bartlett(*groups)
+    assert got["statistic"] == pytest.approx(ref.statistic)
+    assert got["p"] == pytest.approx(ref.pvalue)
 
 
 def test_analyse_flags_pairs_that_differ_on_few_items():
@@ -299,3 +327,15 @@ def test_family_clustered_pairs_and_run_shifts_by_family(tmp_path):
     bad.to_csv(p, index=False)
     with pytest.raises(study.DataError, match="more than one family"):
         study._with_families(study.load_trials(p), p, "family")
+
+
+def test_component_cell_marks_negative_estimates():
+    from evalnoise.report import component_cell
+
+    def unit(v, lo, hi):
+        comps = {"item_arm": v, "absorbed": {}}
+        return {"components": comps, "bootstrap": {"components": {"item_arm": [lo, hi]}}}
+
+    assert component_cell(unit(-4.0, -9.0, -1.0), "item_arm") == "<0 [upper bound < 0]"
+    assert component_cell(unit(-4.0, -9.0, 4.0), "item_arm").startswith("<0 [")
+    assert component_cell(unit(4.0, 1.0, 9.0), "item_arm") == "2.0 [1.0, 3.0]"

@@ -11,6 +11,9 @@ def test_quick_validation_checks_pass(tmp_path):
         for name, v in r["rates"].items():
             if r["name"].startswith("binary-p90") and name == "at_mde":
                 # Documented: near the ceiling, power is above target for gains, below for losses.
+                lo, hi = v["mc95"]
+                ok = lo > v["nominal"] if r["name"].endswith("-up") else hi < v["nominal"]
+                assert ok, (r["name"], v)
                 continue
             lo, hi = v["mc95"]
             # Known, documented gaps: percentile-bootstrap undercoverage with few items,

@@ -3,6 +3,7 @@ import math
 import numpy as np
 import pandas as pd
 import pytest
+from scipy import stats
 
 from evalnoise.components import Components, RunTerm, bootstrap, estimate
 from evalnoise.reml import reml
@@ -197,7 +198,9 @@ def test_run_interval_is_degenerate_not_zero_width():
     lo, hi = t.interval()
     assert math.isnan(lo) and math.isnan(hi)
     lo, hi = RunTerm(ss=500.0, df=1, k=10.0, rss=100.0, df_res=10).interval()
-    assert 0 < lo < hi
+    # ss / E[ms] ~ chi2(1), E[ms] = s2 + run k / df, s2 = rss / df_res = 10.
+    assert lo == pytest.approx((500.0 / stats.chi2.ppf(0.975, 1) - 10.0) / 10.0)
+    assert hi == pytest.approx((500.0 / stats.chi2.ppf(0.025, 1) - 10.0) / 10.0)
 
 
 def test_estimates_do_not_depend_on_the_score_offset():
