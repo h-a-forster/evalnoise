@@ -1,7 +1,7 @@
 {
  "name": "borrowed-t120-r1",
  "kind": "borrowed",
- "key": "b654d3d2111e924f",
+ "key": "9b12257e5ce8e83d",
  "seed": 3424778871,
  "sims": 400,
  "design": {
@@ -40,5 +40,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 15.74
+ "seconds": 8.76
 }

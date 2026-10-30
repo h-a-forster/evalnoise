@@ -8,8 +8,9 @@ components, a chi-square interval for the run component. `n/i`: not identified b
 the layout; `(in X)`: folded into component X. `<0`: the moment estimate is
 negative (planning uses 0); `upper bound < 0`: so is the upper end of its bootstrap
 interval, a hint that the model may overstate the noise of cell means there (with few
-informative items the draws resample the same items). `[degenerate]`: the runs agree
-more closely than the residual allows, so no run variance fits the chi-square interval.
+informative items the draws resample the same items). `[degenerate]`: no run variance
+fits the chi-square interval (the runs agree more closely than the residual allows, or
+runs and residual are both exactly 0, which carries no information).
 
 ## Datasets
 
@@ -124,15 +125,15 @@ items per family would not.
 
 | dataset | tasks x repeats | SE, items only | SE with run term | MDE [item bootstrap] | MDE at run CI ends | run share of SE^2 | naive false-positive rate [run CI] |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `mm-arena-replicated` | 120 x 1 | 2.1 | 6.3 | 21.9 [21.9, 22.0] | [12.1, 66.8] | 89% | 51% [27%, 82%] |
+| `mm-arena-replicated` | 120 x 1 | 2.1 | 6.3 | 21.9 [21.9, 22.0] | [12.1, 66.8] | 89% | 50% [27%, 81%] |
 | `mm-arena-all` | 120 x 1 | 3.1 | 6.7 | 22.1 [22.0, 22.3] | [13.3, 66.7] | 78% | 36% [17%, 73%] |
-| `agent-ab-no-tests` | 50 x 3 | 2.3 | - | 6.6 [4.7, 8.7] | - | n/i | n/i |
+| `agent-ab-no-tests` (few) | 50 x 3 | 2.3 | - | 6.6 [4.7, 8.7] | - | n/i | n/i |
 | `agent-ab-no-tests-cost` | 50 x 3 | 0.040 | - | 0.114 [0.063, 0.164] | - | n/i | n/i |
-| `agent-ab-haiku-vs-sonnet` | 50 x 1 | 3.5 | - | 10.0 [0.0, 15.1] | - | n/i | n/i |
-| `overclaim-setups` | 23 x 2 | 3.8 | - | 11.0 [6.4, 15.6] | - | n/i | n/i |
-| `overclaim-interventions` | 18 x 4 | 3.7 | - | 11.1 [7.3, 14.2] | - | n/i | n/i |
-| `ruleproof-main` | 5 x 3 | 14.9 | 14.9 | 55.9 [37.0, 59.8] | [55.9, 63.3] | 0% | 5% [5%, 13%] |
-| `ruleproof-pressure` | 5 x 3 | 14.1 | - | 53.2 [31.0, 65.7] | - | n/i | n/i |
+| `agent-ab-haiku-vs-sonnet` (few) | 50 x 1 | 3.5 | - | 10.0 [0.0, 15.1] | - | n/i | n/i |
+| `overclaim-setups` (few) | 23 x 2 | 3.8 | - | 11.0 [6.4, 15.6] | - | n/i | n/i |
+| `overclaim-interventions` (few) | 18 x 4 | 3.7 | - | 11.1 [7.3, 14.2] | - | n/i | n/i |
+| `ruleproof-main` (few) | 5 x 3 | 14.9 | 14.9 | 55.9 [37.0, 59.8] | [55.9, 63.3] | 0% | 5% [5%, 10%] |
+| `ruleproof-pressure` (few) | 5 x 3 | 14.1 | - | 53.2 [31.0, 65.7] | - | n/i | n/i |
 
 One run per arm, the observed tasks and repeats. SE: of the difference in arm means.
 MDE: smallest difference detected with 80% power at alpha 0.05 (two-sided t,
@@ -143,6 +144,8 @@ understates the MDE if runs vary.
 Naive false-positive rate: how often a paired test over items, which ignores run
 effects, declares a difference between single runs of two arms with equal mean
 scores (their item x arm effects still differ; identical arms give a higher rate).
+(few): a pair of arms differs on fewer than 10 items, so these
+numbers rest on those few items (see the planning notes).
 
 ## Tasks per arm needed for a target MDE
 
@@ -152,22 +155,22 @@ scores (their item x arm effects still differ; identical arms give a higher rate
 | `mm-arena-replicated` | 10 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: 95; R5 K1: 45; R6 K1: 34; R8 K1: 25; R10 K1: 22; R12 K1: 20; R13 K1: 19; R15 K1: 18; R20 K1: 17 |
 | `mm-arena-all` | 5 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: never; R5 K1: never; R6 K1: never; R8 K1: never; R10 K1: never; R12 K1: 15077; R13 K1: 2439; R15 K1: 1067; R20 K1: 570 |
 | `mm-arena-all` | 10 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: 340; R5 K1: 169; R6 K1: 130; R8 K1: 102; R10 K1: 91; R12 K1: 85; R13 K1: 82; R15 K1: 79; R20 K1: 74 |
-| `agent-ab-no-tests` | 5 pp | R1 K1: 239; R1 K3: 86; R2 K1: 124; R2 K3: 47; R3 K1: 86; R3 K3: 34; R5 K1: 55; R5 K3: 24 |
-| `agent-ab-no-tests` | 10 pp | R1 K1: 62; R1 K3: 23; R2 K1: 33; R2 K3: 14; R3 K1: 23; R3 K3: 11; R5 K1: 16; R5 K3: 8 |
+| `agent-ab-no-tests` (few) | 5 pp | R1 K1: 239; R1 K3: 86; R2 K1: 124; R2 K3: 47; R3 K1: 86; R3 K3: 34; R5 K1: 55; R5 K3: 24 |
+| `agent-ab-no-tests` (few) | 10 pp | R1 K1: 62; R1 K3: 23; R2 K1: 33; R2 K3: 14; R3 K1: 23; R3 K3: 11; R5 K1: 16; R5 K3: 8 |
 | `agent-ab-no-tests-cost` | 0.1 log USD | R1 K1: 103; R1 K3: 65; R2 K1: 74; R2 K3: 55; R3 K1: 65; R3 K3: 52; R5 K1: 57; R5 K3: 49 |
 | `agent-ab-no-tests-cost` | 0.2 log USD | R1 K1: 28; R1 K3: 18; R2 K1: 20; R2 K3: 16; R3 K1: 18; R3 K3: 15; R5 K1: 16; R5 K3: 14 |
-| `agent-ab-haiku-vs-sonnet` | 5 pp | R1 K1: 193; R1 K3: 193; R2 K1: 193; R2 K3: 193; R3 K1: 193; R3 K3: 193; R5 K1: 193; R5 K3: 193 |
-| `agent-ab-haiku-vs-sonnet` | 10 pp | R1 K1: 50; R1 K3: 50; R2 K1: 50; R2 K3: 50; R3 K1: 50; R3 K3: 50; R5 K1: 50; R5 K3: 50 |
-| `overclaim-setups` | 10 pp | R1 K1: 54; R1 K3: 20; R2 K1: 28; R2 K3: 11; R3 K1: 20; R3 K3: 8; R5 K1: 13; R5 K3: 6 |
-| `overclaim-setups` | 20 pp | R1 K1: 15; R1 K3: 7; R2 K1: 9; R2 K3: 5; R3 K1: 7; R3 K3: 4; R5 K1: 5; R5 K3: 4 |
-| `overclaim-interventions` | 10 pp | R1 K1: 81; R1 K3: 29; R2 K1: 42; R2 K3: 16; R3 K1: 29; R3 K3: 11; R5 K1: 18; R5 K3: 8 |
-| `overclaim-interventions` | 20 pp | R1 K1: 22; R1 K3: 9; R2 K1: 12; R2 K3: 6; R3 K1: 9; R3 K3: 5; R5 K1: 7; R5 K3: 4 |
-| `ruleproof-main` | 10 pp | R1 K1: 141; R1 K3: 89; R2 K1: 102; R2 K3: 76; R3 K1: 89; R3 K3: 72; R5 K1: 79; R5 K3: 68 |
-| `ruleproof-main` | 20 pp | R1 K1: 37; R1 K3: 24; R2 K1: 27; R2 K3: 21; R3 K1: 24; R3 K3: 20; R5 K1: 22; R5 K3: 19 |
-| `ruleproof-pressure` | 10 pp | R1 K1: 220; R1 K3: 81; R2 K1: 116; R2 K3: 46; R3 K1: 81; R3 K3: 34; R5 K1: 53; R5 K3: 25 |
-| `ruleproof-pressure` | 20 pp | R1 K1: 57; R1 K3: 22; R2 K1: 31; R2 K3: 13; R3 K1: 22; R3 K3: 11; R5 K1: 15; R5 K3: 8 |
+| `agent-ab-haiku-vs-sonnet` (few) | 5 pp | R1 K1: 193; R1 K3: 193; R2 K1: 193; R2 K3: 193; R3 K1: 193; R3 K3: 193; R5 K1: 193; R5 K3: 193 |
+| `agent-ab-haiku-vs-sonnet` (few) | 10 pp | R1 K1: 50; R1 K3: 50; R2 K1: 50; R2 K3: 50; R3 K1: 50; R3 K3: 50; R5 K1: 50; R5 K3: 50 |
+| `overclaim-setups` (few) | 10 pp | R1 K1: 54; R1 K3: 20; R2 K1: 28; R2 K3: 11; R3 K1: 20; R3 K3: 8; R5 K1: 13; R5 K3: 6 |
+| `overclaim-setups` (few) | 20 pp | R1 K1: 15; R1 K3: 7; R2 K1: 9; R2 K3: 5; R3 K1: 7; R3 K3: 4; R5 K1: 5; R5 K3: 4 |
+| `overclaim-interventions` (few) | 10 pp | R1 K1: 81; R1 K3: 29; R2 K1: 42; R2 K3: 16; R3 K1: 29; R3 K3: 11; R5 K1: 18; R5 K3: 8 |
+| `overclaim-interventions` (few) | 20 pp | R1 K1: 22; R1 K3: 9; R2 K1: 12; R2 K3: 6; R3 K1: 9; R3 K3: 5; R5 K1: 7; R5 K3: 4 |
+| `ruleproof-main` (few) | 10 pp | R1 K1: 141; R1 K3: 89; R2 K1: 102; R2 K3: 76; R3 K1: 89; R3 K3: 72; R5 K1: 79; R5 K3: 68 |
+| `ruleproof-main` (few) | 20 pp | R1 K1: 37; R1 K3: 24; R2 K1: 27; R2 K3: 21; R3 K1: 24; R3 K3: 20; R5 K1: 22; R5 K3: 19 |
+| `ruleproof-pressure` (few) | 10 pp | R1 K1: 220; R1 K3: 81; R2 K1: 116; R2 K3: 46; R3 K1: 81; R3 K3: 34; R5 K1: 53; R5 K3: 25 |
+| `ruleproof-pressure` (few) | 20 pp | R1 K1: 57; R1 K3: 22; R2 K1: 31; R2 K3: 13; R3 K1: 22; R3 K3: 11; R5 K1: 15; R5 K3: 8 |
 
-`never`: the run term alone exceeds the target at that number of runs.
+`never`: the run term alone exceeds the target at that number of runs. (few): as above.
 
 ## Planning notes
 

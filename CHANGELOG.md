@@ -21,6 +21,11 @@ All notable changes are listed here. The format follows
   for every two runs of a replicated arm.
 - Study: each pair's run-aware p-value with the run variance re-estimated without each
   replicated arm in turn.
+- Summary: planning rows of datasets with a pair differing on fewer than 10 items are
+  marked `(few)`.
+- `scripts/longrun.sh` (resumable full-profile launcher) and `scripts/derived_numbers.py`
+  (the numbers REPORT.md marks as derived). The sdist now includes `configs/` and
+  `uv.lock`.
 
 ### Changed
 
@@ -40,6 +45,17 @@ All notable changes are listed here. The format follows
   item means weight every run equally, so it now adds run / R with R the number of runs.
 - The run chi-square interval returned a zero-width [0, 0] when even its upper end fell
   below zero; it is now reported as degenerate.
+- The naive false-positive rate used a normal critical value for what is a t-test over
+  items, overstating it with few tasks (mm-arena: 51% is now 50%).
+- `power --task-cost` ignored `--runs`; it now reports the optimal repeats per run count.
+- `evalnoise extract` wrote earlier CSVs before a later table failed, leaving the
+  manifest stale; malformed source records raised raw tracebacks; mm-arena `prior_std`
+  of 0 was silently replaced by 1.
+- Study dataset ids and table names could point outside the output directory.
+- The within-cell sum of squares lost precision on large scores (one-pass formula).
+- `.eval` logs now reach the Inspect reader's "convert first" message; several run-less
+  table files sharing an arm are refused instead of merged into one run; Inspect samples
+  skipped for errors are counted and reported.
 
 ## [0.1.0] - 2026-10-30
 

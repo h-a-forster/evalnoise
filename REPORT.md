@@ -1,10 +1,10 @@
 # evalnoise report: variance components of four Claude agent evals
 
 Quick profile, 2026-10-30. All numbers come from `results/study/summary.md` and
-`results/validation/summary.md` (or the unit files next to them), except the few marked
-as derived from them, which `uv run evalnoise study` and
-`uv run evalnoise validate` regenerate (about 4 minutes each on a laptop CPU). Intervals
-are 95%. Model, estimators and interval methods: [docs/DESIGN.md](docs/DESIGN.md).
+`results/validation/summary.md` (or the unit files next to them), which
+`uv run evalnoise study` and `uv run evalnoise validate` regenerate (about 4 minutes each
+on a laptop CPU), except the few marked as derived, which
+`uv run python scripts/derived_numbers.py` prints. Intervals are 95%. Model, estimators and interval methods: [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Summary
 
@@ -22,8 +22,10 @@ are 95%. Model, estimators and interval methods: [docs/DESIGN.md](docs/DESIGN.md
 - For a hypothetical pair of setups with the pooled variances, compared from one run
   each, the estimated SE of the difference is **6.3 pp** instead of the **2.1 pp** the
   episodes alone give (2.4 once the two seeds of a game are treated as correlated); the
-  run term is 89% of the variance. A paired test over episodes, which ignores runs, would
-  call two setups with equal mean scores different **51%** of the time (**27% to 82%**
+  run term is 89% of the variance (treating episodes as independent; with their
+  clustering the item part is larger, so 89% and the rate below are upper-end figures). A
+  paired test over episodes, which ignores runs, would
+  call two setups with equal mean scores different **50%** of the time (**27% to 81%**
   across the run-variance interval) at a nominal 5%; for literally identical setups,
   whose item x arm effects cancel, the rate is higher (56%, derived). Fitted to the
   fable and opus setups only (every component re-estimated), the SE is 3.2 pp and the
@@ -32,7 +34,8 @@ are 95%. Model, estimators and interval methods: [docs/DESIGN.md](docs/DESIGN.md
   comparison below 10 pp. 10 pp needs 4 runs per setup with 95 episodes, or 5 with 45.
   5 pp needs 20 runs within the 120 episodes available; 13 runs need 526 episodes and 12
   runs 3286. These counts treat episodes as independent; the seeds of a game are
-  correlated (design effect about 1.3), so multiply them by about 1.3. Episodes of one
+  correlated (design effect about 1.3), so multiply them by at least 1.3, which puts both
+  4 runs at 10 pp and 20 runs at 5 pp beyond the 120 episodes available. Episodes of one
   task family are more alike still (family-clustered design effect about 2.8 over pairs,
   from only 5 families), and "only runs help" assumes run shifts shared by every
   episode, which the family breakdown contradicts. The run-variance interval is wide, so
@@ -159,13 +162,13 @@ the 4 run df.
 
 | Dataset | Tasks x repeats | SE, items only | SE with run term | MDE | MDE at run CI ends | Naive false-positive rate |
 |---|---|---:|---:|---:|---:|---:|
-| `mm-arena-replicated` | 120 x 1 | 2.1 | 6.3 | 21.9 | 12.1 to 66.8 | 51% [27%, 82%] |
+| `mm-arena-replicated` | 120 x 1 | 2.1 | 6.3 | 21.9 | 12.1 to 66.8 | 50% [27%, 81%] |
 | `mm-arena-all` | 120 x 1 | 3.1 | 6.7 | 22.1 | 13.3 to 66.7 | 36% [17%, 73%] |
 | `agent-ab-no-tests` | 50 x 3 | 2.3 | n/i | 6.6 [4.7, 8.7] | - | n/i |
 | `agent-ab-haiku-vs-sonnet` | 50 x 1 | 3.5 | n/i | 10.0 [0.0, 15.1] | - | n/i |
 | `overclaim-setups` | 23 x 2 | 3.8 | n/i | 11.0 [6.4, 15.6] | - | n/i |
 | `overclaim-interventions` | 18 x 4 | 3.7 | n/i | 11.1 [7.3, 14.2] | - | n/i |
-| `ruleproof-main` | 5 x 3 | 14.9 | 14.9 | 55.9 [37.0, 59.8] | 55.9 to 63.3 | 5% [5%, 13%] |
+| `ruleproof-main` | 5 x 3 | 14.9 | 14.9 | 55.9 [37.0, 59.8] | 55.9 to 63.3 | 5% [5%, 10%] |
 | `ruleproof-pressure` | 5 x 3 | 14.1 | n/i | 53.2 [31.0, 65.7] | - | n/i |
 
 MDE in pp, 80% power, alpha 0.05; brackets are item-bootstrap intervals (run variance held
@@ -189,7 +192,7 @@ Repeats within a run do not help here because within-run noise is not separated 
 item x run noise (no repeats inside a run); the planner then assumes, conservatively, that
 only new runs average it out. These counts treat the 120 episodes as independent; the
 two seeds of a game are correlated, and the median design effect over pairs is 1.33, so
-multiply them by about 1.3. Clustered by task family the median design effect is 2.8
+multiply them by at least 1.3. Clustered by task family the median design effect is 2.8
 (5 families, so rough). They use the pooled components, which no single setup has.
 
 Tasks per arm for the pass/fail datasets (no run effect assumed, and the linear model biases them either way near the pass-rate
@@ -242,7 +245,7 @@ Monte Carlo intervals there):
 | run-aware t, 60 tasks, 3 runs | size | 0.077 [0.053, 0.108] | 0.05 |
 | same | power at planned MDE | 0.775 [0.731, 0.815] | 0.80 |
 | run-aware t, 60 tasks, 6 runs | size / power | 0.052 / 0.797 | 0.05 / 0.80 |
-| run-blind paired t, 1 run, 120 / 30 tasks | false-positive rate | 0.615 / 0.370 | 0.624 / 0.368 |
+| run-blind paired t, 1 run, 120 / 30 tasks | false-positive rate | 0.615 / 0.370 | 0.621 / 0.356 |
 | pass/fail (logistic), 50 x 3 / 30 x 1, pass rate 60 to 70% | size | 0.060 / 0.044 | 0.05 |
 | same | power at planned MDE | 0.854 / 0.866 | 0.80 |
 | pass/fail near 90% pass, 50 x 3, gain / loss | size | 0.048 / 0.046 | 0.05 |

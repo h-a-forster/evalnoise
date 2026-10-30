@@ -1,7 +1,7 @@
 {
  "name": "binary-t30-k1",
  "kind": "binary",
- "key": "5d4a5f6444f8275d",
+ "key": "5949a4cfc089ffd9",
  "seed": 1255966230,
  "sims": 500,
  "design": {
@@ -51,5 +51,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 5.74
+ "seconds": 3.96
 }

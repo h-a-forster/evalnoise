@@ -1,7 +1,7 @@
 {
  "name": "binary-p90-t50-k3-down",
  "kind": "binary",
- "key": "835d8a0e1a1049a7",
+ "key": "92f992e7b3feee11",
  "seed": 1092437588,
  "sims": 500,
  "design": {
@@ -51,5 +51,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 5.8
+ "seconds": 3.94
 }

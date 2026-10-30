@@ -14,7 +14,8 @@ tasks needed for a target MDE, and how often a test that ignores run effects wil
 a difference between two configurations with equal mean scores.
 
 Item-level confidence intervals, paired or clustered, cannot see the run term. In the one
-dataset here with replicate runs it dominates: see [Findings](#findings).
+dataset here with replicate runs of unchanged setups it dominates: see
+[Findings](#findings).
 
 Python 3.11+, depends on numpy, scipy and pandas. No model calls, no network.
 
@@ -24,18 +25,22 @@ From [REPORT.md](REPORT.md), a quick-profile study of per-trial data published b
 small agent-eval projects, all on Claude models. These are a handful of datasets, not a
 survey; treat the numbers as examples of what the tool shows.
 
-- **Run-to-run shifts dominated the one benchmark with replicate runs.** In mm-arena
+- **Run-to-run shifts dominated the one benchmark with replicate runs of unchanged
+  setups.** In mm-arena
   (120 market-making episodes, three Claude setups run two or three times each) the run
   SD pooled over the setups was 4.2 pp of edge captured (95% CI 2.2 to 12.6), mostly from
   one setup (fitted alone: 0.9, 2.6 and 5.6 pp). For a pair of setups with the pooled
   variances, compared from one run each, the estimated SE is 6.3 pp, not the 2.1 pp an
   item-level interval reports, and a run-blind paired test calls two setups with equal
-  mean scores different about half the time (51%, CI 27% to 82%; 38% with the noisiest
-  setup left out).
+  mean scores different about half the time (50%, CI 27% to 81%; 38% with the noisiest
+  setup left out). Both treat episodes as independent; with the episodes' clustering the
+  item-level SE is larger, so the run term's share and that rate are upper-end figures.
 - **More episodes cannot fix that; more runs can,** as far as run shifts are shared by
-  every episode. With the pooled estimates a 10 pp difference needs 4 runs per setup with
-  95 episodes, or 5 with 45; 5 pp needs 20 runs within the 120 episodes (13 runs need
-  526). Episodes pair up within games, so multiply these counts by about 1.3. Run shifts
+  every episode. With the pooled estimates and episodes counted as independent, a 10 pp
+  difference needs 4 runs per setup with 95 episodes, or 5 with 45; 5 pp needs 20 runs
+  with 118 episodes (13 runs need 526). Episodes pair up within games, so multiply these
+  counts by at least 1.3, which puts 4 runs at 10 pp and 20 runs at 5 pp beyond the 120
+  episodes available. Run shifts
   also differed by task family (one setup: +1.7 to +22.8 pp), so part of the run term
   may shrink with more task families.
 - **Pass/fail evals with one run per arm cannot identify the run term at all.** For
@@ -46,12 +51,13 @@ survey; treat the numbers as examples of what the tool shows.
   239 tasks with one repeat or 86 with three.
 - **The planner is calibrated where its assumptions hold.** In simulation, power at the
   planned MDE was 0.79 to 0.81 and size 0.04 to 0.06 for paired item-level tests; the
-  false-positive formula for run-blind tests matched simulation (0.615 vs 0.624, 0.370
-  vs 0.368). Planning for pass/fail data from a pilot was conservative at 60 to 70% pass
+  false-positive formula for run-blind tests matched simulation (0.615 vs 0.621, 0.370
+  vs 0.356). Planning for pass/fail data from a pilot was conservative at 60 to 70% pass
   rates (power 0.85 to 0.87). Weak spots: with only three runs the run-aware test was
   somewhat liberal (size 0.077); with the run variance borrowed on 4 df, power at the
-  planned MDE was 0.76 (Monte Carlo interval 0.72 to 0.80); near a 90% pass rate a planned drop was detected with power 0.67;
-  and the bootstrap interval for item x arm undercovered with 40 items (0.85).
+  planned MDE was 0.76 (Monte Carlo interval 0.72 to 0.80); near a 90% pass rate a
+  planned drop was detected with power 0.67; and the bootstrap interval for item x arm
+  undercovered with 40 items (0.85).
 
 ## Install
 
