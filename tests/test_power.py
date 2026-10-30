@@ -157,14 +157,14 @@ def test_realised_power_at_planned_mde():
 
 def test_naive_rate_matches_simulation():
     comps = Components(item=400.0, item_arm=60.0, run=20.0, item_run=100.0, within=0.0)
-    d = Design(60, 1, 1)
+    # Few tasks, where a normal critical value would overstate the rate by about 0.03.
+    d = Design(10, 1, 1)
     rng = np.random.default_rng(1)
-    sims = 6000
+    sims = 20000
     rate = _paired_t_reject(_item_differences(comps, d, 0.0, sims, rng), 0.05).mean()
     nominal = naive_false_positive_rate(resolve(comps), d)
-    assert nominal > 0.3
-    # z-based nominal vs t-test with 59 df: allow a small approximation gap.
-    assert abs(rate - nominal) < 4 * math.sqrt(nominal * (1 - nominal) / sims) + 0.01
+    assert nominal > 0.1
+    assert abs(rate - nominal) < 4 * math.sqrt(nominal * (1 - nominal) / sims)
 
 
 def test_mde_falls_with_runs_whatever_the_run_df():

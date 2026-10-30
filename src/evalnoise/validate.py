@@ -54,7 +54,7 @@ PROFILES: dict[str, dict[str, int]] = {
     },
 }  # fmt: skip
 # Bump when a check's computation changes, so cached shards rerun.
-SCHEMA = 3
+SCHEMA = 4
 
 
 @dataclass(frozen=True)

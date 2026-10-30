@@ -42,7 +42,7 @@ from evalnoise.sources import sha256
 
 COMPONENTS = ("item", "item_arm", "run", "item_run", "within")
 # Bump when the unit format or any computation in analyse() changes, so cached units rerun.
-SCHEMA = 6
+SCHEMA = 7
 # Pairs whose arms differ on fewer items than this get a reliability note.
 MIN_ITEMS_DIFFERING = 10
 

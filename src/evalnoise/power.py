@@ -264,13 +264,15 @@ def naive_false_positive_rate(r: Resolved, d: Design, *, alpha: float = 0.05) ->
     Such a test estimates only the item-level term of the variance, so a run-to-run shift
     reads as an arm difference. The arms have equal mean scores but keep their item x arm
     effects; for literally identical arms pass ``item_arm = 0``. Equals ``alpha`` when the
-    run variance is zero.
+    run variance is zero. The test is a t-test over items (``T - 1`` df paired, ``2 (T - 1)``
+    unpaired), whose statistic is ``sqrt((v_items + v_run) / v_items)`` times a central t.
     """
     v_items, v_run = variance_terms(r, d)
     if v_items + v_run == 0:
         return alpha
-    zc = stats.norm.ppf(1 - alpha / 2)
-    return float(2 * stats.norm.sf(zc * math.sqrt(v_items / (v_items + v_run))))
+    df = (d.tasks - 1) if d.paired else 2 * (d.tasks - 1)
+    tc = stats.t.ppf(1 - alpha / 2, df)
+    return float(2 * stats.t.sf(tc * math.sqrt(v_items / (v_items + v_run)), df))
 
 
 def optimal_repeats(r: Resolved, *, runs: int = 1, task_cost: float = 0.0) -> float:
