@@ -170,6 +170,15 @@ def test_study_refuses_ids_that_escape_the_output_dir(tmp_path, table):
     with pytest.raises(DataError, match="alphanumeric"):
         study.run_study(cfg, repo / "results" / "study")
     assert not (repo / "results" / "study" / "x.json").exists()
+    # Regression: an empty table name passed the character check (an empty id is
+    # already refused as missing).
+    cfg.write_text(
+        cfg.read_text(encoding="utf-8")
+        .replace("../x", "sim")
+        .replace('table = "sim"', 'table = ""')
+    )
+    with pytest.raises(DataError, match="alphanumeric"):
+        study.run_study(cfg, repo / "results" / "study")
 
 
 def test_study_cli_writes_summary(tmp_path, table, capsys):

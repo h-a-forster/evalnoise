@@ -21,8 +21,9 @@ on a laptop CPU), except the few marked as derived, which
   part of the run term may be a family x run effect, which more families would shrink.
 - For a hypothetical pair of setups with the pooled variances, compared from one run
   each, the estimated SE of the difference is **6.3 pp** instead of the **2.1 pp** the
-  episodes alone give (2.4 once the two seeds of a game are treated as correlated); the
-  run term is 89% of the variance (treating episodes as independent; with their
+  episodes alone give (2.5, derived, once the two seeds of a game are treated as correlated
+  via the median design effect of 1.33); the run term is 89% of the variance (treating
+  episodes as independent; with their
   clustering the item part is larger, so 89% and the rate below are upper-end figures). A
   paired test over episodes, which ignores runs, would
   call two setups with equal mean scores different **50%** of the time (**27% to 81%**
@@ -227,7 +228,7 @@ run-adjusted episode means average every run equally, so a partial replicate run
 as a whole run), and is tested with Satterthwaite df using its own 4 df. The last column
 redoes that test with the run variance (and its df) re-estimated without each replicated
 setup in turn; the pooled run variance comes mostly from haiku (87% of the run sum of
-squares), so this range is the honest summary. The fable vs opus gap, clearly non-zero
+squares, derived), so this range is the honest summary. The fable vs opus gap, clearly non-zero
 over games (p = 0.001), is not distinguishable from zero once runs count (p from 0.16 to
 0.45 depending on which setups' run variance is assumed). The opus effort gap is
 borderline (p from 0.012 to 0.10, 0.061 pooled); the sonnet effort gap stays clear. These

@@ -21,18 +21,21 @@ run_stage() {
   local attempt
   for attempt in 1 2 3; do
     log "$name: attempt $attempt: $*"
-    if "$@" >>"$LOG" 2>&1; then
+    local rc=0
+    "$@" >>"$LOG" 2>&1 || rc=$?
+    if [ "$rc" -eq 0 ]; then
       log "$name: ok"
       return 0
     fi
-    log "$name: failed (exit $?)"
+    log "$name: failed (exit $rc)"
     sleep 10
   done
   log "$name: giving up after 3 attempts"
   return 1
 }
 
+# ${arr[@]+...}: bash < 4.4 treats an empty array as unset under set -u.
 log "start (smoke=${LONGRUN_SMOKE:-0})"
-run_stage study uv run evalnoise study --profile full --out results/study-full "${STUDY_ONLY[@]}" || exit 1
-run_stage validate uv run evalnoise validate --profile full --out results/validation-full "${VALIDATE_ONLY[@]}" || exit 1
+run_stage study uv run evalnoise study --profile full --out results/study-full ${STUDY_ONLY[@]+"${STUDY_ONLY[@]}"} || exit 1
+run_stage validate uv run evalnoise validate --profile full --out results/validation-full ${VALIDATE_ONLY[@]+"${VALIDATE_ONLY[@]}"} || exit 1
 log "done"

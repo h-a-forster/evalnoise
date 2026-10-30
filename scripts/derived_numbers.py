@@ -1,9 +1,13 @@
 """Numbers REPORT.md marks as derived: run-blind false-positive rates for literally
-identical setups (item x arm = 0) and the mm-arena reference design refitted without the
-haiku setup. Run from the repository root: uv run python scripts/derived_numbers.py"""
+identical setups (item x arm = 0), the mm-arena reference design refitted without the
+haiku setup, its episode-only SE scaled by the game design effect, and haiku's share of the
+run sum of squares. Run from the repository root: uv run python scripts/derived_numbers.py"""
 
 import dataclasses
+import itertools
 import math
+
+import numpy as np
 
 from evalnoise.components import estimate
 from evalnoise.data import load_trials
@@ -28,3 +32,16 @@ for name, arms in fits.items():
         f"naive rate {naive_false_positive_rate(r, ref):.3f}, "
         f"identical setups {naive_false_positive_rate(same, ref):.3f}"
     )
+
+# Episode-only SE of the reference design, and with the two seeds of a game correlated:
+# scaled by the median game design effect over the replicated pairs (as in the study).
+est = estimate(df, arms=replicated, pairs=list(itertools.combinations(replicated, 2)))
+c = est.components
+se_items = se_difference(resolve(dataclasses.replace(c, run=0.0)), ref)
+deff = float(np.median([(p["se_clusters"] / p["se_items"]) ** 2 for p in est.pairs.values()]))
+haiku = [a for a in replicated if "haiku" in a]
+share = sum(est.run_terms[a].ss for a in haiku) / est.run_term.ss
+print(
+    f"mm-arena-replicated: SE episodes only {se_items:.3f}, game design effect {deff:.3f}, "
+    f"SE games {se_items * math.sqrt(deff):.3f}; haiku share of run sum of squares {share:.3f}"
+)

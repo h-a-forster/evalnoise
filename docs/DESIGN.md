@@ -64,13 +64,14 @@ unpaired:  V = 2 (item + item_arm + item_run / R + within / (R K)) / T  +  2 run
 - The minimum detectable effect (MDE): the smallest true difference detected with
   probability `power` by a two-sided level-`alpha` test.
 - The naive false-positive rate: how often a test that estimates only the item-level part
-  of `V` (a paired t-test over items, or any clustered SE that ignores runs) declares a
+  of `V` (here a paired t-test over items) declares a
   difference between two arms with equal mean scores, when each arm has `R` runs:
   `2 (1 - F_nu(t_{nu,1-alpha/2} sqrt(V_items / (V_items + V_run))))`, with `F_nu` the t
   distribution on the test's `nu = T - 1` df (paired; `2 (T - 1)` unpaired): the test
   statistic is `sqrt((V_items + V_run) / V_items)` times a central t. `V_items` keeps
   `item_arm`: the arms agree on average but not item by item. For two literally identical
-  arms `item_arm` is 0 and the rate is higher.
+  arms `item_arm` is 0 and the rate is higher. A cluster-robust test that ignores runs has
+  the same form with its own `V_items` and `nu` = clusters - 1.
 
 The run term has no `T` in its denominator: more tasks or repeats never remove it. Only
 more runs per arm do, or a design in which both arms share each run's shock (for example

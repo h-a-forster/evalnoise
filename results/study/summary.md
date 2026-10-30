@@ -144,8 +144,9 @@ understates the MDE if runs vary.
 Naive false-positive rate: how often a paired test over items, which ignores run
 effects, declares a difference between single runs of two arms with equal mean
 scores (their item x arm effects still differ; identical arms give a higher rate).
-(few): a pair of arms differs on fewer than 10 items, so these
-numbers rest on those few items (see the planning notes).
+(few): some pair of arms differs on fewer than 10 items. With two
+arms these numbers rest on those few items; with more, the pooled components also
+use the other arms, but that pair's numbers stay unreliable (see the planning notes).
 
 ## Tasks per arm needed for a target MDE
 
