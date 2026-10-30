@@ -163,3 +163,17 @@ def test_naive_rate_matches_simulation():
     assert nominal > 0.3
     # z-based nominal vs t-test with 59 df: allow a small approximation gap.
     assert abs(rate - nominal) < 4 * math.sqrt(nominal * (1 - nominal) / sims) + 0.01
+
+
+def test_mde_falls_with_runs_whatever_the_run_df():
+    # Regression: one run treated the run variance as known while two or more runs
+    # estimated it with 2 (R - 1) df, so adding a run could raise the MDE.
+    for run_df in (math.inf, 4.0, 0.0):
+        r = resolve(C, run_df=run_df)
+        runs = [2, 3, 5, 10] if run_df == 0 else [1, 2, 3, 5, 10]
+        mdes = [mde(r, Design(500, k)) for k in runs]
+        assert mdes == sorted(mdes, reverse=True), (run_df, mdes)
+    with pytest.raises(ValueError, match="cannot estimate the run term"):
+        mde(resolve(C, run_df=0.0), Design(50, 1))
+    with pytest.raises(ValueError, match="run_df"):
+        resolve(C, run_df=-1.0)

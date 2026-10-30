@@ -53,12 +53,24 @@ class Resolved:
     item_run: float
     within: float
     notes: tuple[str, ...]
+    # Degrees of freedom of the run-variance estimate available besides the experiment's
+    # own replicate runs (e.g. from a pilot); inf = known exactly, 0 = none.
+    run_df: float = math.inf
 
 
-def resolve(c: Components, *, run: float | None = None, paired: bool = True) -> Resolved:
+def resolve(
+    c: Components,
+    *,
+    run: float | None = None,
+    paired: bool = True,
+    run_df: float = math.inf,
+) -> Resolved:
     """Turn estimated components into planning inputs.
 
     ``run`` overrides the run variance (required when the data had one run per arm).
+    ``run_df`` is the degrees of freedom of the run-variance estimate the analysis can
+    borrow (a pilot's pooled runs minus one); the analysis pools it with the experiment's
+    own ``2 (R - 1)``. The default treats the run variance as known exactly.
     Unidentified residual parts are set to zero only when they are already folded into a
     component that does not shrink with repeats or runs, which errs towards a larger MDE.
     """
@@ -103,7 +115,9 @@ def resolve(c: Components, *, run: float | None = None, paired: bool = True) -> 
             "no repeats or replicate runs: trial noise is folded into the item terms, so "
             "repeats are assumed not to help (conservative)"
         )
-    return Resolved(item, item_arm, run_v, item_run, within, tuple(notes))
+    if not run_df >= 0:
+        raise ValueError("run_df must be non-negative (inf = run variance known)")
+    return Resolved(item, item_arm, run_v, item_run, within, tuple(notes), float(run_df))
 
 
 def variance_terms(r: Resolved, d: Design) -> tuple[float, float]:
@@ -124,8 +138,14 @@ def _df(r: Resolved, d: Design) -> float:
     v_items, v_run = variance_terms(r, d)
     df_items = (d.tasks - 1) if d.paired else 2 * (d.tasks - 1)
     terms = [(v_items, df_items)]
-    if v_run > 0 and d.runs > 1:
-        terms.append((v_run, 2 * (d.runs - 1)))
+    if v_run > 0:
+        df_run = 2 * (d.runs - 1) + r.run_df
+        if df_run == 0:
+            raise ValueError(
+                "one run per arm and no other estimate of the run variance: a test cannot "
+                "estimate the run term; add runs or supply run_df from a pilot"
+            )
+        terms.append((v_run, df_run))
     denom = sum(v * v / df for v, df in terms)
     total = v_items + v_run
     return math.inf if denom == 0 else total * total / denom
