@@ -117,7 +117,10 @@ class RunTerm:
         """Interval for the run variance, treating the residual variance as known.
 
         Uses ss / E[ms] ~ chi2(df) / df, which is exact for balanced normal data; the
-        residual variance has many more degrees of freedom than the run term here.
+        residual variance has many more degrees of freedom than the run term here. When
+        even the upper end falls below zero (the runs agree more closely than the residual
+        allows), no run variance fits and the interval is degenerate: (nan, nan), not a
+        zero-width [0, 0].
         """
         if not self.identified():
             return (NAN, NAN)
@@ -127,7 +130,9 @@ class RunTerm:
         lo_q = stats.chi2.ppf(alpha / 2, self.df)
         lo = (self.ss / hi_q - s2) * self.df / self.k
         hi = (self.ss / lo_q - s2) * self.df / self.k
-        return (max(lo, 0.0), max(hi, 0.0))
+        if hi <= 0:
+            return (NAN, NAN)
+        return (max(lo, 0.0), hi)
 
 
 @dataclass

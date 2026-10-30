@@ -54,15 +54,24 @@ def component_cell(unit: dict[str, Any], name: str, digits: int = 1) -> str:
     if v is None:
         return "n/i"
     if name == "run":
-        lo, hi = unit["run_interval"]
+        return run_cell(v, unit["run_interval"], digits)
     else:
         lo, hi = unit["bootstrap"]["components"][name]
     if v < 0:
         # No SD exists; say so rather than print an exact-looking 0.
         if hi is not None and hi < 0:
-            return "<0 [all draws < 0]"
+            return "<0 [upper bound < 0]"
         return f"<0 {fmt_ci(sd(lo), sd(hi), digits)}"
     return f"{fmt(sd(v), digits)} {fmt_ci(sd(lo), sd(hi), digits)}"
+
+
+def run_cell(v: float | None, interval: Sequence[float | None], digits: int = 1) -> str:
+    """Run SD with its chi-square interval; a degenerate interval is labelled, not [0, 0]."""
+    if v is None:
+        return "n/i"
+    lo, hi = interval
+    ci = "[degenerate]" if lo is None or hi is None else fmt_ci(sd(lo), sd(hi), digits)
+    return f"{'<0' if v < 0 else fmt(sd(v), digits)} {ci}"
 
 
 def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
@@ -76,8 +85,10 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "unit, with 95% intervals: percentile bootstrap over clusters for item-level",
         "components, a chi-square interval for the run component. `n/i`: not identified by",
         "the layout; `(in X)`: folded into component X. `<0`: the moment estimate is",
-        "negative (planning uses 0); `all draws < 0`: so was every bootstrap draw, a sign that",
-        "the model overstates the noise of cell means there.",
+        "negative (planning uses 0); `upper bound < 0`: so is the upper end of its bootstrap",
+        "interval, a hint that the model may overstate the noise of cell means there (with few",
+        "informative items the draws resample the same items). `[degenerate]`: the runs agree",
+        "more closely than the residual allows, so no run variance fits the chi-square interval.",
         "",
         "## Datasets",
         "",
@@ -128,13 +139,11 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
                 [
                     f"`{u['id']}`",
                     arm,
-                    f"{fmt(sd(x['run']), dg)} {fmt_ci(*_sds(x['run_interval']), dg)}",
+                    run_cell(x["run"], x["run_interval"], dg),
                     str(x["run_df"]),
                     f"{fmt(sd(x['item_run']), dg)}",
                     str(x["residual_df"]),
-                    f"{fmt(sd(rest['run']), dg)} {fmt_ci(*_sds(rest['run_interval']), dg)}"
-                    if rest
-                    else "-",
+                    run_cell(rest["run"], rest["run_interval"], dg) if rest else "-",
                 ]
             )
         hom = by_arm.get("residual_homogeneity")
@@ -267,6 +276,7 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
                     f"{fmt(pe.get('df_with_run'), 1)} / {_p(pe.get('p_with_run'))}"
                     if pe.get("se_with_run") is not None
                     else "-",
+                    _p_range(pe.get("p_with_run_without")),
                     f"{fmt(sd(pe['item_arm']), dg)} {fmt_ci(*_sds(b.get('item_arm')), dg)}",
                 ]
             )
@@ -281,10 +291,11 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
                 "p, clusters",
                 "SE with run term",
                 "df / p with run term",
+                "p, run variance without one arm",
                 "item x arm SD",
             ],
             rows,
-            "llrrrrrrr",
+            "llrrrrrrrr",
         )
     )
     parts += [
@@ -292,9 +303,11 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "The bootstrap interval and the item-level SEs ignore run-to-run variation. SE,",
         "clusters: cluster-robust, tested with clusters - 1 df (equals the items-only SE when",
         "each item is its own cluster). Where the run variance is identified, the SE with run",
-        "term adds run / R_eff for each arm (R_eff: trials / (items x repeats), so a partial",
-        "replicate run counts fractionally), tested with Satterthwaite df using the run",
-        "term's own df.",
+        "term adds run / R for each arm (R: its number of runs; the run-adjusted item means",
+        "average every run equally, so a partial replicate run counts as a whole run), tested",
+        "with Satterthwaite df using the run term's own df. p, run variance without one arm:",
+        "the range of that p-value when the run variance (and its df) is re-estimated",
+        "without each replicated arm in turn, since the pooled value averages arms that differ.",
         "",
     ]
     return "\n".join(parts)
@@ -304,6 +317,14 @@ def _p(x: float | None) -> str:
     if x is None or not math.isfinite(x):
         return "-"
     return "<0.001" if x < 0.001 else f"{x:.3f}"
+
+
+def _p_range(ps: dict[str, float | None] | None) -> str:
+    vals = [x for x in (ps or {}).values() if x is not None and math.isfinite(x)]
+    if not vals:
+        return "-"
+    lo, hi = min(vals), max(vals)
+    return _p(lo) if lo == hi else f"{_p(lo)} to {_p(hi)}"
 
 
 def _sds(pair: Sequence[float | None] | None) -> list[float]:

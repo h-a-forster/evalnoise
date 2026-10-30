@@ -8,6 +8,7 @@ resumes where it stopped. Progress goes to ``<out>/progress.log``.
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import itertools
 import json
@@ -41,7 +42,7 @@ from evalnoise.sources import sha256
 
 COMPONENTS = ("item", "item_arm", "run", "item_run", "within")
 # Bump when the unit format or any computation in analyse() changes, so cached units rerun.
-SCHEMA = 5
+SCHEMA = 6
 # Pairs whose arms differ on fewer items than this get a reliability note.
 MIN_ITEMS_DIFFERING = 10
 
@@ -146,6 +147,16 @@ def analyse(
     run_df = float(est.run_term.df) if run_identified else math.inf
     by_arm = _run_by_arm(est)
     pair_est = _pairs_with_run_term(est.pairs, pairs, df, comps, run_df)
+    # The pooled run variance is an average over arms that may differ: redo the run-aware
+    # tests with the run variance re-estimated without each replicated arm in turn.
+    for left_out, x in by_arm.get("leave_one_out", {}).items():
+        if not math.isfinite(x["run"]):
+            continue
+        alt = _pairs_with_run_term(
+            est.pairs, pairs, df, dataclasses.replace(comps, run=x["run"]), float(x["run_df"])
+        )
+        for k, p in pair_est.items():
+            p.setdefault("p_with_run_without", {})[left_out] = alt[k]["p_with_run"]
     planning: dict[str, Any] = {"alpha": alpha, "power": target_power}
     paired_ok = len(arms) >= 2
     if paired_ok:
@@ -171,13 +182,19 @@ def analyse(
             planning["run_share_of_variance"] = (
                 v_run / (v_items + v_run) if v_items + v_run else 0.0
             )
+            # A degenerate run interval (nan ends) leaves these ends undefined.
             planning["reference_mde_run_ci"] = [
                 mde(resolve(comps, run=v, run_df=run_df), ref, alpha=alpha, power=target_power)
+                if math.isfinite(v)
+                else math.nan
                 for v in run_ci
             ]
             planning["naive_fpr"] = naive_false_positive_rate(res_est, ref, alpha=alpha)
             planning["naive_fpr_run_ci"] = [
-                naive_false_positive_rate(resolve(comps, run=v), ref, alpha=alpha) for v in run_ci
+                naive_false_positive_rate(resolve(comps, run=v), ref, alpha=alpha)
+                if math.isfinite(v)
+                else math.nan
+                for v in run_ci
             ]
         planning["grid"] = plan(
             res_est, grid_tasks, grid_runs, grid_reps, alpha=alpha, power=target_power
@@ -250,25 +267,21 @@ def _pairs_with_run_term(
     """Add t-tests of each pair's difference: over clusters, and with the run variance.
 
     The item-level part uses the cluster-robust SE with clusters - 1 df. Where the run
-    variance is identified, each arm adds run / R_eff, with R_eff its trials divided by
-    (items x median repeats per cell), so a half-finished replicate run counts as half a
-    run; the df are Satterthwaite's, with ``run_df`` for the run term.
+    variance is identified, each arm adds run / R with R its number of runs: the
+    run-adjusted item means average every run's shock equally, so a partial replicate run
+    counts as a whole run. The df are Satterthwaite's, with ``run_df`` for the run term.
     """
     out = {k: dict(v) for k, v in pair_est.items()}
-    cells = df.groupby(["arm", "run", "item"]).size()
-    eff = {}
-    for arm, sub in df.groupby("arm"):
-        reps = float(cells.loc[arm].median())
-        eff[arm] = len(sub) / (sub["item"].nunique() * reps)
+    n_runs = df.groupby("arm")["run"].nunique()
     for a, b in pairs:
         p = out[f"{a} - {b}"]
         se_i, df_i = p["se_clusters"], p["clusters"] - 1
         p["p_items"] = _t_p(p["difference"], [(se_i**2, df_i)])
         if not math.isfinite(comps.run):
             continue
-        v_run = max(comps.run, 0.0) * (1 / eff[a] + 1 / eff[b])
+        v_run = max(comps.run, 0.0) * (1 / n_runs[a] + 1 / n_runs[b])
         terms = [(se_i**2, df_i), (v_run, run_df)]
-        p["runs_eff"] = [eff[a], eff[b]]
+        p["runs"] = [int(n_runs[a]), int(n_runs[b])]
         p["se_with_run"] = math.sqrt(se_i**2 + v_run)
         p["df_with_run"] = _satterthwaite(terms)
         p["p_with_run"] = _t_p(p["difference"], terms)
@@ -311,7 +324,11 @@ def _run_by_arm(est: Estimate) -> dict[str, Any]:
         loo = {}
         for arm in terms:
             rest = RunTerm.pool(t for a, t in terms.items() if a != arm)
-            loo[arm] = {"run": rest.variance(), "run_interval": list(rest.interval())}
+            loo[arm] = {
+                "run": rest.variance(),
+                "run_interval": list(rest.interval()),
+                "run_df": rest.df,
+            }
         out["leave_one_out"] = loo
         out["residual_homogeneity"] = _bartlett(
             [(t.rss / t.df_res, t.df_res) for t in terms.values() if t.df_res >= 1]

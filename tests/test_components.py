@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from evalnoise.components import Components, bootstrap, estimate
+from evalnoise.components import Components, RunTerm, bootstrap, estimate
 from evalnoise.reml import reml
 from evalnoise.simulate import simulate
 
@@ -189,3 +189,12 @@ def test_run_terms_per_arm_and_pooled():
         alone = estimate(df[df["arm"] == arm]).run_term
         assert t.variance() == pytest.approx(alone.variance())
     assert est.components.run == pytest.approx(est.run_term.variance())
+
+
+def test_run_interval_is_degenerate_not_zero_width():
+    # Two runs that agree far more closely than the residual allows: no run variance fits.
+    t = RunTerm(ss=1e-6, df=1, k=10.0, rss=100.0, df_res=10)
+    lo, hi = t.interval()
+    assert math.isnan(lo) and math.isnan(hi)
+    lo, hi = RunTerm(ss=500.0, df=1, k=10.0, rss=100.0, df_res=10).interval()
+    assert 0 < lo < hi

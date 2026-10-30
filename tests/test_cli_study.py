@@ -1,5 +1,6 @@
 import json
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -167,6 +168,9 @@ def test_analyse_reports_per_arm_run_terms_and_unequal_residuals():
     p = res["pair_estimates"]["arm0 - arm1"]
     # The run term has 4 df: the test with it has far fewer df than the 59 of the items.
     assert 1 < p["df_with_run"] < 59 and p["p_with_run"] > p["p_items"]
+    # Sensitivity: the same test with the run variance of each arm left out in turn.
+    assert set(p["p_with_run_without"]) == {"arm0", "arm1"}
+    assert all(0 < x <= 1 for x in p["p_with_run_without"].values())
 
 
 def test_analyse_flags_pairs_that_differ_on_few_items():
@@ -195,3 +199,29 @@ def test_binary_check_direction(tmp_path, monkeypatch):
     )
     assert abs(up["context"]["base_pass"] - 0.9) < 0.01
     assert up["context"]["logit_shift"] > 0 > down["context"]["logit_shift"]
+
+
+def test_pair_run_term_counts_partial_runs_as_whole_runs():
+    # Run-adjusted item means average every run's shock equally, so a partial replicate run
+    # adds a whole run: var(diff) = run * (1/2 + 1), not run / R_eff with R_eff = 1.1.
+    from evalnoise.components import estimate
+
+    rng = np.random.default_rng(3)
+    items = np.array([f"t{j}" for j in range(40)])
+    pairs = [("a", "b")]
+    diffs, se2 = [], []
+    for _ in range(1000):
+        u = rng.normal(0, 3, 40)
+        w = rng.normal(0, 1, 3)
+        parts = [
+            pd.DataFrame({"item": items, "arm": "a", "run": "r1", "y": u + w[0]}),
+            pd.DataFrame({"item": items[:4], "arm": "a", "run": "r2", "y": u[:4] + w[1]}),
+            pd.DataFrame({"item": items, "arm": "b", "run": "r1", "y": u + w[2]}),
+        ]
+        df = pd.concat(parts, ignore_index=True)
+        df = df.assign(score=df["y"] + rng.normal(0, 0.1, len(df)), repeat=0, cluster=df["item"])
+        est = estimate(df, pairs=pairs)
+        p = study._pairs_with_run_term(est.pairs, pairs, df, Components(run=1.0), 4.0)["a - b"]
+        diffs.append(p["difference"])
+        se2.append(p["se_with_run"] ** 2)
+    assert np.var(diffs) / np.mean(se2) == pytest.approx(1.0, abs=0.1)
