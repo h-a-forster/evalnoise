@@ -8,25 +8,38 @@ are 95%. Model, estimators and interval methods: [docs/DESIGN.md](docs/DESIGN.md
 ## Summary
 
 - In the only dataset with replicate runs (mm-arena, three Claude setups run two or three
-  times on 120 episodes), the run SD was **4.2 pp** of edge captured (**2.2 to 12.6**,
-  chi-square, 4 df). For a paired comparison of two setups from one run each, that makes
-  the SE of the difference **6.3 pp** instead of the **2.1 pp** the episodes alone give;
-  the run term is 89% of the variance. A paired test over episodes, which ignores runs,
-  would call two identical setups different **51%** of the time (**27% to 82%** across the
-  run-variance interval) at a nominal 5%.
-- With those estimates no number of episodes brings the MDE of a one-run-per-setup
-  comparison below 10 pp. Five runs per setup with 45 episodes reach 10 pp; 5 pp needs
-  about 20 runs. The run-variance interval is wide, so these counts are uncertain by a
-  factor of several.
+  times on 120 episodes), the run SD pooled over the three setups was **4.2 pp** of edge
+  captured (**2.2 to 12.6**, chi-square, 4 df). Most of it is one setup: fitted alone, the
+  run SDs are 0.9 (`fable-5-1@high`), 2.6 (`opus-5-5@high`) and 5.6 (`haiku-5-5@high`), and
+  re-estimated without haiku the run SD is 2.0 (0.7 to 14.1). The setups also differ in
+  item x run SD (5.9, 10.9 and 18.0; Bartlett p < 0.001), so the shared-variance model is
+  a rough approximation here.
+- For a hypothetical pair of setups with the pooled variances, compared from one run
+  each, the estimated SE of the difference is **6.3 pp** instead of the **2.1 pp** the
+  episodes alone give (2.4 once the two seeds of a game are treated as correlated); the
+  run term is 89% of the variance. A paired test over episodes, which ignores runs, would
+  call two identical setups different **51%** of the time (**27% to 82%** across the
+  run-variance interval) at a nominal 5%. Without haiku the SE is 3.2 pp and the rate 38%.
+- With the pooled estimates no number of episodes brings the MDE of a one-run-per-setup
+  comparison below 10 pp. 10 pp needs 4 runs per setup with 95 episodes, or 5 with 45.
+  5 pp needs 20 runs within the 120 episodes available; 13 runs need 526 episodes and 12
+  runs 3286. These counts treat episodes as independent; the seeds of a game are
+  correlated (design effect about 1.3), so they are roughly a third too small. The
+  run-variance interval is wide, so the counts are uncertain by a factor of several.
 - In the pass/fail datasets with one run per arm (agent-ab, overclaim, ruleproof
   pressure), the run variance is not identified. Their MDEs at the published designs,
   6.6 pp (agent-ab, 50 tasks x 3), 11 pp (overclaim, 23 x 2 and 18 x 4) and 53 pp
   (ruleproof pressure, 5 tasks x 3), assume no run effect and are lower bounds. Trial
   noise within a run was SD 18 to 22 pp of pass rate (36 pp on ruleproof's pressure
-  tasks), comparable to or larger than the task SD, so repeats there buy real precision.
+  tasks), far larger than the item x arm SD, so repeats there buy real precision. Most of
+  these pairs differ on fewer than 10 tasks (agent-ab Haiku vs Sonnet: 3 of 50), so their
+  SEs and MDEs rest on a handful of tasks.
 - The planner reproduces its nominal power and size in simulation when its assumptions
-  hold. Known gaps: the run-aware t-test is somewhat liberal with three runs per arm, and
-  the percentile bootstrap undercovers the item x arm SD with 40 items.
+  hold. Known gaps: the run-aware t-test is somewhat liberal with three runs per arm;
+  with the run variance borrowed from a pilot with 4 run df, as in the mm-arena MDEs, power
+  at the planned MDE was 0.76; near a 90% pass rate the planned MDE is conservative for
+  gains but optimistic for losses (power 0.67); and the percentile bootstrap undercovers
+  the item x arm SD with 40 items.
 
 These are nine analyses of seven tables from four small projects, all using Claude models
 through Claude Code or the Claude CLI. They show what the method finds; they do not
@@ -57,7 +70,9 @@ so their run term includes a code change.
 ## Variance components
 
 SD in the dataset's unit; 95% cluster-bootstrap intervals, chi-square for run.
-`n/i`: not identified; `(in X)`: folded into X.
+`n/i`: not identified; `(in X)`: folded into X; `<0`: negative moment estimate (0 in
+planning); `all draws < 0`: every bootstrap draw was negative too. ICC item is the
+correlation between trials of two different arms on the same item.
 
 | Dataset | item | item x arm | run | item x run | within run | ICC item |
 |---|---:|---:|---:|---:|---:|---:|
@@ -66,9 +81,9 @@ SD in the dataset's unit; 95% cluster-bootstrap intervals, chi-square for run.
 | `agent-ab-no-tests` | 13.9 [0.0, 24.3] | 3.2 [0.0, 8.7] | n/i | (in item x arm) | 19.1 [12.9, 23.8] | 0.34 |
 | `agent-ab-no-tests-cost` | 0.753 [0.489, 0.993] | 0.166 [0.027, 0.258] | n/i | (in item x arm) | 0.191 [0.140, 0.245] | 0.90 |
 | `agent-ab-haiku-vs-sonnet` | 13.4 [0.0, 23.7] | 17.4 [0.0, 26.4] | n/i | (in item x arm) | (in item x arm) | 0.37 |
-| `overclaim-setups` | 43.0 [27.8, 49.1] | 0.0 [0.0, 1.3] | n/i | (in item x arm) | 18.1 [10.4, 25.5] | 0.85 |
-| `overclaim-interventions` | 22.8 [0.6, 37.1] | 0.0 [0.0, 0.0] | n/i | (in item x arm) | 22.3 [14.8, 28.7] | 0.51 |
-| `ruleproof-main` | 9.5 [0.0, 12.0] | 19.6 [10.6, 21.3] | 0.0 [0.0, 8.8] | 0.0 [0.0, 7.5] | 22.4 [18.3, 25.8] | 0.09 |
+| `overclaim-setups` | 43.0 [27.8, 49.1] | <0 [0.0, 1.3] | n/i | (in item x arm) | 18.1 [10.4, 25.5] | 0.85 |
+| `overclaim-interventions` | 22.8 [0.6, 37.1] | <0 [all draws < 0] | n/i | (in item x arm) | 22.3 [14.8, 28.7] | 0.51 |
+| `ruleproof-main` | 9.5 [0.0, 12.0] | 19.6 [10.6, 21.3] | <0 [0.0, 8.8] | <0 [0.0, 7.5] | 22.4 [18.3, 25.8] | 0.09 |
 | `ruleproof-pressure` | 26.2 [0.0, 35.9] | 7.5 [0.0, 14.8] | n/i | (in item x arm) | 36.5 [20.0, 47.6] | 0.33 |
 
 Observations:
@@ -83,11 +98,19 @@ Observations:
   third run covers, `haiku-5-5@high` scored 61.8, 74.8 and 67.2 in runs 1 to 3. The
   harness version was not recorded for runs 1 and 2, so a version change cannot be ruled
   out as the cause.
+- **The setups do not share one noise level.** Fitted one setup at a time
+  (`results/study/summary.md`, "Run term by arm"), the run SD is 0.9 [0.0, 35.4] for
+  `fable-5-1@high`, 2.6 [0.7, 88.5] for `opus-5-5@high` and 5.6 [2.5, 37.1] for
+  `haiku-5-5@high`, each on 1 or 2 df; leaving one setup out gives 4.7, 2.0 and 4.7. The
+  item x run SD is 5.9, 10.9 and 18.0 (Bartlett p < 0.001). The pooled 4.2 pp and every
+  number derived from it describe an average of these setups, not any particular pair.
 - **`mm-arena-all` pools single-run setups** under the assumption that all setups share
   the replicated setups' residual; its larger item x arm SD (19.7 vs 8.4) reflects that
   low-effort setups disagree with high-effort ones on which episodes are hard.
 - **Pass/fail data near ceiling** (agent-ab 93 to 95% pass, overclaim interventions 88
-  to 92%) give wide item intervals that reach 0, and item x arm estimates at the boundary.
+  to 92%) give wide item intervals that reach 0, and item x arm estimates at or below the
+  boundary. In overclaim study 2 every bootstrap draw of item x arm is negative: the
+  moment noise model overstates the noise of the cell means there.
   overclaim study 1 (pass rates 67 to 72%) has a much larger task SD (43 pp).
 - **ruleproof has only 5 tasks**, so its item components are barely informative; its run
   estimate (hook arms, two builds) is 0 with an upper bound of 8.8 pp.
@@ -106,7 +129,10 @@ repeat, so the layout is unbalanced); every other component differs by less than
 
 Paired comparison of two arms, one run per arm, at each dataset's observed number of tasks
 and repeats. Where identified, the run variance is borrowed with its degrees of freedom
-(4 for mm-arena), which widens the t quantiles.
+(4 for mm-arena), which widens the t quantiles. In simulation of that regime
+(`borrowed-t120-r1`) the test's size was 0.058 and its power at the planned MDE 0.76, so
+the mm-arena MDEs are somewhat optimistic. SEs are estimates; for mm-arena they rest on
+the 4 run df.
 
 | Dataset | Tasks x repeats | SE, items only | SE with run term | MDE | MDE at run CI ends | Naive false-positive rate |
 |---|---|---:|---:|---:|---:|---:|
@@ -123,37 +149,50 @@ MDE in pp, 80% power, alpha 0.05; brackets are item-bootstrap intervals (run var
 at its estimate). For mm-arena the item-bootstrap interval is negligible next to the
 run-variance interval, shown separately.
 
-Tasks per arm for a target MDE (selected rows; R runs per arm, K repeats per task per run;
-"never": the run term alone exceeds the target):
+Episodes per setup for a target MDE in `mm-arena-replicated` (R runs per setup, one
+trial per episode per run; "never": the run term alone exceeds the target):
 
-| Dataset | Target | R1 K1 | R1 K3 | R3 K1 | R5 K1 | R10 K1 | R20 K1 |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| `mm-arena-replicated` | 10 pp | never | never | never | 45 | 22 | 17 |
-| `mm-arena-replicated` | 5 pp | never | never | never | never | never | 118 |
-| `agent-ab-no-tests` (lower bound) | 5 pp | 239 | 86 | 86 | 55 | - | - |
-| `agent-ab-no-tests` (lower bound) | 10 pp | 62 | 23 | 23 | 16 | - | - |
-| `overclaim-interventions` (lower bound) | 10 pp | 81 | 29 | 29 | 18 | - | - |
+| Target | R1 to R3 | R4 | R5 | R10 | R12 | R13 | R15 | R20 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 10 pp | never | 95 | 45 | 22 | 20 | 19 | 18 | 17 |
+| 5 pp | never | never | never | never | 3286 | 526 | 226 | 118 |
 
-For mm-arena, repeats within a run do not help in this table because within-run noise is
-not separated from item x run noise there (no repeats inside a run); the planner then
-assumes, conservatively, that only new runs average it out.
+Repeats within a run do not help here because within-run noise is not separated from
+item x run noise (no repeats inside a run); the planner then assumes, conservatively, that
+only new runs average it out. These counts treat the 120 episodes as independent; the
+two seeds of a game are correlated, and the median design effect over pairs is 1.33, so
+multiply them by about 1.3. They use the pooled components, which no single setup has.
+
+Tasks per arm for the pass/fail datasets (lower bounds: no run effect; K repeats per task):
+
+| Dataset | Target | R1 K1 | R1 K3 | R3 K1 | R5 K1 |
+|---|---:|---:|---:|---:|---:|
+| `agent-ab-no-tests` | 5 pp | 239 | 86 | 86 | 55 |
+| `agent-ab-no-tests` | 10 pp | 62 | 23 | 23 | 16 |
+| `overclaim-interventions` | 10 pp | 81 | 29 | 29 | 18 |
+
+Their arms differ on only 9 (agent-ab) and 3 to 5 (overclaim) tasks, so these counts are
+rough.
 
 ## Pairwise differences, with and without the run term
 
-For mm-arena, the items-only SE understates the uncertainty of every pair:
+For mm-arena, the item-level SEs understate the uncertainty of every pair:
 
-| Pair (mm-arena) | Difference, pp [item bootstrap] | SE, items only | SE with run term |
-|---|---:|---:|---:|
-| `fable-5-1@high` - `opus-5-5@high` | 4.1 [1.9, 6.5] | 1.2 | 4.5 |
-| `fable-5-1@high` - `haiku-5-5@high` | 5.1 [0.5, 9.1] | 1.8 | 4.5 |
-| `haiku-5-5@high` - `opus-5-5@high` | -1.0 [-5.5, 3.9] | 2.0 | 4.4 |
-| `opus-5-5@high` - `opus-5-5@medium` | 13.1 [10.2, 16.2] | 1.5 | 5.3 |
-| `sonnet-5-5@high` - `sonnet-5-5@low` | 54.4 [47.5, 61.6] | 3.4 | 6.8 |
+| Pair (mm-arena) | Difference, pp [item bootstrap] | SE, episodes | SE, games | p, games | SE with run term | df / p with run term |
+|---|---:|---:|---:|---:|---:|---:|
+| `fable-5-1@high` - `opus-5-5@high` | 4.1 [1.9, 6.5] | 1.2 | 1.2 | 0.001 | 4.5 | 4.6 / 0.40 |
+| `fable-5-1@high` - `haiku-5-5@high` | 5.1 [0.5, 9.1] | 1.8 | 2.1 | 0.018 | 4.6 | 6.3 / 0.31 |
+| `haiku-5-5@high` - `opus-5-5@high` | -1.0 [-5.5, 3.9] | 2.0 | 2.5 | 0.69 | 4.6 | 7.6 / 0.84 |
+| `opus-5-5@high` - `opus-5-5@medium` | 13.1 [10.2, 16.2] | 1.5 | 1.6 | <0.001 | 5.4 | 4.8 / 0.061 |
+| `sonnet-5-5@high` - `sonnet-5-5@low` | 54.4 [47.5, 61.6] | 3.4 | 3.7 | <0.001 | 7.0 | 7.7 / <0.001 |
 
-The run term counts each arm's effective runs (a partial replicate run counts
-fractionally). The fable vs opus gap, clearly non-zero by its item interval, is within one
-SE once runs are accounted for. The effort-level gaps stay clear: 13.1 pp is 2.5 SEs and
-54.4 pp is 8 SEs.
+SE, games: clustered by game (60 games of two seeds each), tested with 59 df. The run term
+counts each arm's effective runs (a partial replicate run counts fractionally) and is
+tested with Satterthwaite df using its own 4 df. The fable vs opus gap, clearly non-zero
+over games (p = 0.001), is within one SE once runs are accounted for (p = 0.40). The opus
+effort gap is borderline once runs count (t = 2.4 on about 5 df, p = 0.06); the sonnet
+effort gap stays clear. The pooled run variance is an average over setups that differ
+(see Variance components), so these run-aware tests are approximate.
 
 ## Validation
 
@@ -168,13 +207,16 @@ Monte Carlo intervals there):
 | same | power at planned MDE | 0.775 [0.731, 0.815] | 0.80 |
 | run-aware t, 60 tasks, 6 runs | size / power | 0.052 / 0.797 | 0.05 / 0.80 |
 | run-blind paired t, 1 run, 120 / 30 tasks | false-positive rate | 0.615 / 0.370 | 0.624 / 0.368 |
-| pass/fail (logistic), 50 x 3 / 30 x 1 | size | 0.060 / 0.044 | 0.05 |
+| pass/fail (logistic), 50 x 3 / 30 x 1, pass rate 60 to 70% | size | 0.060 / 0.044 | 0.05 |
 | same | power at planned MDE | 0.854 / 0.866 | 0.80 |
+| pass/fail near 90% pass, 50 x 3, gain / loss | size | 0.048 / 0.046 | 0.05 |
+| same | power at planned MDE | 0.984 / 0.668 | 0.80 |
+| run variance borrowed from a pilot (4 run df), 120 tasks, 1 run | size / power | 0.058 / 0.762 | 0.05 / 0.80 |
 | bootstrap, 40 tasks x 2 arms x 3 repeats | coverage: item / item x arm / within | 0.89 / 0.85 / 0.93 | 0.95 |
 | bootstrap and chi-square, 60 tasks x 3 arms x 3 runs | coverage: item / item x arm / run | 0.93 / 0.94 / 0.96 | 0.95 |
 
-Simulation counts: 2000 per power and false-positive check, 400 per run-aware check, 500
-per pass/fail check, and 120 (200 bootstrap draws each) per coverage check. The unit tests
+Simulation counts: 2000 per power and false-positive check, 400 per run-aware and
+borrowed-run check, 500 per pass/fail check, and 120 (200 bootstrap draws each) per coverage check. The unit tests
 add unbiasedness checks of every estimator under every layout, the variance formula
 against simulated experiments, and the REML code against statsmodels.
 
@@ -188,12 +230,21 @@ against simulated experiments, and the REML code against statsmodels.
   runs as exchangeable draws, which a one-off version change is not.
 - **Lower bounds where runs are not replicated.** Every MDE for agent-ab, overclaim and
   ruleproof-pressure assumes no run effect.
-- **Linear model for pass/fail outcomes, with common variances across arms.** The
-  simulation checks show this is conservative for planning, but component estimates near
-  0% or 100% pass rates sit on the boundary.
+- **Common variances across arms.** The mm-arena setups reject it (item x run SD 5.9 to
+  18.0, run SD 0.9 to 5.6), and `mm-arena-all` extends the same assumption to six
+  single-run setups. Pooled numbers describe an average setup.
+- **Episodes are not independent.** mm-arena's two seeds per game are correlated. Pair
+  tests use game-clustered SEs, but the planner counts episodes as independent units, so
+  its episode counts are about 1.3x too small there.
+- **Linear model for pass/fail outcomes.** At pass rates of 60 to 70% the planned MDE was
+  conservative. Near 90% it was conservative for gains (power 0.98) and optimistic for
+  losses (0.67), because the variance shrinks towards the ceiling; plan for a drop near 0%
+  or 100% from the variance at the shifted rate. Component estimates near those rates sit
+  on the boundary, and most pass/fail pairs here differ on fewer than 10 tasks.
 - **Interval methods.** The percentile bootstrap undercovered the item x arm SD with 40
-  items (0.85); the run-variance interval treats the residual as known; the run-aware
-  t-test was liberal with three runs per arm (size 0.077).
+  items (0.85); the run-variance interval treats the residual as known and pools arms
+  whose residuals differ; the run-aware t-test was liberal with three runs per arm (size
+  0.077), and with a run variance borrowed on 4 df its power at the planned MDE was 0.76.
 - **Quick profile.** 1000 bootstrap draws per dataset and the Monte Carlo sizes above. A
   full-profile run (10,000 draws, about 10x the simulations) is prepared but not yet run.
 - **Data snapshot.** The mm-arena replicate runs were incomplete at extraction; rerunning

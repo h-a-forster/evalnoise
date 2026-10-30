@@ -26,12 +26,15 @@ survey; treat the numbers as examples of what the tool shows.
 
 - **Run-to-run shifts dominated the one benchmark with replicate runs.** In mm-arena
   (120 market-making episodes, three Claude setups run two or three times each) the run
-  SD was 4.2 pp of edge captured (95% CI 2.2 to 12.6). A paired comparison of two setups
-  from one run each then has an SE of 6.3 pp, not the 2.1 pp its item-level interval
-  reports, and a run-blind paired test calls two identical setups different about half
-  the time (51%, CI 27% to 82%).
-- **More episodes cannot fix that; more runs can.** With these estimates a 10 pp
-  difference needs at least 5 runs per setup (45 episodes each); 5 pp needs about 20.
+  SD pooled over the setups was 4.2 pp of edge captured (95% CI 2.2 to 12.6), mostly from
+  one setup (fitted alone: 0.9, 2.6 and 5.6 pp). For a pair of setups with the pooled
+  variances, compared from one run each, the estimated SE is 6.3 pp, not the 2.1 pp an
+  item-level interval reports, and a run-blind paired test calls two identical setups
+  different about half the time (51%, CI 27% to 82%; 38% with the noisiest setup left out).
+- **More episodes cannot fix that; more runs can.** With the pooled estimates a 10 pp
+  difference needs 4 runs per setup with 95 episodes, or 5 with 45; 5 pp needs 20 runs
+  within the 120 episodes (13 runs need 526). Episodes pair up within
+  games, so these counts are roughly a third too small.
 - **Pass/fail evals with one run per arm cannot identify the run term at all.** For
   agent-ab and overclaim (18 to 50 coding tasks) the MDEs of the published designs are
   6.6 to 11 pp before any run effect, so they are lower bounds. Trial noise within a run
@@ -40,9 +43,11 @@ survey; treat the numbers as examples of what the tool shows.
 - **The planner is calibrated where its assumptions hold.** In simulation, power at the
   planned MDE was 0.79 to 0.81 and size 0.04 to 0.06 for paired item-level tests; the
   false-positive formula for run-blind tests matched simulation (0.615 vs 0.624, 0.370
-  vs 0.368). Planning for pass/fail data from a pilot was conservative (power 0.85 to 0.87).
-  Two weak spots: with only three runs the run-aware test was somewhat liberal (size
-  0.077), and the bootstrap interval for item x arm undercovered with 40 items (0.85).
+  vs 0.368). Planning for pass/fail data from a pilot was conservative at 60 to 70% pass
+  rates (power 0.85 to 0.87). Weak spots: with only three runs the run-aware test was
+  somewhat liberal (size 0.077); with the run variance borrowed on 4 df, power at the
+  planned MDE was 0.76; near a 90% pass rate a planned drop was detected with power 0.67;
+  and the bootstrap interval for item x arm undercovered with 40 items (0.85).
 
 ## Install
 
@@ -153,15 +158,20 @@ validation plan are in [docs/DESIGN.md](docs/DESIGN.md), with prior work. In sho
 - paired difference variance: `2 (item_arm + item_run / R + within / (R K)) / T + 2 run / R`
   for `T` tasks, `R` runs per arm and `K` repeats per task per run;
 - the run term ignores `T` and `K`: only runs reduce it;
-- components the data cannot separate are folded where they do not shrink, so the MDE is
-  never understated.
+- components the data cannot separate are folded where they do not shrink, so folding
+  never lowers the MDE; a component that is neither given nor folded is an error.
 
 ## Limitations
 
 - The study covers four small projects, all on Claude models through Claude Code or the
   Claude CLI; only one has replicate runs, and its run variance rests on 4 degrees of
   freedom.
-- Pass/fail outcomes are analysed on the 0/1 scale with variances common to all arms.
+- Variances are assumed common to all arms; the study reports per-arm run terms and tests
+  the item x run variance for equality (the mm-arena setups fail it).
+- Pass/fail outcomes are analysed on the 0/1 scale, which makes planned MDEs optimistic
+  for drops near 0% or 100% pass rates.
+- The planner treats items as independent; when items share a cluster (mm-arena: two
+  seeds per game), the study reports the design effect and pair tests use clustered SEs.
 - Runs are treated as exchangeable draws; a harness update between runs is really a fixed
   shift, which the data here cannot tell apart.
 - More in [REPORT.md](REPORT.md#limitations).

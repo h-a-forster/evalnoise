@@ -6,6 +6,29 @@ All notable changes are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Study: per-arm run and item x run estimates, leave-one-arm-out run estimates and
+  Bartlett's test of a common item x run variance; cluster-robust pair SEs with
+  p-values, with and without the run term (Satterthwaite df); the median design effect
+  of clustered items; a flag for pairs that differ on fewer than 10 items. The summary
+  lists all planning notes.
+- Validation: pass/fail checks near a 90% pass rate with gains and losses, and a check of
+  tests that borrow the run variance from a small pilot.
+
+### Changed
+
+- The mm-arena planning grid covers every run count where the plan changes (1 to 20).
+- Negative moment estimates are shown as `<0` in the study summary instead of 0.
+
+### Fixed
+
+- Planning took an omitted item x run or within-run variance as 0 (for example
+  `power --components item_arm=70,run=17`); it is now an error unless the layout folded
+  that component into another.
+- `Components.from_dict` could not read the nulls that study unit files use for nan.
+- A test depended on a scipy release in which `nct.cdf` returns nan.
+
 ## [0.1.0] - 2026-10-30
 
 ### Added

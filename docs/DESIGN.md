@@ -32,7 +32,9 @@ y_airk = mu_a + u_i + v_ai + w_ar + g_air + e_airk
 | `e_airk` | `within` | trial-to-trial noise inside one run |
 
 All effects are independent with mean zero, and the variances are common to all arms
-(a working assumption; per-arm summaries are reported alongside). Runs are nested in arms:
+(a working assumption: the study reports per-arm run and item x run estimates, run
+estimates leaving each arm out, and Bartlett's test that the arms share one item x run
+variance). Runs are nested in arms:
 run `r1` of arm A has nothing to do with run `r1` of arm B. Scores are analysed on their own
 scale; pass/fail outcomes are 0/1 (or 0/100 for percentage points), which makes the
 components variances of a linear probability model. That is the right scale for the
@@ -44,7 +46,7 @@ simulated binary data.
 - The five variance components above, reported as standard deviations in the score's
   unit, with 95% intervals.
 - `ICC item = item / (item + item_arm + run + item_run + within)`: the correlation between
-  two trials of one arm on the same item. It is large in every dataset here, which is why
+  trials of two different arms on the same item. It is large in every dataset here, which is why
   paired comparisons are so much more efficient than unpaired ones.
 - For a comparison of two arms on `T` items with `R` runs per arm and `K` repeats per item
   per run, the variance of the difference in arm means:
@@ -100,8 +102,13 @@ dataset) or explicitly assume zero, and the study labels every such MDE a lower 
    `E[MS_inter] = item_arm + noise` and `E[MS_item] = A item + item_arm + noise`, where
    `noise` is the mean variance of the (arm, item) means implied by steps 1-2.
 4. Pairs: for each requested pair the per-item differences give the mean difference, its
-   items-only SE, and the pair's own `item_arm` (half the excess variance of the
-   differences). The study adds an SE that includes `run / R_eff` per arm.
+   items-only SE, a cluster-robust SE (sums of centred differences per cluster; equal to
+   the items-only SE with one item per cluster), the number of items on which the arms
+   differ, and the pair's own `item_arm` (half the excess variance of the differences).
+   The study tests each pair over clusters (clusters - 1 df) and, adding `run / R_eff`
+   per arm, with Satterthwaite df using the run term's own df. It also reports the median
+   design effect (clustered over items-only SE, squared) and flags pairs that differ on
+   fewer than 10 items.
 
 **REML** (`evalnoise.reml`): the same model fitted by restricted maximum likelihood with a
 dense marginal covariance and analytic gradients (L-BFGS-B), as a cross-check. On balanced
@@ -111,7 +118,8 @@ statsmodels itself is not used at runtime: its single-group crossed fit did not 
 within two minutes on a simulated 720-trial table (40 items, 3 arms, 3 runs, 2 repeats)
 that the dense fit handles in about 5 seconds.
 
-Negative moment estimates are kept for bootstrapping and shown as 0.
+Negative moment estimates are kept for bootstrapping, used as 0 in planning and shown as
+`<0` in the study summary.
 
 ## 6. Intervals
 
@@ -151,7 +159,8 @@ more precision than another repeat of an old one.
 | `power-*` | Gaussian, no run effect | paired t-test over items | alpha at 0; 80% at the MDE |
 | `runs-*` | Gaussian, run effect, 3 or 6 runs | moment estimates + Satterthwaite t | alpha at 0; 80% at the MDE |
 | `naive-*` | Gaussian, run effect, 1 run | paired t-test over items | the naive false-positive rate |
-| `binary-*` | logistic pass/fail | paired t-test over items, planned from a pilot | alpha at 0; 80% at the MDE |
+| `binary-*` | logistic pass/fail, 60 to 70% and 90% pass, gains and losses | paired t-test over items, planned from a pilot | alpha at 0; 80% at the MDE |
+| `borrowed-*` | Gaussian, run effect, 1 run per arm | run variance from a 4-df pilot + Satterthwaite t | alpha at 0; 80% at the MDE |
 | `coverage-*` | Gaussian | bootstrap / chi-square intervals | 95% coverage |
 
 The unit tests also check unbiasedness of every estimator for every layout in section 4,
@@ -209,8 +218,13 @@ Trials without a verdict (agent errors) are excluded and counted in the manifest
 
 ## 10. Limitations of the design
 
-- Common variances across arms. Pass/fail data violate this (variance `p(1 - p)`); per-pair
-  `item_arm` estimates and the binary validation checks show how much it matters.
+- Common variances across arms. Pass/fail data violate this (variance `p(1 - p)`): near
+  the ceiling a planned drop is detected less often than planned and a gain more often
+  (see the binary checks). The mm-arena setups violate it too (item x run SD 5.9 to 18.0).
+- Items are independent in the planner. Clustered items (mm-arena's seeds within games)
+  make its task counts too small by the design effect, which the study reports.
+- MDEs with a run variance borrowed on few df are somewhat optimistic (power 0.76 at a
+  planned 0.80 with 4 df).
 - Runs are assumed exchangeable. A run effect that is really a version change (a harness
   update between runs) is a fixed shift, not a draw from a distribution; the model treats
   it as random because nothing records which runs share a version.
