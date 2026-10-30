@@ -68,10 +68,12 @@ def test_t_power_equals_noncentral_t_for_paired_items():
     assert power_at(r, d, 1.7) == pytest.approx(expect, rel=1e-9)
 
 
-def test_power_where_scipy_nct_returns_nan():
-    # Regression: nct.cdf is nan here, which made the MDE root-finder fail.
-    assert math.isnan(stats.nct.cdf(-2.7764, 4.0001, 10.86))
-    r = resolve(Components(item=3000, item_arm=44.0, run=22.1, item_run=227.6))
+def test_power_where_scipy_nct_returns_nan(monkeypatch):
+    # Regression: some scipy releases return nan from nct.cdf here (e.g. at
+    # (-2.7764, 4.0001, 10.86)), which made the MDE root-finder fail. Force the nan so the
+    # fallback is exercised whatever scipy is installed.
+    monkeypatch.setattr(stats.nct, "cdf", lambda *a, **k: math.nan)
+    r = resolve(Components(item=3000, item_arm=44.0, run=22.1, item_run=227.6, within=0.0))
     p = power_at(r, Design(1_000_000, 3, 1), 41.69)
     assert math.isfinite(p) and p > 0.999
     assert math.isfinite(mde(r, Design(1_000_000, 3, 1)))
