@@ -187,7 +187,8 @@ def _cells(a: np.ndarray, i: np.ndarray, r: np.ndarray, y: np.ndarray) -> tuple[
     n = np.diff(np.r_[starts, len(k_sorted)])
     ys = y[order]
     s = np.add.reduceat(ys, starts)
-    ss = np.add.reduceat(ys * ys, starts) - s * s / n
+    dev = ys - np.repeat(s / n, n)  # two-pass: sum(y^2) - s^2/n cancels on large scores
+    ss = np.add.reduceat(dev * dev, starts)
     first = order[starts]
     return a[first], i[first], r[first], n, s / n, np.maximum(ss, 0.0)
 

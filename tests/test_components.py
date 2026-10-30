@@ -198,3 +198,12 @@ def test_run_interval_is_degenerate_not_zero_width():
     assert math.isnan(lo) and math.isnan(hi)
     lo, hi = RunTerm(ss=500.0, df=1, k=10.0, rss=100.0, df_res=10).interval()
     assert 0 < lo < hi
+
+
+def test_estimates_do_not_depend_on_the_score_offset():
+    # Regression: the one-pass within-cell sum of squares lost precision on large scores.
+    df = simulate(Components(4.0, 1.0, 0.5, 0.7, 2.0), tasks=20, arms=2, runs=2, repeats=3, seed=3)
+    base = estimate(df).components
+    shifted = estimate(df.assign(score=df["score"] + 1e8)).components
+    for name in ("item", "item_arm", "run", "item_run", "within"):
+        assert getattr(shifted, name) == pytest.approx(getattr(base, name), rel=1e-3), name
