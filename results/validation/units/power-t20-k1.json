@@ -1,7 +1,7 @@
 {
  "name": "power-t20-k1",
  "kind": "power",
- "key": "896a5c564f9587d0",
+ "key": "75b6f9ce816f4d38",
  "seed": 2197195442,
  "sims": 2000,
  "design": {
@@ -39,5 +39,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 0.02
+ "seconds": 0.04
 }

@@ -1,7 +1,7 @@
 {
  "name": "naive-t120-r1",
  "kind": "naive",
- "key": "54cc324844bcf037",
+ "key": "964b9c5cb1a2114b",
  "seed": 1817617302,
  "sims": 2000,
  "design": {
@@ -29,5 +29,5 @@
    "nominal": 0.6241402702064649
   }
  },
- "seconds": 0.01
+ "seconds": 0.11
 }

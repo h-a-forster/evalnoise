@@ -33,4 +33,5 @@ Rates with exact 95% Monte Carlo intervals; `nominal` is what the planner predic
 | `coverage-t40-a2-k3` | within | 0.925 [0.862, 0.965] | 0.950 | 120 |
 | `coverage-t60-a3-r3` | item | 0.925 [0.862, 0.965] | 0.950 | 120 |
 | `coverage-t60-a3-r3` | item_arm | 0.942 [0.884, 0.976] | 0.950 | 120 |
+| `coverage-t60-a3-r3` | item_run | 0.875 [0.802, 0.928] | 0.950 | 120 |
 | `coverage-t60-a3-r3` | run (chi-square) | 0.958 [0.905, 0.986] | 0.950 | 120 |

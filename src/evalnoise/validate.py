@@ -54,7 +54,7 @@ PROFILES: dict[str, dict[str, int]] = {
     },
 }  # fmt: skip
 # Bump when a check's computation changes, so cached shards rerun.
-SCHEMA = 2
+SCHEMA = 3
 
 
 @dataclass(frozen=True)
@@ -359,7 +359,7 @@ def _count_borrowed(chk, ctx, sims, rng, prof) -> dict[str, int]:  # type: ignor
 
 
 def _coverage_names(chk: Check) -> list[str]:
-    return [n for n in ("item", "item_arm", "within") if getattr(chk.comps, n) > 0]
+    return [n for n in ("item", "item_arm", "item_run", "within") if getattr(chk.comps, n) > 0]
 
 
 def _prep_coverage(chk: Check, rng: np.random.Generator) -> dict[str, Any]:

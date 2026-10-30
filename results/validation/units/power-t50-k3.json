@@ -1,7 +1,7 @@
 {
  "name": "power-t50-k3",
  "kind": "power",
- "key": "2eec206b20660040",
+ "key": "5e222f74f45012bf",
  "seed": 3738711966,
  "sims": 2000,
  "design": {
@@ -39,5 +39,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 0.01
+ "seconds": 0.08
 }

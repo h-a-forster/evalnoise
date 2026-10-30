@@ -1,7 +1,7 @@
 {
  "name": "naive-t30-r1",
  "kind": "naive",
- "key": "bb1790ab78ec3161",
+ "key": "c30abd54a8d7a7db",
  "seed": 1235085377,
  "sims": 2000,
  "design": {
@@ -29,5 +29,5 @@
    "nominal": 0.36849653412685623
   }
  },
- "seconds": 0.01
+ "seconds": 0.04
 }
