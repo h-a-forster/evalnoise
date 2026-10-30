@@ -106,8 +106,15 @@ CHECKS = [
         Design(50, 1, 3),
         {"mean": 2.97, "direction": -1},
     ),
-    # Pilot of 2 arms x 3 runs (4 run df), then a 120-task, one-run-per-arm comparison.
-    Check("borrowed-t120-r1", "borrowed", RUNNY, Design(120, 1, 1), {"pilot_runs": 3}),
+    # Pilot of 7 arms x 2 runs (7 run df, as mm-arena's pooled run term), then a 120-task,
+    # one-run-per-arm comparison.
+    Check(
+        "borrowed-t120-r1",
+        "borrowed",
+        RUNNY,
+        Design(120, 1, 1),
+        {"pilot_arms": 7, "pilot_runs": 2},
+    ),
     Check("coverage-t40-a2-k3", "coverage", BASE, Design(40, 1, 3)),
     Check("coverage-t60-a3-r3", "coverage", RUNNY, Design(60, 3, 1), {"arms": 3}),
 ]
@@ -326,12 +333,14 @@ def _count_binary(chk, ctx, sims, rng, prof) -> dict[str, int]:  # type: ignore[
 # --------------------------------------------------------------------------- borrowed
 
 
-def _pilot_runs(chk: Check) -> int:
-    return int(chk.params["pilot_runs"])
+def _pilot(chk: Check) -> tuple[int, int]:
+    """Pilot (arms, runs per arm)."""
+    return int(chk.params["pilot_arms"]), int(chk.params["pilot_runs"])
 
 
 def _prep_borrowed(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
-    run_df = 2.0 * (_pilot_runs(chk) - 1)  # two pilot arms
+    arms, runs = _pilot(chk)
+    run_df = float(arms * (runs - 1))
     target = mde(resolve(chk.comps, run_df=run_df), chk.design)
     return {"mde": target, "run_df": run_df, "nominal": {"null": 0.05, "at_mde": 0.8}}
 
@@ -339,12 +348,13 @@ def _prep_borrowed(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
 def _count_borrowed(chk, ctx, sims, rng, prof) -> dict[str, int]:  # type: ignore[no-untyped-def]
     """Pilot estimate of the run variance, then a test of a fresh one-run-per-arm experiment."""
     d = chk.design
+    arms, runs = _pilot(chk)
     out = {}
     for q, eff in (("null", 0.0), ("at_mde", ctx["mde"])):
         diffs = _item_differences(chk.comps, d, eff, sims, rng)
         rej = 0
         for row in diffs:
-            pilot = estimate(simulate(chk.comps, tasks=d.tasks, runs=_pilot_runs(chk), seed=rng))
+            pilot = estimate(simulate(chk.comps, tasks=d.tasks, arms=arms, runs=runs, seed=rng))
             v_items = float(np.var(row, ddof=1)) / d.tasks
             v_run = 2.0 * max(pilot.components.run, 0.0) / d.runs
             terms = [(v_items, d.tasks - 1), (v_run, float(pilot.run_term.df))]

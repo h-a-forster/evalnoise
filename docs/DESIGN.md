@@ -174,7 +174,7 @@ more precision than another repeat of an old one.
 | `runs-*` | Gaussian, run effect, 3 or 6 runs | moment estimates + Satterthwaite t | alpha at 0; 80% at the MDE |
 | `naive-*` | Gaussian, run effect, 1 run | paired t-test over items | the naive false-positive rate |
 | `binary-*` | logistic pass/fail, 60 to 70% and 90% pass, gains and losses | paired t-test over items, planned from a pilot | alpha at 0; 80% at the MDE |
-| `borrowed-*` | Gaussian, run effect, 1 run per arm | run variance from a 4-df pilot + Satterthwaite t | alpha at 0; 80% at the MDE |
+| `borrowed-*` | Gaussian, run effect, 1 run per arm | run variance from a 7-df pilot (7 arms x 2 runs) + Satterthwaite t | alpha at 0; 80% at the MDE |
 | `coverage-*` | Gaussian | bootstrap / chi-square intervals | 95% coverage |
 
 The unit tests also check unbiasedness of every estimator for every layout in section 4,
@@ -239,9 +239,9 @@ Trials without a verdict (agent errors) are excluded and counted in the manifest
 - Items are independent in the planner. Clustered items (mm-arena's seeds within games,
   and its task families) make its task counts too small by the design effect, which the
   study reports.
-- MDEs with a run variance borrowed on few df may be slightly optimistic (power 0.76 at a
-  planned 0.80 with 4 df; Monte Carlo interval 0.72 to 0.80 at 400 simulations, so not
-  distinguishable from 0.80).
+- A test with a run variance borrowed on few df may be slightly liberal (size 0.068 with
+  7 df; Monte Carlo interval 0.045 to 0.097 at 400 simulations, so not distinguishable
+  from 0.05); power at the planned MDE was 0.795.
 - Runs are assumed exchangeable. A run effect that is really a version change (a harness
   update between runs) is a fixed shift, not a draw from a distribution; the model treats
   it as random because nothing records which runs share a version.

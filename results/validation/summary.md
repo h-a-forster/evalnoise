@@ -26,8 +26,8 @@ Rates with exact 95% Monte Carlo intervals; `nominal` is what the planner predic
 | `binary-p90-t50-k3-up` | at_mde | 0.984 [0.969, 0.993] | 0.800 | 500 |
 | `binary-p90-t50-k3-down` | null | 0.046 [0.029, 0.068] | 0.050 | 500 |
 | `binary-p90-t50-k3-down` | at_mde | 0.668 [0.625, 0.709] | 0.800 | 500 |
-| `borrowed-t120-r1` | null | 0.058 [0.037, 0.085] | 0.050 | 400 |
-| `borrowed-t120-r1` | at_mde | 0.762 [0.718, 0.803] | 0.800 | 400 |
+| `borrowed-t120-r1` | null | 0.068 [0.045, 0.097] | 0.050 | 400 |
+| `borrowed-t120-r1` | at_mde | 0.795 [0.752, 0.834] | 0.800 | 400 |
 | `coverage-t40-a2-k3` | item | 0.892 [0.822, 0.941] | 0.950 | 120 |
 | `coverage-t40-a2-k3` | item_arm | 0.850 [0.773, 0.909] | 0.950 | 120 |
 | `coverage-t40-a2-k3` | within | 0.925 [0.862, 0.965] | 0.950 | 120 |

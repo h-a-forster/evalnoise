@@ -58,8 +58,8 @@ survey; treat the numbers as examples of what the tool shows.
   false-positive formula for run-blind tests matched simulation (0.615 vs 0.621, 0.370
   vs 0.356). Planning for pass/fail data from a pilot was conservative at 60 to 70% pass
   rates (power 0.85 to 0.87). Weak spots: with only three runs the run-aware test was
-  somewhat liberal (size 0.077); with the run variance borrowed on 4 df, power at the
-  planned MDE was 0.76 (Monte Carlo interval 0.72 to 0.80); near a 90% pass rate a
+  somewhat liberal (size 0.077), and with the run variance borrowed on 7 df (as for
+  mm-arena) slightly so (size 0.068, power 0.80 at the planned MDE); near a 90% pass rate a
   planned drop was detected with power 0.67; and the bootstrap interval for item x arm
   undercovered with 40 items (0.85).
 

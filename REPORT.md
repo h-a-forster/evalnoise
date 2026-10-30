@@ -62,9 +62,9 @@ on a laptop CPU), except the few marked as derived, which
   these pairs differ on fewer than 10 tasks (agent-ab Haiku vs Sonnet: 3 of 50), so their
   SEs and MDEs rest on a handful of tasks.
 - The planner reproduces its nominal power and size in simulation when its assumptions
-  hold. Known gaps: the run-aware t-test is somewhat liberal with three runs per arm;
-  with the run variance borrowed from a pilot with 4 run df (mm-arena's MDEs now borrow
-  7), power at the planned MDE was 0.76; near a 90% pass rate the planned MDE is conservative for
+  hold. Known gaps: the run-aware t-test is somewhat liberal with three runs per arm,
+  and with the run variance borrowed on 7 df as mm-arena's MDEs are (size 0.068, power
+  0.80 at the planned MDE); near a 90% pass rate the planned MDE is conservative for
   gains but optimistic for losses (power 0.67); and the percentile bootstrap undercovers
   the item x arm SD (and slightly the item SD) with 40 items and the item x run SD
   (0.88, as reported for mm-arena's 14.5 [11.1, 17.7]) with 60 items and 3 runs.
@@ -91,7 +91,7 @@ mm-arena episodes are items and games are bootstrap clusters (each game has two 
 share a hidden structure). Every mm-arena run is complete (120 episodes) and read from
 mm-arena's `results/core-v1`, where all replicate runs are now committed (on its branch
 `polish-2026-10-30`, not yet merged into the public main branch);
-`results/trials/MANIFEST.json` records that commit and each file's sha256. The table's
+`results/trials/MANIFEST.json` records that commit and each file's sha256 (CRLF read as LF). The table's
 `harness` column carries the Claude Code version from each trace's provenance: 2.1.308
 for fable r2, haiku r3 and r4, opus r3 and sonnet r2; runs 1 and 2 did not record it
 (mm-arena's README gives 2.1.296 for opus and haiku r2 and an earlier version for r1). In ruleproof, the replicate runs of the three hook arms used different hook builds,
@@ -167,11 +167,10 @@ repeat, so the layout is unbalanced); every other component differs by less than
 
 Paired comparison of two arms, one run per arm, at each dataset's observed number of tasks
 and repeats. Where identified, the run variance is borrowed with its degrees of freedom
-(7 for mm-arena), which widens the t quantiles. In simulation of a pilot with 4 run df
-(`borrowed-t120-r1`) the test's size was 0.058 and its power at the planned MDE 0.76
-(Monte Carlo interval 0.72 to 0.80), so the mm-arena MDEs may be slightly optimistic;
-400 simulations cannot tell that power from 0.80, and the 7 df mm-arena now has were not
-simulated. SEs are estimates; for mm-arena they rest on the 7 run df.
+(7 for mm-arena), which widens the t quantiles. In simulation of a pilot with 7 run df
+(`borrowed-t120-r1`) the test's power at the planned MDE was 0.795 (Monte Carlo interval
+0.75 to 0.83) and its size 0.068 (0.045 to 0.097), so the mm-arena MDEs hold and the test
+may be slightly liberal. SEs are estimates; for mm-arena they rest on the 7 run df.
 
 | Dataset | Tasks x repeats | SE, items only | SE with run term | MDE | MDE at run CI ends | Naive false-positive rate |
 |---|---|---:|---:|---:|---:|---:|
@@ -266,7 +265,7 @@ Monte Carlo intervals there):
 | same | power at planned MDE | 0.854 / 0.866 | 0.80 |
 | pass/fail near 90% pass, 50 x 3, gain / loss | size | 0.048 / 0.046 | 0.05 |
 | same | power at planned MDE | 0.984 / 0.668 | 0.80 |
-| run variance borrowed from a pilot (4 run df), 120 tasks, 1 run | size / power | 0.058 / 0.762 | 0.05 / 0.80 |
+| run variance borrowed from a pilot (7 run df), 120 tasks, 1 run | size / power | 0.068 / 0.795 | 0.05 / 0.80 |
 | bootstrap, 40 tasks x 2 arms x 3 repeats | coverage: item / item x arm / within | 0.89 / 0.85 / 0.93 | 0.95 |
 | bootstrap and chi-square, 60 tasks x 3 arms x 3 runs | coverage: item / item x arm / item x run / run | 0.93 / 0.94 / 0.88 / 0.96 | 0.95 |
 
@@ -312,7 +311,7 @@ against simulated experiments, and the REML code against statsmodels.
   allows (two ruleproof hook arms fitted alone) and is not capped by the score range
   (its upper end for one ruleproof arm is 150 pp on a 0 to 100 scale); the residuals are heavy-tailed,
   so Bartlett's test overstates the evidence against equal item x run variances; the run-aware t-test was liberal with three runs per arm (size
-  0.077), and with a run variance borrowed on 4 df its power at the planned MDE was 0.76.
+  0.077), and with a run variance borrowed on 7 df its size was 0.068.
 - **Quick profile.** 1000 bootstrap draws per dataset and the Monte Carlo sizes above. A
   full-profile run (10,000 draws, about 10x the simulations) is prepared but not yet run.
 - **Data snapshot.** The mm-arena rows use its runs as of 2026-10-30 (16 LLM runs);

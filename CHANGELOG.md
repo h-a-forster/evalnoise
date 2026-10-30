@@ -33,6 +33,11 @@ All notable changes are listed here. The format follows
   r4, opus r3, sonnet r2; 1920 trials), read from mm-arena's `results/core-v1` only. The
   quick study and REPORT.md follow: pooled run SD 2.9 pp [1.6, 6.4] on 7 df (was 4.2 on
   4), naive false-positive rate 33% (was 50%), one-run MDE 14.4 pp (was 21.9).
+- Validation: the borrowed-run check simulates a 7-df pilot (7 arms x 2 runs), the df
+  mm-arena's MDEs borrow (was 2 arms x 3 runs, 4 df): size 0.068, power 0.795 at the
+  planned MDE (was 0.058 and 0.762 on 4 df).
+- Source-file sha256 values in `MANIFEST.json` are taken with CRLF read as LF, so a CRLF
+  and an LF checkout of a source repository give the same digests.
 - `scripts/derived_numbers.py` also refits each setup's run term on its runs that share a
   recorded harness version (haiku r3 and r4 on Claude Code 2.1.308).
 - The mm-arena planning grid covers every run count where the plan changes (1 to 20).
