@@ -169,7 +169,54 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "",
         "Arms with two or more runs, each fitted alone. The pooled run and item x run terms",
         "assume these arms share one variance; the Bartlett test checks that for item x run.",
+        "It assumes normal residuals, so with heavy-tailed residuals its p-value is too small.",
         "",
+    ]
+    rows = []
+    for u in units:
+        dg = u.get("digits", 1)
+        for s in (u.get("run_by_arm") or {}).get("shifts", []):
+            fams = "; ".join(f"{f} {fmt(v, dg)}" for f, v in s["by_family"].items())
+            rows.append(
+                [
+                    f"`{u['id']}`",
+                    s["arm"],
+                    " to ".join(s["runs"]),
+                    str(s["items"]),
+                    " / ".join(fmt(m, dg) for m in s["run_means"]),
+                    fmt(s["mean"], dg),
+                    fmt(s["median"], dg),
+                    fams,
+                ]
+            )
+    if rows:
+        parts += ["## Run shifts by family", ""]
+        parts.append(
+            table(
+                [
+                    "dataset",
+                    "arm",
+                    "runs",
+                    "items",
+                    "run means",
+                    "mean shift",
+                    "median shift",
+                    "by family",
+                ],
+                rows,
+                "lllrrrrl",
+            )
+        )
+        parts += [
+            "",
+            "Run means and the mean change from one run to the other, over the items both runs",
+            "cover.",
+            "The model's run term is a shift shared by every item; shifts that differ by family",
+            "are partly a family x run effect, which more families would average out but more",
+            "items per family would not.",
+            "",
+        ]
+    parts += [
         "## Moment estimates vs REML (SD)",
         "",
     ]
@@ -272,6 +319,7 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
                     fmt(pe["se_items"], dg),
                     fmt(pe.get("se_clusters"), dg),
                     _p(pe.get("p_items")),
+                    fmt(pe.get("se_families"), dg),
                     fmt(pe.get("se_with_run"), dg),
                     f"{fmt(pe.get('df_with_run'), 1)} / {_p(pe.get('p_with_run'))}"
                     if pe.get("se_with_run") is not None
@@ -289,25 +337,28 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
                 "SE, items only",
                 "SE, clusters",
                 "p, clusters",
+                "SE, families",
                 "SE with run term",
                 "df / p with run term",
                 "p, run variance without one arm",
                 "item x arm SD",
             ],
             rows,
-            "llrrrrrrrr",
+            "llrrrrrrrrr",
         )
     )
     parts += [
         "",
         "The bootstrap interval and the item-level SEs ignore run-to-run variation. SE,",
         "clusters: cluster-robust, tested with clusters - 1 df (equals the items-only SE when",
-        "each item is its own cluster). Where the run variance is identified, the SE with run",
-        "term adds run / R for each arm (R: its number of runs; the run-adjusted item means",
-        "average every run equally, so a partial replicate run counts as a whole run), tested",
-        "with Satterthwaite df using the run term's own df. p, run variance without one arm:",
-        "the range of that p-value when the run variance (and its df) is re-estimated",
-        "without each replicated arm in turn, since the pooled value averages arms that differ.",
+        "each item is its own cluster). SE, families: clustered by item family where the",
+        "dataset defines one (few families, so rough). Where the run variance is identified,",
+        "the SE with run term adds run / R for each arm (R: its number of runs; the",
+        "run-adjusted item means average every run equally, so a partial replicate run counts",
+        "as a whole run), tested with Satterthwaite df using the run term's own df. p, run",
+        "variance without one arm: the range of that p-value when the run variance (and its",
+        "df) is re-estimated without each replicated arm in turn, since the pooled value",
+        "averages arms that differ.",
         "",
     ]
     return "\n".join(parts)

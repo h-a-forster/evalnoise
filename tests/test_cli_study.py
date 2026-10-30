@@ -225,3 +225,37 @@ def test_pair_run_term_counts_partial_runs_as_whole_runs():
         diffs.append(p["difference"])
         se2.append(p["se_with_run"] ** 2)
     assert np.var(diffs) / np.mean(se2) == pytest.approx(1.0, abs=0.1)
+
+
+def test_family_clustered_pairs_and_run_shifts_by_family(tmp_path):
+    # Run 2 of arm a shifts one of four families only: a family x run effect, which the
+    # run term (a shift shared by every item) cannot describe.
+    items = [f"f{f}-{j}" for f in range(4) for j in range(10)]
+    family = [i.split("-")[0] for i in items]
+    rng = np.random.default_rng(0)
+    u = rng.normal(0, 3, len(items))
+    shift = np.where(np.array(family) == "f0", 8.0, 0.0)
+    # Arm b differs from arm a by a family-level offset, which items of a family share.
+    offset = np.repeat([3.0, -3.0, 1.0, -1.0], 10) + rng.normal(0, 0.5, len(items))
+    base = pd.DataFrame({"item": items, "family": family, "repeat": 0})
+    df = pd.concat(
+        [
+            base.assign(arm="a", run="r1", score=u),
+            base.assign(arm="a", run="r2", score=u + shift),
+            base.assign(arm="b", run="r1", score=u + shift * 0.5 + offset),
+        ],
+        ignore_index=True,
+    )
+    p = tmp_path / "t.csv"
+    df.to_csv(p, index=False)
+    trials = study._with_families(study.load_trials(p), p, "family")
+    res = study.analyse(trials, DATASET, PROFILE, {})
+    (s,) = res["run_by_arm"]["shifts"]
+    assert s["by_family"] == pytest.approx({"f0": 8.0, "f1": 0.0, "f2": 0.0, "f3": 0.0})
+    assert s["mean"] == pytest.approx(2.0) and s["median"] == pytest.approx(0.0)
+    pe = res["pair_estimates"]["a - b"]
+    assert pe["families"] == 4 and pe["se_families"] > pe["se_clusters"]
+    bad = df.assign(family=np.where(df["arm"] == "b", "other", df["family"]))
+    bad.to_csv(p, index=False)
+    with pytest.raises(study.DataError, match="more than one family"):
+        study._with_families(study.load_trials(p), p, "family")

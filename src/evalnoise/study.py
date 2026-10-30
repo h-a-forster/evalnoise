@@ -27,7 +27,7 @@ from scipy import stats
 
 from evalnoise import __version__
 from evalnoise.components import Components, Estimate, RunTerm, bootstrap, estimate
-from evalnoise.data import DataError, describe, load_trials
+from evalnoise.data import DataError, describe, load_trials, read_table
 from evalnoise.power import (
     Design,
     mde,
@@ -104,7 +104,10 @@ def run_study(
                 results.append(prev)
                 continue
         t0 = time.perf_counter()
-        res = analyse(load_trials(table, {"score": d["score"]}), d, prof, defaults)
+        trials = load_trials(table, {"score": d["score"]})
+        if "family" in d:
+            trials = _with_families(trials, table, d["family"])
+        res = analyse(trials, d, prof, defaults)
         res["key"] = key
         res["table_sha256"] = sha256(table)
         res["seconds"] = round(time.perf_counter() - t0, 2)
@@ -116,10 +119,24 @@ def run_study(
     return results
 
 
+def _with_families(df: pd.DataFrame, table: Path, column: str) -> pd.DataFrame:
+    """Add a ``family`` column (a grouping of items above the cluster) from the raw table."""
+    raw = read_table(table)
+    if column not in raw.columns:
+        raise DataError(f"{table.name}: family column {column!r} not found")
+    fam = raw.groupby("item")[column].agg(lambda s: s.unique().tolist())
+    split = fam[fam.map(len) > 1]
+    if len(split):
+        raise DataError(f"{table.name}: item {split.index[0]!r} is in more than one family")
+    return df.assign(family=df["item"].map(fam.str[0]))
+
+
 def analyse(
     df: pd.DataFrame, d: dict[str, Any], prof: dict[str, Any], defaults: dict[str, Any]
 ) -> dict[str, Any]:
-    """Everything reported for one dataset."""
+    """Everything reported for one dataset. An optional ``family`` column groups items above
+    the cluster level: pairs then also get family-clustered SEs, and run shifts are broken
+    down by family."""
     scale = float(d.get("scale", 1.0))
     df = df.assign(score=df["score"] * scale)
     arms = _select_arms(df, d.get("arms", "all"))
@@ -147,6 +164,12 @@ def analyse(
     run_df = float(est.run_term.df) if run_identified else math.inf
     by_arm = _run_by_arm(est)
     pair_est = _pairs_with_run_term(est.pairs, pairs, df, comps, run_df)
+    if "family" in df.columns:
+        by_arm["shifts"] = _run_shifts(df)
+        fam = estimate(df.assign(cluster=df["family"]), arms=arms, pairs=pairs).pairs
+        for k, p in pair_est.items():
+            p["families"] = fam[k]["clusters"]
+            p["se_families"] = fam[k]["se_clusters"]
     # The pooled run variance is an average over arms that may differ: redo the run-aware
     # tests with the run variance re-estimated without each replicated arm in turn.
     for left_out, x in by_arm.get("leave_one_out", {}).items():
@@ -336,6 +359,35 @@ def _run_by_arm(est: Estimate) -> dict[str, Any]:
     return out
 
 
+def _run_shifts(df: pd.DataFrame) -> list[dict[str, Any]]:
+    """Mean change between each two runs of an arm over the items both cover: overall,
+    median over items, and by family (a shift shared by every trial is equal across
+    families; family-specific shifts shrink with more families, not more items)."""
+    out = []
+    cells = df.groupby(["arm", "run", "item"])["score"].mean()
+    fam = df.groupby("item")["family"].first()
+    for arm in sorted(df["arm"].unique()):
+        by_run = cells.loc[arm].unstack("run")
+        for r1, r2 in itertools.combinations(sorted(by_run.columns), 2):
+            both = by_run[[r1, r2]].dropna()
+            d = both[r2] - both[r1]
+            if len(d) < 2:
+                continue
+            by_fam = d.groupby(fam.loc[d.index]).mean()
+            out.append(
+                {
+                    "arm": arm,
+                    "runs": [r1, r2],
+                    "items": len(d),
+                    "run_means": [float(both[r1].mean()), float(both[r2].mean())],
+                    "mean": float(d.mean()),
+                    "median": float(d.median()),
+                    "by_family": {str(f): float(v) for f, v in by_fam.items()},
+                }
+            )
+    return out
+
+
 def _bartlett(groups: list[tuple[float, int]]) -> dict[str, float]:
     """Bartlett's test of equal variances from (variance, df) pairs."""
     v = np.array([g[0] for g in groups], dtype=float)
@@ -376,6 +428,21 @@ def _data_notes(
                 f"items are clustered (median design effect {deff:.2f} over pairs): the "
                 f"planner treats items as independent, so its task counts are about "
                 f"{deff:.2f}x too small"
+            )
+    fam = [
+        (p["se_families"] / p["se_items"]) ** 2
+        for p in pair_est.values()
+        if "se_families" in p and p["se_items"] > 0 and math.isfinite(p["se_families"])
+    ]
+    if fam:
+        deff = float(np.median(fam))
+        n_fam = min(p["families"] for p in pair_est.values())
+        planning["design_effect_families"] = deff
+        if deff > 1.05:
+            notes.append(
+                f"items are also clustered by family (median design effect {deff:.2f} over "
+                f"pairs, from only {n_fam} families, so rough): counting items as "
+                "independent, or only clusters as dependent, overstates the information"
             )
     few = {k: p["items_differing"] for k, p in pair_est.items()}
     few = {k: n for k, n in few.items() if n < MIN_ITEMS_DIFFERING}
