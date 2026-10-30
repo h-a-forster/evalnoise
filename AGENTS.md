@@ -48,9 +48,9 @@ overclaim, ruleproof).
 | Path | Role |
 |---|---|
 | `src/evalnoise/data.py` | read CSV/JSONL, map columns, validate trial tables |
-| `src/evalnoise/components.py` | moment estimators (Henderson III runs, two-way ANOVA items), pairs, cluster bootstrap, run chi-square interval |
+| `src/evalnoise/components.py` | moment estimators (Henderson III runs, two-way ANOVA items), pairs, cluster bootstrap, run MLS interval |
 | `src/evalnoise/reml.py` | dense REML cross-check |
-| `src/evalnoise/power.py` | variance of a difference, MDE, tasks needed, naive FPR, optimal repeats |
+| `src/evalnoise/power.py` | variance of a difference (design effect, pass-rate scaling), MDE, tasks needed, naive FPR, optimal repeats |
 | `src/evalnoise/simulate.py` | synthetic tables from the model (Gaussian or logistic) |
 | `src/evalnoise/adapters.py` | Inspect JSON logs, lm-eval sample files |
 | `src/evalnoise/sources.py`, `extract.py` | per-trial tables from the four source layouts, manifest |
@@ -101,17 +101,24 @@ Next:
    one agent-ab or overclaim arm would make it estimable there.
 5. Consider a per-arm (heteroscedastic) residual for pass/fail data.
 
-Open audit items (verified, not yet done):
+Audit items 6 to 11 (2026-10-30): done, except as noted.
 
-6. The planner counts items as independent; the study only reports design effects
-   (game, family). Add a design effect to `tasks_needed` and a family x run component.
-7. Pass/fail MDEs use the variance at the base rate; use the variance at the shifted
-   rate (optimistic for drops near 0 or 100% now).
-8. `RunTerm.interval` treats the residual as known and is not capped by the score range;
-   consider Burdick-Graybill and a cap for bounded scores.
-9. Validation lacks a coverage check with partial runs and unequal residuals, and a size
-   check of the run-aware pair test (`study._pairs_with_run_term`) on an mm-arena layout.
-10. Bartlett's test is too liberal with heavy-tailed residuals; report Brown-Forsythe,
-    which needs `_run_fit` to return per-arm residuals.
-11. `tests/test_validation_slow.py` allows slack 0.12 for coverage and binary checks;
-    tighten to about 3 Monte Carlo SEs and list the known-liberal checks by name.
+- Done: design effect in `resolve` / `tasks_needed` / `power --design-effect`, applied by
+  the study to its tasks-needed tables (median game design effect over pairs); pass/fail
+  MDEs with the shifted arm's variance at its own rate where larger, the larger of gain
+  and loss (`pass_rate`, `power --pass-rate`; the study detects 0/100 scores via
+  `bounds`); Burdick-Graybill (MLS) run-variance interval, capped at `(range / 2)^2` for
+  bounded scores; an item-level Brown-Forsythe test next to Bartlett's (it drives the
+  planning note); the `pairs-t120-mm` validation check (size of the run-aware pair test
+  and MLS coverage with a partial run and sixfold unequal residuals); the slow test
+  allows 3 Monte Carlo SEs and names the known gaps (`KNOWN` in
+  `tests/test_validation_slow.py`).
+- Not done: a family x run component. It needs a new model term and estimator, and with
+  5 mm-arena families its variance would rest on about 4 df per run pair, too few to
+  plan with; the run-shift-by-family table stays the evidence.
+- Not done: the design effect in the grid and reference-design MDEs (only the
+  tasks-needed tables use it), so those stay comparable with `derived_numbers.py`, which
+  scales the reference SE by the design effect separately. The item df stay `T - 1`.
+- Not done: bootstrap coverage with partial runs and unequal residuals. With unequal
+  residuals the pooled item x run variance is a df-weighted average with no single true
+  value to cover; the `pairs-*` check covers the run interval, which has one.

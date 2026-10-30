@@ -8,7 +8,7 @@
  "scale": 1.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T09:24:35Z",
+ "created": "2026-10-30T22:45:28Z",
  "arms": [
   "control",
   "no-tests"
@@ -157,6 +157,7 @@
    "run variance set to 0 (not identified by the data)",
    "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)"
   ],
+  "targets_design_effect": 1.0,
   "observed_design": {
    "tasks": 50,
    "runs": 1,
@@ -768,7 +769,7 @@
   },
   "reference_mde_unpaired": 0.4405409400656508
  },
- "key": "f8c01f64dd1e474e",
+ "key": "3f08f2678e4f1546",
  "table_sha256": "91cfb1d7a719124da07926186b1d273c64f0d4a5f19405a7f89378d44bcdfe2a",
- "seconds": 14.96
+ "seconds": 10.63
 }

@@ -1,7 +1,7 @@
 {
  "name": "coverage-t60-a3-r3",
  "kind": "coverage",
- "key": "2c23bf97c6df0814",
+ "key": "facb23cbebfcafec",
  "seed": 348979564,
  "sims": 120,
  "design": {
@@ -44,7 +44,7 @@
    ],
    "nominal": 0.95
   },
-  "run (chi-square)": {
+  "run (MLS)": {
    "rate": 0.9583333333333334,
    "mc95": [
     0.9054412000240628,
@@ -53,5 +53,5 @@
    "nominal": 0.95
   }
  },
- "seconds": 150.1
+ "seconds": 122.91
 }

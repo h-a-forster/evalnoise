@@ -8,7 +8,7 @@
  "scale": 1.0,
  "note": "Pools single-run setups with the replicated ones: the residual is assumed equal across setups.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T11:06:02Z",
+ "created": "2026-10-30T22:44:49Z",
  "arms": [
   "claude-cli:claude-fable-5-1@high",
   "claude-cli:claude-fable-5-1@low",
@@ -162,8 +162,8 @@
   }
  },
  "run_interval": [
-  2.708152002200986,
-  40.42477969422497
+  2.700934472715364,
+  40.41939922706822
  ],
  "run_term": {
   "ss": 8550.72000749624,
@@ -258,7 +258,7 @@
     "run": 1.7313160147255857,
     "run_interval": [
      0.0,
-     2251.993799377577
+     2251.9809738638746
     ],
     "run_df": 1,
     "item_run": 57.69236361419924,
@@ -267,8 +267,8 @@
    "claude-cli:claude-haiku-5-5@high": {
     "run": 16.401605469261053,
     "run_interval": [
-     3.3770638118418903,
-     263.85567027188415
+     3.3538277496470847,
+     263.8329229679515
     ],
     "run_df": 3,
     "item_run": 333.337235535387,
@@ -277,8 +277,8 @@
    "claude-cli:claude-opus-5-5@high": {
     "run": 2.9394942631382666,
     "run_interval": [
-     0.09346625833308093,
-     153.25342423006083
+     0.0789088016093693,
+     153.2410592448796
     ],
     "run_df": 2,
     "item_run": 115.79731471341142,
@@ -288,7 +288,7 @@
     "run": 2.2482932695986113,
     "run_interval": [
      0.0,
-     3762.7706240617467
+     3762.7319897459042
     ],
     "run_df": 1,
     "item_run": 173.81160164298484,
@@ -299,32 +299,32 @@
    "claude-cli:claude-fable-5-1@high": {
     "run": 9.555349700609705,
     "run_interval": [
-     2.826362767075502,
-     53.848115853495166
+     2.817112674226653,
+     53.84089578812931
     ],
     "run_df": 6
    },
    "claude-cli:claude-haiku-5-5@high": {
     "run": 2.464649452650184,
     "run_interval": [
-     0.266244172173518,
-     27.35318662676846
+     0.258016048358114,
+     27.34759656504703
     ],
     "run_df": 4
    },
    "claude-cli:claude-opus-5-5@high": {
     "run": 10.636885138421473,
     "run_interval": [
-     2.8917206312109713,
-     74.27828454446855
+     2.8804696699360246,
+     74.26889424221304
     ],
     "run_df": 5
    },
    "claude-cli:claude-sonnet-5-5@high": {
     "run": 9.469186824797532,
     "run_interval": [
-     2.8848919602957706,
-     52.80953442773866
+     2.8766105210560164,
+     52.80288815511315
     ],
     "run_df": 6
    }
@@ -333,6 +333,14 @@
    "statistic": 148.68871807586032,
    "df": 3,
    "p": 5.053893654704766e-32
+  },
+  "residual_homogeneity_bf": {
+   "statistic": 11.519142492709964,
+   "df": [
+    3,
+    476
+   ],
+   "p": 2.6578504111413616e-07
   },
   "shifts": [
    {
@@ -683,10 +691,11 @@
   "design_effect_families": 2.7430933499754135,
   "notes": [
    "within-run noise is not separated from item x run noise: repeats inside a run are assumed not to help (conservative)",
-   "the replicated arms do not share one item x run variance (Bartlett p = 5.1e-32; SD by arm: claude-cli:claude-fable-5-1@high 7.6, claude-cli:claude-haiku-5-5@high 18.3, claude-cli:claude-opus-5-5@high 10.8, claude-cli:claude-sonnet-5-5@high 13.2): pooled components describe an average arm",
-   "items are clustered (median design effect 1.18 over pairs): the planner treats items as independent, so its task counts are about 1.18x too small",
+   "the replicated arms do not share one item x run variance (Brown-Forsythe p = 2.7e-07; SD by arm: claude-cli:claude-fable-5-1@high 7.6, claude-cli:claude-haiku-5-5@high 18.3, claude-cli:claude-opus-5-5@high 10.8, claude-cli:claude-sonnet-5-5@high 13.2): pooled components describe an average arm",
+   "items are clustered (median design effect 1.18 over pairs): the tasks-needed counts multiply the item-level variance by it; the grid and reference-design MDEs treat items as independent",
    "items are also clustered by family (median design effect 2.74 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information"
   ],
+  "targets_design_effect": 1.1791306772033878,
   "observed_design": {
    "tasks": 120,
    "runs": 1,
@@ -706,13 +715,13 @@
   "reference_se_items_only": 3.0983576240041897,
   "run_share_of_variance": 0.6374016795624736,
   "reference_mde_run_ci": [
-   11.092743015935842,
-   30.062723761575146
+   11.08678323535773,
+   30.060824095181122
   ],
   "naive_fpr": 0.23550029485103943,
   "naive_fpr_run_ci": [
-   0.1160267298518833,
-   0.5201149119903831
+   0.11585323551304706,
+   0.5200901304184952
   ],
   "grid": [
    {
@@ -1502,37 +1511,37 @@
     {
      "runs": 6,
      "repeats": 1,
-     "tasks": 37591
+     "tasks": 44324
     },
     {
      "runs": 8,
      "repeats": 1,
-     "tasks": 841
+     "tasks": 991
     },
     {
      "runs": 10,
      "repeats": 1,
-     "tasks": 545
+     "tasks": 643
     },
     {
      "runs": 12,
      "repeats": 1,
-     "tasks": 444
+     "tasks": 524
     },
     {
      "runs": 13,
      "repeats": 1,
-     "tasks": 415
+     "tasks": 489
     },
     {
      "runs": 15,
      "repeats": 1,
-     "tasks": 376
+     "tasks": 443
     },
     {
      "runs": 20,
      "repeats": 1,
-     "tasks": 326
+     "tasks": 384
     }
    ],
    "10": [
@@ -1544,63 +1553,63 @@
     {
      "runs": 2,
      "repeats": 1,
-     "tasks": 340
+     "tasks": 401
     },
     {
      "runs": 3,
      "repeats": 1,
-     "tasks": 133
+     "tasks": 157
     },
     {
      "runs": 4,
      "repeats": 1,
-     "tasks": 103
+     "tasks": 121
     },
     {
      "runs": 5,
      "repeats": 1,
-     "tasks": 90
+     "tasks": 106
     },
     {
      "runs": 6,
      "repeats": 1,
-     "tasks": 84
+     "tasks": 98
     },
     {
      "runs": 8,
      "repeats": 1,
-     "tasks": 76
+     "tasks": 90
     },
     {
      "runs": 10,
      "repeats": 1,
-     "tasks": 72
+     "tasks": 85
     },
     {
      "runs": 12,
      "repeats": 1,
-     "tasks": 70
+     "tasks": 82
     },
     {
      "runs": 13,
      "repeats": 1,
-     "tasks": 69
+     "tasks": 81
     },
     {
      "runs": 15,
      "repeats": 1,
-     "tasks": 68
+     "tasks": 80
     },
     {
      "runs": 20,
      "repeats": 1,
-     "tasks": 66
+     "tasks": 77
     }
    ]
   },
   "reference_mde_unpaired": 21.619496145758617
  },
- "key": "2655b3c5e59ac51e",
+ "key": "ddc75e5f3308cb79",
  "table_sha256": "7ff868ae3bdc516234e95d8ffc86e88c1bc4dfe55e8dd20b9c8d9d10688fadac",
- "seconds": 53.16
+ "seconds": 51.17
 }

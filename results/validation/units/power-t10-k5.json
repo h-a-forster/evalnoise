@@ -1,7 +1,7 @@
 {
  "name": "power-t10-k5",
  "kind": "power",
- "key": "0f982dbaccf8b827",
+ "key": "6bfd70a664b44a51",
  "seed": 3258659945,
  "sims": 2000,
  "design": {
@@ -39,5 +39,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 0.04
+ "seconds": 0.03
 }

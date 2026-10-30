@@ -1,7 +1,7 @@
 {
  "name": "binary-t50-k3",
  "kind": "binary",
- "key": "3b1a3699bfc14e8d",
+ "key": "f3f0748e31d6e8fd",
  "seed": 730993290,
  "sims": 500,
  "design": {
@@ -20,6 +20,7 @@
  },
  "context": {
   "mde": 0.1434639340331516,
+  "mde_base_rate": 0.1434639340331516,
   "logit_shift": 1.038126126918388,
   "base_pass": 0.6692980600855402,
   "pilot": {
@@ -51,5 +52,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 5.08
+ "seconds": 3.18
 }

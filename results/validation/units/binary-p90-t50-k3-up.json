@@ -1,7 +1,7 @@
 {
  "name": "binary-p90-t50-k3-up",
  "kind": "binary",
- "key": "94523c318b36fabc",
+ "key": "8f5f363b2b733114",
  "seed": 3945396338,
  "sims": 500,
  "design": {
@@ -20,6 +20,7 @@
  },
  "context": {
   "mde": 0.09600867527624453,
+  "mde_base_rate": 0.09600867527624453,
   "logit_shift": 3.671571807819939,
   "base_pass": 0.899996691654616,
   "pilot": {
@@ -51,5 +52,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 4.78
+ "seconds": 4.35
 }

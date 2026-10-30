@@ -1,8 +1,9 @@
 """Numbers REPORT.md marks as derived: run-blind false-positive rates for literally
 identical setups (item x arm = 0), the mm-arena reference design refitted without the
 haiku setup, its episode-only SE scaled by the game design effect, and haiku's share of the
-run sum of squares, and the run term of each setup refitted on its runs from one recorded
-harness version. Run from the repository root: uv run python scripts/derived_numbers.py"""
+run sum of squares, the run term of each setup refitted on its runs from one recorded
+harness version, and agent-ab's one-run MDE from the base-rate variance. Run from the
+repository root: uv run python scripts/derived_numbers.py"""
 
 import dataclasses
 import itertools
@@ -13,7 +14,7 @@ import pandas as pd
 
 from evalnoise.components import estimate
 from evalnoise.data import load_trials
-from evalnoise.power import Design, naive_false_positive_rate, resolve, se_difference
+from evalnoise.power import Design, mde, naive_false_positive_rate, resolve, se_difference
 
 df = load_trials("results/trials/mm-arena.csv", {"score": "edge_pp"})
 runs = df.groupby("arm")["run"].nunique()
@@ -64,3 +65,15 @@ for (arm, harness), v in versions.groupby(["arm", "harness"]):
         f"[{math.sqrt(max(lo, 0)):.2f}, {math.sqrt(max(hi, 0)):.2f}] on {rt.df} df, "
         f"item x run SD {math.sqrt(rt.rss / rt.df_res):.2f}"
     )
+
+# agent-ab-no-tests (94% pass, 50 tasks x 3): the one-run MDE from the base-rate variance,
+# against the study's, which takes the shifted arm's variance at its own rate where larger.
+ab = load_trials("results/trials/agent-ab-no-tests.csv", {"score": "passed"})
+ab = ab.assign(score=ab["score"] * 100)
+c = estimate(ab).components
+rate = float(ab["score"].mean()) / 100
+d = Design(50, 1, 3)
+print(
+    f"agent-ab-no-tests: MDE {mde(resolve(c, run=0.0), d):.2f} from the base-rate variance, "
+    f"{mde(resolve(c, run=0.0, pass_rate=rate, pass_score=100.0), d):.2f} at the shifted rate"
+)

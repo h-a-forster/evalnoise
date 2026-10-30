@@ -33,8 +33,8 @@ y_airk = mu_a + u_i + v_ai + w_ar + g_air + e_airk
 
 All effects are independent with mean zero, and the variances are common to all arms
 (a working assumption: the study reports per-arm run and item x run estimates, run
-estimates leaving each arm out, and Bartlett's test that the arms share one item x run
-variance). There is no term for groups of items above the cluster: if a run shifts some
+estimates leaving each arm out, and Bartlett's and a Brown-Forsythe test that the arms
+share one item x run variance). There is no term for groups of items above the cluster: if a run shifts some
 task families more than others, the model reads part of that family x run effect as `run`,
 which would shrink with more families but not with more items per family. Where a table
 names item families the study reports family-clustered pair SEs and run shifts by family.
@@ -141,10 +141,22 @@ Negative moment estimates are kept for bootstrapping, used as 0 in planning and 
   differences: percentile bootstrap over clusters (items by default; games in mm-arena,
   whose two seeds share a hidden structure). Duplicated clusters become distinct items.
   Runs are not resampled.
-- `run`: a chi-square interval from `SS(run | item) / E[MS] ~ chi2(df) / df`, treating the
-  cell-level residual as known (it has hundreds of degrees of freedom where the run term
-  has a handful). With `df` pooled runs-minus-one, the interval is honest about how little
-  two or three runs say: its upper end is often several times the estimate.
+- `run`: the Burdick-Graybill modified large-sample (MLS) interval for
+  `c (MS_run - MS_res)`, `c = df / k`, which accounts for the uncertainty of both mean
+  squares and reduces to the chi-square interval `SS(run | item) / E[MS] ~ chi2(df) / df`
+  when the residual has many degrees of freedom (hundreds in mm-arena, where the two
+  agree; with few residual df the chi-square interval undercovers, 0.82 in a unit test,
+  the MLS one does not). For bounded scores (`bounds` in `configs/study.toml`) both ends
+  are capped at `(range / 2)^2`, the largest variance such a score allows. With `df`
+  pooled runs-minus-one, the interval is honest about how little two or three runs say:
+  its upper end is often several times the estimate.
+- Equal item x run variances across replicated arms: Bartlett's test (normal theory) and
+  a Brown-Forsythe test with items as units: each arm's full-fit residuals, scaled by
+  `sqrt(cells / df_res)`, as absolute deviations from the arm's median, averaged per item
+  and compared across arms by one-way ANOVA. Cell-level deviations would not do: with two
+  runs an item's two residuals are equal and opposite, which makes that version far too
+  liberal. A unit test checks the item-level test's size with t(3) residuals in a layout
+  with 2, 2 and 4 runs, where Bartlett's test rejects in over 30% of draws.
 - MDE: the study reports the MDE with the run variance at its estimate, a bootstrap
   interval over the item-level components, and the MDE at both ends of the run interval.
 
@@ -156,7 +168,15 @@ freedom: `T - 1` for the paired item term, `2 (R - 1) + run_df` for the run term
 study borrows its own pooled run degrees of freedom, and a run variance passed by hand is
 treated as known, `run_df = inf`), the fewest tasks for a target MDE (`None` when the run
 term alone exceeds it), the naive false-positive rate, and the cost-optimal number of
-repeats
+repeats. Two optional adjustments: a design effect (at least 1) multiplies the item-level
+term, and the study passes the median game design effect over pairs to its tasks-needed
+tables (not to the grid or the reference-design MDE); for pass/fail scores at base rate
+`p`, the arm shifted by an effect has its half of `V` scaled by
+`max(1, p'(1 - p') / (p(1 - p)))` at its rate `p'`, and the MDE is the larger of gain and
+loss. The scale is floored at 1 because a logit-scale shift moves items by different
+amounts, which offsets the fall in Bernoulli variance: in trial runs of the binary checks,
+scaling it down made the plan optimistic at about 60% pass.
+The cost-optimal number of repeats is
 
 ```
 K* = sqrt(task_cost within / (R (R item_arm + item_run)))
@@ -173,9 +193,10 @@ more precision than another repeat of an old one.
 | `power-*` | Gaussian, no run effect | paired t-test over items | alpha at 0; 80% at the MDE |
 | `runs-*` | Gaussian, run effect, 3 or 6 runs | moment estimates + Satterthwaite t | alpha at 0; 80% at the MDE |
 | `naive-*` | Gaussian, run effect, 1 run | paired t-test over items | the naive false-positive rate |
-| `binary-*` | logistic pass/fail, 60 to 70% and 90% pass, gains and losses | paired t-test over items, planned from a pilot | alpha at 0; 80% at the MDE |
+| `binary-*` | logistic pass/fail, 60 to 70% and 90% pass, gains and losses | paired t-test over items, planned from a pilot for the check's direction | alpha at 0; 80% at the MDE |
 | `borrowed-*` | Gaussian, run effect, 1 run per arm | run variance from a 7-df pilot (7 arms x 2 runs) + Satterthwaite t | alpha at 0; 80% at the MDE |
-| `coverage-*` | Gaussian | bootstrap / chi-square intervals | 95% coverage |
+| `coverage-*` | Gaussian | bootstrap / MLS intervals | 95% coverage |
+| `pairs-*` | Gaussian, 4 setups with 2, 2, 2, 4 runs, one partial run, item x run variances 50 to 300, items in clusters of 2 | the study's run-aware pair test; pooled MLS run interval | alpha; 95% coverage |
 
 The unit tests also check unbiasedness of every estimator for every layout in section 4,
 the variance formula against simulated experiments, and the planner's root-finding.
@@ -233,21 +254,24 @@ Trials without a verdict (agent errors) are excluded and counted in the manifest
 
 ## 10. Limitations of the design
 
-- Common variances across arms. Pass/fail data violate this (variance `p(1 - p)`): near
-  the ceiling a planned drop is detected less often than planned and a gain more often
-  (see the binary checks). The mm-arena setups violate it too (item x run SD 7.6 to 18.3).
-- Items are independent in the planner. Clustered items (mm-arena's seeds within games,
-  and its task families) make its task counts too small by the design effect, which the
-  study reports.
+- Common variances across arms. Pass/fail data violate this (variance `p(1 - p)`); the
+  planner takes the shifted arm's variance at its own rate where that is larger, which
+  brought power for a loss near 90% pass from 0.67 to the target (binary checks), but the
+  fitted components still come from a linear model. The mm-arena setups violate it too
+  (item x run SD 7.6 to 18.3).
+- Items are independent in the grid and reference-design MDEs. The tasks-needed tables
+  apply the game design effect (a constant factor on the item-level term, with `T - 1`
+  item df); the family design effect (about 2.4 from 5 families) is too rough to apply,
+  and there is no family x run component.
 - A test with a run variance borrowed on few df may be slightly liberal (size 0.068 with
   7 df; Monte Carlo interval 0.045 to 0.097 at 400 simulations, so not distinguishable
   from 0.05); power at the planned MDE was 0.795.
 - Runs are assumed exchangeable. A run effect that is really a version change (a harness
   update between runs) is a fixed shift, not a draw from a distribution; the model treats
   it as random because nothing records which runs share a version.
-- Normal-theory intervals for the run variance, with very few degrees of freedom. The
-  chi-square interval treats the residual as known; it is degenerate (reported as such)
-  when the runs agree more closely than the residual allows, and its upper end is not
-  capped at the largest SD a bounded score allows.
+- Normal-theory intervals for the run variance, with very few degrees of freedom. The MLS
+  interval is degenerate (reported as such) when the runs agree more closely than the
+  residual allows; it pools arms whose residuals differ (in the `pairs-*` check, with
+  sixfold different item x run variances and a partial run, it still covered 95%).
 - The percentile bootstrap undercovers for variance components with few items (see
   `results/validation/`).

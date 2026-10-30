@@ -1,7 +1,7 @@
 {
  "name": "runs-t60-r3",
  "kind": "runs",
- "key": "951d806d0ab82e61",
+ "key": "4837f299c28f5f53",
  "seed": 420009377,
  "sims": 400,
  "design": {
@@ -39,5 +39,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 5.74
+ "seconds": 7.07
 }

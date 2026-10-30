@@ -1,0 +1,41 @@
+{
+ "name": "pairs-t120-mm",
+ "kind": "pairs",
+ "key": "fd960dc6203c7281",
+ "seed": 1526825260,
+ "sims": 400,
+ "design": {
+  "tasks": 120,
+  "runs": 2,
+  "repeats": 1,
+  "paired": true
+ },
+ "components": {
+  "item": 0.0,
+  "item_arm": 60.0,
+  "run": 20.0,
+  "item_run": 100.0,
+  "within": 0.0,
+  "absorbed": {}
+ },
+ "context": {},
+ "rates": {
+  "null (run-aware pair test)": {
+   "rate": 0.0625,
+   "mc95": [
+    0.040851457009555066,
+    0.0908823695513088
+   ],
+   "nominal": 0.05
+  },
+  "run (MLS)": {
+   "rate": 0.95,
+   "mc95": [
+    0.9238330272448575,
+    0.969194758856734
+   ],
+   "nominal": 0.95
+  }
+ },
+ "seconds": 12.53
+}

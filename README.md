@@ -40,28 +40,30 @@ survey; treat the numbers as examples of what the tool shows.
   drive much of the run term; one pair cannot settle it, and the model has no harness
   factor.
 - **More episodes cannot fix that; more runs can,** as far as run shifts are shared by
-  every episode. With the pooled estimates and episodes counted as independent, a 10 pp
-  difference needs 3 runs per setup with 56 episodes, or 4 with 41; 5 pp needs 20 runs
-  with 107 episodes (10 runs need 188). Episodes pair up within games, so multiply these
-  counts by at least 1.24, which puts 20 runs at 5 pp beyond the 120 episodes available.
-  Run shifts
+  every episode. With the pooled estimates, and allowing for the seeds that pair up
+  within games (design effect 1.24), a 10 pp difference needs 3 runs per setup with 70
+  episodes, or 4 with 51; 5 pp needs 20 runs with 133 episodes (10 runs need 234), beyond
+  the 120 episodes available. Run shifts
   also differed by task family (one setup: +1.7 to +22.8 pp), so part of the run term
   may shrink with more task families.
 - **Pass/fail evals with one run per arm cannot identify the run term at all.** For
   agent-ab and overclaim (18 to 50 coding tasks) the MDEs of the published designs are
-  6.6 to 11 pp before any run effect, which understates them if runs vary (the linear
-  model for pass/fail scores can also bias them either way). Trial noise within a run
-  was large (SD 18 to 22 pp of pass rate), so repeats helped there: 5 pp on agent-ab needs
-  239 tasks with one repeat or 86 with three.
+  8.3 to 13.3 pp before any run effect, which understates them if runs vary. Near a 94%
+  pass rate a loss is harder to detect than a gain (the variance grows towards 50%), and
+  the planner takes the larger. Trial noise within a run was large (SD 18 to 22 pp of
+  pass rate), so repeats helped there: 5 pp on agent-ab needs 326 tasks with one repeat
+  or 116 with three.
 - **The planner is calibrated where its assumptions hold.** In simulation, power at the
   planned MDE was 0.79 to 0.81 and size 0.04 to 0.06 for paired item-level tests; the
   false-positive formula for run-blind tests matched simulation (0.615 vs 0.621, 0.370
   vs 0.356). Planning for pass/fail data from a pilot was conservative at 60 to 70% pass
-  rates (power 0.85 to 0.87). Weak spots: with only three runs the run-aware test was
-  somewhat liberal (size 0.077), and with the run variance borrowed on 7 df (as for
-  mm-arena) slightly so (size 0.068, power 0.80 at the planned MDE); near a 90% pass rate a
-  planned drop was detected with power 0.67; and the bootstrap interval for item x arm
-  undercovered with 40 items (0.85).
+  rates (power 0.85 to 0.87), and near a 90% pass rate a planned drop was detected with
+  power 0.79 once the variance was taken at the shifted rate. In an mm-arena-like layout
+  (2 to 4 runs per setup, a partial run, unequal residuals) the run-aware pair test had
+  size 0.062 and the run-variance interval covered 0.95. Weak spots: with only three runs
+  the run-aware test was somewhat liberal (size 0.077), and with the run variance
+  borrowed on 7 df (as for mm-arena) slightly so (size 0.068, power 0.80 at the planned
+  MDE); and the bootstrap interval for item x arm undercovered with 40 items (0.85).
 
 ## Install
 
@@ -123,6 +125,11 @@ MDE 10 with 1 run(s) x 1 repeat(s): 62 tasks per arm
 MDE 10 with 1 run(s) x 3 repeat(s): 23 tasks per arm
 ```
 
+These are pass/fail scores at a 94% pass rate, where a drop is harder to detect than a
+gain: add `--pass-rate 0.94 --pass-score 100` to take the variance at the shifted rate
+(MDE 5 with one repeat then needs 326 tasks per arm). `--design-effect` multiplies the
+item-level variance when items come in correlated clusters.
+
 This table has one run per arm, so the run variance is unknown: `power` refuses to guess
 until you pass `--run-var` (0 assumes no run effects, which understates every MDE if runs
 do vary).
@@ -182,12 +189,14 @@ validation plan are in [docs/DESIGN.md](docs/DESIGN.md), with prior work. In sho
   Claude CLI; only mm-arena has replicate runs of unchanged setups (ruleproof's replicate
   runs changed the hook build), and its run variance rests on 7 degrees of freedom.
 - Variances are assumed common to all arms; the study reports per-arm run terms and tests
-  the item x run variance for equality (the mm-arena setups fail it).
-- Pass/fail outcomes are analysed on the 0/1 scale, which makes planned MDEs optimistic
-  for drops near 0% or 100% pass rates.
-- The planner treats items as independent; when items share a cluster (mm-arena: two
-  seeds per game) or a family (mm-arena: five task families), the study reports design
-  effects and clustered pair SEs, and breaks run shifts down by family.
+  the item x run variance for equality (Brown-Forsythe; the mm-arena setups fail it).
+- Pass/fail outcomes are analysed on the 0/1 scale. The planner takes the shifted arm's
+  variance at its own pass rate where larger, which held power for drops near a 90% pass
+  rate in simulation; elsewhere it keeps the base-rate variance (conservative there).
+- The planner treats items as independent unless given a design effect; the study applies
+  the game design effect (mm-arena: two seeds per game) to its tasks-needed tables only,
+  reports the family one (five task families, too few to apply) and clustered pair SEs,
+  and breaks run shifts down by family.
 - Runs are treated as exchangeable draws and there is no harness-version factor; a
   harness update between runs is really a fixed shift. Trial tables keep the harness
   version per run where the source records it, but only one mm-arena setup has two runs

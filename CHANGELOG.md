@@ -23,11 +23,39 @@ All notable changes are listed here. The format follows
   replicated arm in turn.
 - Summary: planning rows of datasets with a pair differing on fewer than 10 items are
   marked `(few)`.
+- Planner: `design_effect` (multiplies the item-level variance; `power --design-effect`)
+  and pass/fail planning (`pass_rate`, `pass_score`; `power --pass-rate --pass-score`):
+  the shifted arm's variance is taken at its own pass rate where larger, and the MDE is
+  the larger of gain and loss (`mde(direction=...)` gives one side).
+- Study: a Brown-Forsythe test of equal item x run variances with items as units, next to
+  Bartlett's; it now drives the planning note (mm-arena: p = 2.7e-07). `RunTerm` keeps
+  each arm's full-fit residuals.
+- Study: optional `bounds` per dataset (the pass/fail datasets: [0, 100]) caps the
+  run-variance interval at (range / 2)^2 and marks 0/100 scores as pass/fail.
+- Validation: `pairs-t120-mm`, an mm-arena-like layout (runs 2, 2, 2, 4, one half run,
+  item x run variances 50 to 300): size of the study's run-aware pair test 0.062,
+  run-interval coverage 0.950.
 - `scripts/longrun.sh` (resumable full-profile launcher) and `scripts/derived_numbers.py`
   (the numbers REPORT.md marks as derived). The sdist now includes `configs/` and
   `uv.lock`.
 
 ### Changed
+
+- The run-variance interval is the Burdick-Graybill modified large-sample (MLS) interval,
+  which accounts for the residual's uncertainty (the chi-square interval treated it as
+  known and undercovered with few residual df). mm-arena's intervals are unchanged to the
+  shown digit; ruleproof-main's pooled upper end is 8.7 pp (was 8.8), and one ruleproof
+  arm's upper end is capped at 50 pp (was 150 on a 0 to 100 scale).
+- The study's tasks-needed tables multiply the item-level variance by the median game
+  design effect over pairs (mm-arena-replicated 1.24): 10 pp needs 70 episodes with 3
+  runs (was 56), 5 pp 133 with 20 runs (was 107).
+- Pass/fail MDEs use the variance at the shifted rate where larger: agent-ab 8.3 pp (was
+  6.6), overclaim 11.5 and 13.3 (were 11.0 and 11.1), ruleproof-main 63.2 (was 55.9).
+  The near-90% loss check planned this way had power 0.788 (was 0.668 with the base-rate
+  variance); each binary check is now planned for its own direction.
+- `tests/test_validation_slow.py` allows 3 Monte Carlo SEs (was a slack of 0.12 for
+  coverage and pass/fail checks) and lists the known gaps by name and direction.
+- Study `SCHEMA` 8, validation `SCHEMA` 5.
 
 - Data: the mm-arena table now holds every replicate run, complete (fable r2, haiku r3 and
   r4, opus r3, sonnet r2; 1920 trials), read from mm-arena's `results/core-v1` only. The
