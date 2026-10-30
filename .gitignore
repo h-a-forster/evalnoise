@@ -16,3 +16,5 @@ runs/
 # Downloaded or cached data
 data/
 .cache/
+# Run logs (units and summaries are committed)
+results/**/progress.log

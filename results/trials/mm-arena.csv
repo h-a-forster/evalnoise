@@ -125,8 +125,12 @@ cards-262f6a6a/s0,cards-262f6a6a,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (
 cards-262f6a6a/s1,cards-262f6a6a,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.9671192168,64.01489135
 cards-49733765/s0,cards-49733765,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,0.5866033138,38.8280439
 cards-49733765/s1,cards-49733765,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,0.8031558776,53.16194255
+cards-4ec65028/s0,cards-4ec65028,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,1.981415765,131.1525122
+cards-4ec65028/s1,cards-4ec65028,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,2.164084673,143.2436072
 cards-678e8425/s0,cards-678e8425,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,0.9161949545,60.64414754
 cards-678e8425/s1,cards-678e8425,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,0.7492854269,49.59618666
+cards-6f2176c2/s0,cards-6f2176c2,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,1.158008215,76.65008492
+cards-6f2176c2/s1,cards-6f2176c2,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.609017035,40.31163754
 cards-84c0d3be/s0,cards-84c0d3be,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.677954959,44.87472929
 cards-84c0d3be/s1,cards-84c0d3be,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.7145952689,47.29999953
 cards-98a424df/s0,cards-98a424df,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.3532625382,23.38291144
@@ -135,8 +139,22 @@ cards-aebc6743/s0,cards-aebc6743,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (
 cards-aebc6743/s1,cards-aebc6743,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.3218832344,21.30587411
 cards-be9a053d/s0,cards-be9a053d,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,0.5502325787,36.42061716
 cards-be9a053d/s1,cards-be9a053d,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,0.5208533152,34.47596512
+cards-d6f25522/s0,cards-d6f25522,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.4445743128,29.42695775
+cards-d6f25522/s1,cards-d6f25522,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,perturbed,0.4599629904,30.44555453
 cards-e63ba600/s0,cards-e63ba600,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,1.465489427,97.0026702
 cards-e63ba600/s1,cards-e63ba600,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),cards,classic,0.9731022846,64.41091847
+coin-865a07e7/s0,coin-865a07e7,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,1.658045031,109.7481786
+coin-865a07e7/s1,coin-865a07e7,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,1.606486359,106.3354423
+coin-8cf467f9/s0,coin-8cf467f9,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,perturbed,1.49875059,99.20427031
+coin-8cf467f9/s1,coin-8cf467f9,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,perturbed,1.486250675,98.37688451
+coin-c7d10ea6/s0,coin-c7d10ea6,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,2.399507306,158.8265405
+coin-c7d10ea6/s1,coin-c7d10ea6,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,2.406057768,159.2601242
+coin-d81dd4ed/s0,coin-d81dd4ed,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,perturbed,1.173677026,77.68722405
+coin-d81dd4ed/s1,coin-d81dd4ed,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,perturbed,1.215309928,80.44296056
+coin-db497930/s0,coin-db497930,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,1.065434533,70.52251129
+coin-db497930/s1,coin-db497930,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,1.166151391,77.18909243
+coin-fee6770b/s0,coin-fee6770b,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,1.235377724,81.77127431
+coin-fee6770b/s1,coin-fee6770b,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),coin,classic,1.05039422,69.52697318
 dice-11320348/s0,dice-11320348,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),dice,classic,1.607666181,106.4135363
 dice-11320348/s1,dice-11320348,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),dice,classic,1.908413805,126.3204166
 dice-3c98ffa3/s0,dice-3c98ffa3,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),dice,perturbed,0.5149294583,34.08385725
@@ -161,6 +179,30 @@ dice-d1bda26f/s0,dice-d1bda26f,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Cl
 dice-d1bda26f/s1,dice-d1bda26f,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),dice,perturbed,1.620778176,107.2814365
 dice-fb2da41f/s0,dice-fb2da41f,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),dice,classic,1.650524672,109.2503961
 dice-fb2da41f/s1,dice-fb2da41f,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),dice,classic,1.85866601,123.0275447
+transform-138d930c/s0,transform-138d930c,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,0.6815444227,45.1123206
+transform-138d930c/s1,transform-138d930c,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,0.7361737122,48.72830504
+transform-1423f916/s0,transform-1423f916,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.876019165,124.1761729
+transform-1423f916/s1,transform-1423f916,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.654445472,109.5099191
+transform-2241a448/s0,transform-2241a448,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,1.444999371,95.64640652
+transform-2241a448/s1,transform-2241a448,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,1.459793773,96.62566738
+transform-349fe0ec/s0,transform-349fe0ec,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.387063922,91.81158302
+transform-349fe0ec/s1,transform-349fe0ec,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.381049018,91.41344859
+transform-423e8283/s0,transform-423e8283,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,1.499753728,99.27066933
+transform-423e8283/s1,transform-423e8283,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,1.504247833,99.56814
+transform-61466a48/s0,transform-61466a48,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.535695856,101.649726
+transform-61466a48/s1,transform-61466a48,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.462623319,96.81295874
+transform-771c9bc6/s0,transform-771c9bc6,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,0.6399774578,42.3609486
+transform-771c9bc6/s1,transform-771c9bc6,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,0.6889889896,45.60508627
+transform-7761972d/s0,transform-7761972d,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,0.943166127,62.42940487
+transform-7761972d/s1,transform-7761972d,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,0.9706623876,64.24941848
+transform-940d1814/s0,transform-940d1814,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,0.7434022077,49.20676865
+transform-940d1814/s1,transform-940d1814,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,0.656463587,43.45218714
+transform-a972aeb9/s0,transform-a972aeb9,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.536933922,101.7316752
+transform-a972aeb9/s1,transform-a972aeb9,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.025274905,67.86429273
+transform-d26ed80b/s0,transform-d26ed80b,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.237110778,81.88598748
+transform-d26ed80b/s1,transform-d26ed80b,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,perturbed,1.124465614,74.42985607
+transform-dc2a73e1/s0,transform-dc2a73e1,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,1.097110565,72.61918945
+transform-dc2a73e1/s1,transform-dc2a73e1,claude-cli:claude-fable-5-1@high,r2,0,2.1.308 (Claude Code),transform,classic,1.113192506,73.68367425
 cards-078b9def/s0,cards-078b9def,claude-cli:claude-fable-5-1@low,r1,0,unrecorded,cards,perturbed,0.185935325,12.3073034
 cards-078b9def/s1,cards-078b9def,claude-cli:claude-fable-5-1@low,r1,0,unrecorded,cards,perturbed,0.3811873667,25.23129252
 cards-262f6a6a/s0,cards-262f6a6a,claude-cli:claude-fable-5-1@low,r1,0,unrecorded,cards,perturbed,0.4920726727,32.57093658
@@ -522,14 +564,27 @@ urn-c5312568/s1,urn-c5312568,claude-cli:claude-haiku-5-5@high,r2,0,unrecorded,ur
 urn-f6b24251/s0,urn-f6b24251,claude-cli:claude-haiku-5-5@high,r2,0,unrecorded,urn,perturbed,2.368798561,156.7938884
 urn-f6b24251/s1,urn-f6b24251,claude-cli:claude-haiku-5-5@high,r2,0,unrecorded,urn,perturbed,3.182951976,210.6837724
 cards-078b9def/s0,cards-078b9def,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.1465644416,9.701292913
+cards-078b9def/s1,cards-078b9def,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.4320633225,28.59883887
 cards-262f6a6a/s0,cards-262f6a6a,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.2968271414,19.64737839
 cards-262f6a6a/s1,cards-262f6a6a,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.9787050936,64.78177576
 cards-49733765/s0,cards-49733765,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,0.53954288,35.71305196
 cards-49733765/s1,cards-49733765,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,0.5622863081,37.21846935
+cards-4ec65028/s0,cards-4ec65028,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,1.886279763,124.8553353
+cards-4ec65028/s1,cards-4ec65028,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,1.542694045,102.1129453
 cards-678e8425/s0,cards-678e8425,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,0.8032660393,53.1692343
 cards-678e8425/s1,cards-678e8425,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,0.86190898,57.05088758
+cards-6f2176c2/s0,cards-6f2176c2,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,1.149854032,76.11034879
+cards-6f2176c2/s1,cards-6f2176c2,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.5344090253,35.37323538
+cards-84c0d3be/s0,cards-84c0d3be,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.5565978438,36.84194242
+cards-84c0d3be/s1,cards-84c0d3be,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.6402524371,42.37914984
+cards-98a424df/s0,cards-98a424df,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.2762339474,18.28428783
+cards-98a424df/s1,cards-98a424df,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.3583592724,23.72027098
+cards-aebc6743/s0,cards-aebc6743,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,-0.7105501445,-47.03224743
+cards-aebc6743/s1,cards-aebc6743,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.3962391375,26.227589
 cards-be9a053d/s0,cards-be9a053d,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,0.4598088369,30.43535091
 cards-be9a053d/s1,cards-be9a053d,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,0.5077909742,33.61135161
+cards-d6f25522/s0,cards-d6f25522,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.4181562619,27.67831226
+cards-d6f25522/s1,cards-d6f25522,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,perturbed,0.4154729723,27.5007018
 cards-e63ba600/s0,cards-e63ba600,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,-0.3533470536,-23.38850563
 cards-e63ba600/s1,cards-e63ba600,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),cards,classic,0.4874769122,32.26673716
 dice-11320348/s0,dice-11320348,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),dice,classic,1.766383132,116.9192198
@@ -556,6 +611,29 @@ dice-d1bda26f/s0,dice-d1bda26f,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Cl
 dice-d1bda26f/s1,dice-d1bda26f,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),dice,perturbed,2.243896012,148.5264246
 dice-fb2da41f/s0,dice-fb2da41f,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),dice,classic,1.341417709,88.79020023
 dice-fb2da41f/s1,dice-fb2da41f,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),dice,classic,1.860593436,123.1551236
+transform-138d930c/s0,transform-138d930c,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,0.7015199978,46.43453016
+transform-138d930c/s1,transform-138d930c,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,0.5027363095,33.27677671
+transform-1423f916/s0,transform-1423f916,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,2.316316073,153.3200036
+transform-2241a448/s0,transform-2241a448,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,1.376833566,91.13442234
+transform-2241a448/s1,transform-2241a448,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,1.459534,96.60847268
+transform-349fe0ec/s0,transform-349fe0ec,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,1.185501692,78.46991428
+transform-349fe0ec/s1,transform-349fe0ec,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,1.441371102,95.40624659
+transform-423e8283/s0,transform-423e8283,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,1.499551051,99.25725386
+transform-423e8283/s1,transform-423e8283,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,1.175692853,77.82065432
+transform-61466a48/s0,transform-61466a48,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,1.504213236,99.56584999
+transform-61466a48/s1,transform-61466a48,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,1.564326912,103.5448532
+transform-771c9bc6/s0,transform-771c9bc6,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,0.6103872383,40.4023331
+transform-771c9bc6/s1,transform-771c9bc6,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,0.7613958904,50.39779414
+transform-7761972d/s0,transform-7761972d,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,0.9441839985,62.49677913
+transform-7761972d/s1,transform-7761972d,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,0.9548572475,63.20325549
+transform-940d1814/s0,transform-940d1814,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,0.7430952306,49.18644943
+transform-940d1814/s1,transform-940d1814,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,0.6541349539,43.29805186
+transform-a972aeb9/s0,transform-a972aeb9,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,1.427202547,94.46841132
+transform-a972aeb9/s1,transform-a972aeb9,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,0.7496936721,49.62320894
+transform-d26ed80b/s0,transform-d26ed80b,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,1.231214827,81.49572667
+transform-d26ed80b/s1,transform-d26ed80b,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,perturbed,1.207098551,79.89943875
+transform-dc2a73e1/s0,transform-dc2a73e1,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,1.140729309,75.50637141
+transform-dc2a73e1/s1,transform-dc2a73e1,claude-cli:claude-haiku-5-5@high,r3,0,2.1.308 (Claude Code),transform,classic,1.113826144,73.7256156
 cards-078b9def/s0,cards-078b9def,claude-cli:claude-haiku-5-5@low,r1,0,unrecorded,cards,perturbed,-0.6304955358,-41.73332773
 cards-078b9def/s1,cards-078b9def,claude-cli:claude-haiku-5-5@low,r1,0,unrecorded,cards,perturbed,-0.3757348319,-24.87038208
 cards-262f6a6a/s0,cards-262f6a6a,claude-cli:claude-haiku-5-5@low,r1,0,unrecorded,cards,perturbed,-0.3496820708,-23.1459156

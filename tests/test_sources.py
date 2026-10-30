@@ -164,3 +164,28 @@ def test_extract_validates_before_writing(tmp_path, arena):
     assert "../a" in m["arena"]["source_paths"]
     manifest = (out / "MANIFEST.json").read_text(encoding="utf-8")
     assert str(root) not in manifest  # no absolute local paths
+
+
+def test_manifest_keeps_files_from_same_named_roots_apart(tmp_path, arena):
+    # Regression: keys were "<root name>/<file>", so two roots both named core-v1 collided.
+    root, a = arena
+    for sub in ("results", "runs"):
+        d = root / sub / "core-v1"
+        d.mkdir(parents=True)
+        for f in a.glob("*.jsonl"):
+            (d / f.name).write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
+    repo = root / "repo"
+    (repo / "configs").mkdir(parents=True)
+    cfg = repo / "configs" / "sources.toml"
+    cfg.write_text(
+        '[[table]]\nname = "arena"\nextractor = "mm-arena"\nrepo = "x"\n'
+        'paths = ["../results/core-v1", "../runs/core-v1"]\n',
+        encoding="utf-8",
+    )
+    m = run_extract(cfg, repo / "out")
+    assert sorted(m["arena"]["files"]) == [
+        "../results/core-v1/bayes.jsonl",
+        "../results/core-v1/claude-cli_m@high.jsonl",
+        "../runs/core-v1/bayes.jsonl",
+        "../runs/core-v1/claude-cli_m@high.jsonl",
+    ]

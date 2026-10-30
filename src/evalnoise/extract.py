@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from evalnoise.data import DataError
-from evalnoise.sources import Extract, agent_ab, git_commit, mm_arena, ruleproof
+from evalnoise.sources import Extract, agent_ab, git_commit, git_tracked, mm_arena, ruleproof
 
 EXTRACTORS = ("mm-arena", "agent-ab", "ruleproof")
 
@@ -71,6 +71,14 @@ def run_extract(config: Path, out_dir: Path, only: list[str] | None = None) -> d
         ex.table.to_csv(tmp, index=False, lineterminator="\n", float_format="%.10g")
         os.replace(tmp, csv_path)
         commit = git_commit(paths[0])
+        tracked = git_tracked(paths[0])
+        files: dict[str, str] = {}
+        untracked: list[str] = []
+        for abs_path, digest in ex.files.items():
+            key = _relative(Path(abs_path), root)
+            files[key] = digest
+            if tracked is not None and Path(abs_path) not in tracked:
+                untracked.append(key)
         manifest[t["name"]] = {
             "extractor": t["extractor"],
             "repo": t["repo"],
@@ -80,12 +88,22 @@ def run_extract(config: Path, out_dir: Path, only: list[str] | None = None) -> d
             "rows": int(len(ex.table)),
             "excluded": ex.excluded,
             "notes": ex.notes,
-            "files": dict(sorted(ex.files.items())),
+            "files": dict(sorted(files.items())),
+            # Files not committed in the source repository at `commit` (e.g. new runs).
+            "untracked_files": sorted(untracked) if tracked is not None else None,
         }
     tmp = manifest_path.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     os.replace(tmp, manifest_path)
     return manifest
+
+
+def _relative(path: Path, root: Path) -> str:
+    """Path relative to the repository root, never absolute (fall back to the file name)."""
+    try:
+        return Path(os.path.relpath(path, root)).as_posix()
+    except ValueError:  # a different drive on Windows
+        return path.name
 
 
 def _extract_one(t: dict[str, Any], paths: list[Path]) -> Extract:

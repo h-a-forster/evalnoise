@@ -29,10 +29,10 @@ META = ("item", "cluster", "arm", "run", "repeat", "harness")
 
 @dataclass
 class Extract:
-    """A trial table plus provenance (paths are relative to the source root)."""
+    """A trial table plus provenance."""
 
     table: pd.DataFrame
-    files: dict[str, str] = field(default_factory=dict)  # relative path -> sha256
+    files: dict[str, str] = field(default_factory=dict)  # absolute path -> sha256
     excluded: dict[str, int] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
 
@@ -58,6 +58,33 @@ def git_commit(path: Path) -> str | None:
     except (OSError, subprocess.SubprocessError):
         return None
     return out.stdout.strip() or None if out.returncode == 0 else None
+
+
+def git_tracked(path: Path) -> set[Path] | None:
+    """Files tracked by git in the repository containing ``path`` (None without git)."""
+    try:
+        top = subprocess.run(
+            ["git", "-C", str(path), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        if top.returncode != 0:
+            return None
+        root = Path(top.stdout.strip())
+        out = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if out.returncode != 0:
+        return None
+    return {(root / f).resolve() for f in out.stdout.split("\0") if f}
 
 
 def iter_jsonl(path: Path, excluded: dict[str, int]) -> Iterator[dict]:
@@ -109,7 +136,7 @@ def mm_arena(roots: Iterable[Path], reference: str = "bayes") -> Extract:
             is_ref = agent_file == reference
             if not (is_ref or agent_file.startswith(("claude-cli_", "anthropic_"))):
                 continue
-            out.files[f"{root.name}/{path.name}"] = sha256(path)
+            out.files[str(path.resolve())] = sha256(path)
             for t in iter_jsonl(path, out.excluded):
                 gid, seed = str(t["game"]["id"]), int(t["seed"])
                 if t.get("status") != "ok":
@@ -181,7 +208,7 @@ def agent_ab(run_dir: Path, run_label: str | None = None) -> Extract:
     if not path.is_file():
         raise DataError(f"{path}: not found")
     out = Extract(table=pd.DataFrame())
-    out.files[f"{run_dir.name}/trials.jsonl"] = sha256(path)
+    out.files[str(path.resolve())] = sha256(path)
     label = run_label or run_dir.name
     rows = []
     seen: set[tuple[str, str, int]] = set()
@@ -263,7 +290,7 @@ def ruleproof(
         if t.get("error") or not report:
             _bump(out.excluded, "errored or unscored")
             continue
-        out.files[rel] = sha256(results_dir / rel)
+        out.files[str((results_dir / rel).resolve())] = sha256(results_dir / rel)
         summary = report["summary"]
         rows.append(
             {
