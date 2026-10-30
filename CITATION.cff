@@ -56,6 +56,16 @@ references:
     authors:
       - family-names: Zhang
         given-names: Yunbei
+      - family-names: Wang
+        given-names: Janet
+      - family-names: Ge
+        given-names: Yingqiang
+      - family-names: Xu
+        given-names: Weijie
+      - family-names: Hamm
+        given-names: Jihun
+      - family-names: Reddy
+        given-names: Chandan K.
     title: "Stop Comparing LLM Agents Without Disclosing the Harness"
     year: 2026
     notes: arXiv:2605.23950
