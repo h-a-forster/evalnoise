@@ -1,0 +1,165 @@
+import math
+
+import numpy as np
+import pytest
+from scipy import stats
+
+from evalnoise.components import Components, estimate
+from evalnoise.power import (
+    Design,
+    _t_power_quad,
+    mde,
+    naive_false_positive_rate,
+    optimal_repeats,
+    plan,
+    power_at,
+    resolve,
+    se_difference,
+    tasks_needed,
+)
+from evalnoise.simulate import simulate
+from evalnoise.validate import _item_differences, _paired_t_reject
+
+C = Components(item=400.0, item_arm=60.0, run=20.0, item_run=100.0, within=300.0)
+
+
+@pytest.mark.parametrize(
+    "design",
+    [Design(30, 1, 1), Design(30, 2, 3), Design(15, 4, 2), Design(40, 1, 3, paired=False)],
+)
+def test_variance_formula_matches_simulation(design):
+    r = resolve(C)
+    diffs = []
+    for s in range(1500):
+        df = simulate(
+            C,
+            tasks=design.tasks,
+            runs=design.runs,
+            repeats=design.repeats,
+            paired=design.paired,
+            seed=s,
+        )
+        m = df.groupby("arm")["score"].mean()
+        diffs.append(m["arm1"] - m["arm0"])
+    emp = np.var(diffs, ddof=1)
+    theory = se_difference(r, design) ** 2
+    # var of a sample variance from n normal draws: 2 sigma^4 / (n - 1)
+    assert abs(emp - theory) < 4 * theory * math.sqrt(2 / (len(diffs) - 1))
+
+
+def test_z_mde_formula_and_power_round_trip():
+    r = resolve(C)
+    d = Design(50, 2, 2)
+    se = se_difference(r, d)
+    z = stats.norm.ppf(0.975) + stats.norm.ppf(0.8)
+    assert mde(r, d, method="z") == pytest.approx(z * se)
+    m = mde(r, d)
+    assert m > mde(r, d, method="z")  # t quantiles are wider
+    assert power_at(r, d, m) == pytest.approx(0.8, abs=1e-6)
+    assert power_at(r, d, 0.0) == pytest.approx(0.05, abs=1e-9)
+
+
+def test_t_power_equals_noncentral_t_for_paired_items():
+    r = resolve(Components(item=1.0, item_arm=2.0, run=0.0, item_run=0.0, within=3.0))
+    d = Design(12, 1, 2)
+    se = se_difference(r, d)
+    tc = stats.t.ppf(0.975, 11)
+    expect = stats.nct.sf(tc, 11, 1.7 / se) + stats.nct.cdf(-tc, 11, 1.7 / se)
+    assert power_at(r, d, 1.7) == pytest.approx(expect, rel=1e-9)
+
+
+def test_power_where_scipy_nct_returns_nan():
+    # Regression: nct.cdf is nan here, which made the MDE root-finder fail.
+    assert math.isnan(stats.nct.cdf(-2.7764, 4.0001, 10.86))
+    r = resolve(Components(item=3000, item_arm=44.0, run=22.1, item_run=227.6))
+    p = power_at(r, Design(1_000_000, 3, 1), 41.69)
+    assert math.isfinite(p) and p > 0.999
+    assert math.isfinite(mde(r, Design(1_000_000, 3, 1)))
+
+
+@pytest.mark.parametrize("df, ncp", [(3.0, 2.0), (10.0, 1.5), (4.0, 6.0), (2.5, 0.0)])
+def test_quadrature_matches_nct(df, ncp):
+    tc = float(stats.t.ppf(0.975, df))
+    expect = stats.nct.sf(tc, df, ncp) + stats.nct.cdf(-tc, df, ncp)
+    assert _t_power_quad(tc, df, ncp) == pytest.approx(expect, abs=1e-7)
+
+
+def test_tasks_needed_is_minimal_and_unreachable_is_none():
+    r = resolve(C)
+    t = tasks_needed(r, 12.0, runs=4, repeats=3)
+    assert t is not None
+    assert mde(r, Design(t, 4, 3)) <= 12.0 < mde(r, Design(t - 1, 4, 3))
+    # One run: the run term alone gives an MDE above 12 for any number of tasks.
+    assert mde(r, Design(10**6, 1, 1)) > 12.0
+    assert tasks_needed(r, 12.0, runs=1) is None
+
+
+def test_naive_false_positive_rate():
+    no_run = resolve(Components(item=1.0, item_arm=1.0, run=0.0, item_run=0.5, within=1.0))
+    assert naive_false_positive_rate(no_run, Design(20)) == pytest.approx(0.05)
+    r = resolve(C)
+    assert naive_false_positive_rate(r, Design(20)) > naive_false_positive_rate(r, Design(20, 5))
+
+
+def test_resolve_requires_run_and_flags_assumptions():
+    single_run = estimate(simulate(Components(1, 1, 0, 0, 1), tasks=10, repeats=2, seed=0))
+    with pytest.raises(ValueError, match="not identified"):
+        resolve(single_run.components)
+    r = resolve(single_run.components, run=0.0)
+    assert r.run == 0.0
+    assert any("folded into item_arm" in n for n in r.notes)
+    with pytest.raises(ValueError, match="non-negative"):
+        resolve(single_run.components, run=-1.0)
+    one_arm = Components(item=2.0, within=1.0, run=0.0, absorbed={"item_run": "item"})
+    with pytest.raises(ValueError, match="item x arm"):
+        resolve(one_arm)
+    assert resolve(one_arm, paired=False).item == 2.0
+
+
+def test_optimal_repeats():
+    r = resolve(C)
+    assert optimal_repeats(r) == 1.0
+    k = optimal_repeats(r, task_cost=20.0)
+    a, b = C.item_arm + C.item_run, C.within
+    assert k == pytest.approx(math.sqrt(b * 20.0 / a))
+
+
+def test_plan_grid_shape():
+    rows = plan(resolve(C), [10, 20], [1, 2], [1, 3])
+    assert len(rows) == 8
+    assert rows[0]["trials_per_arm"] == 10
+
+
+def test_design_validation():
+    with pytest.raises(ValueError):
+        Design(1)
+    with pytest.raises(ValueError):
+        Design(10, 0)
+    with pytest.raises(ValueError):
+        mde(resolve(C), Design(10), power=1.5)
+
+
+def test_realised_power_at_planned_mde():
+    # Gaussian data, no run effect, analysed by the paired t-test over items.
+    comps = Components(item=400.0, item_arm=60.0, run=0.0, item_run=0.0, within=300.0)
+    d = Design(20, 1, 3)
+    target = mde(resolve(comps), d)
+    rng = np.random.default_rng(0)
+    sims = 6000
+    hit = _paired_t_reject(_item_differences(comps, d, target, sims, rng), 0.05).mean()
+    null = _paired_t_reject(_item_differences(comps, d, 0.0, sims, rng), 0.05).mean()
+    mc = math.sqrt(0.8 * 0.2 / sims)
+    assert abs(hit - 0.8) < 4 * mc
+    assert abs(null - 0.05) < 4 * math.sqrt(0.05 * 0.95 / sims)
+
+
+def test_naive_rate_matches_simulation():
+    comps = Components(item=400.0, item_arm=60.0, run=20.0, item_run=100.0, within=0.0)
+    d = Design(60, 1, 1)
+    rng = np.random.default_rng(1)
+    sims = 6000
+    rate = _paired_t_reject(_item_differences(comps, d, 0.0, sims, rng), 0.05).mean()
+    nominal = naive_false_positive_rate(resolve(comps), d)
+    assert nominal > 0.3
+    # z-based nominal vs t-test with 59 df: allow a small approximation gap.
+    assert abs(rate - nominal) < 4 * math.sqrt(nominal * (1 - nominal) / sims) + 0.01
