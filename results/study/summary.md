@@ -6,8 +6,10 @@ Standard deviations (square roots of the variance components) in each dataset's
 unit, with 95% intervals: percentile bootstrap over clusters for item-level
 components, a chi-square interval for the run component. `n/i`: not identified by
 the layout; `(in X)`: folded into component X. `<0`: the moment estimate is
-negative (planning uses 0); `all draws < 0`: so was every bootstrap draw, a sign that
-the model overstates the noise of cell means there.
+negative (planning uses 0); `upper bound < 0`: so is the upper end of its bootstrap
+interval, a hint that the model may overstate the noise of cell means there (with few
+informative items the draws resample the same items). `[degenerate]`: the runs agree
+more closely than the residual allows, so no run variance fits the chi-square interval.
 
 ## Datasets
 
@@ -33,7 +35,7 @@ the model overstates the noise of cell means there.
 | `agent-ab-no-tests-cost` | 0.753 [0.489, 0.993] | 0.166 [0.027, 0.258] | n/i | (in item x arm) | 0.191 [0.140, 0.245] | 0.90 |
 | `agent-ab-haiku-vs-sonnet` | 13.4 [0.0, 23.7] | 17.4 [0.0, 26.4] | n/i | (in item x arm) | (in item x arm) | 0.37 |
 | `overclaim-setups` | 43.0 [27.8, 49.1] | <0 [0.0, 1.3] | n/i | (in item x arm) | 18.1 [10.4, 25.5] | 0.85 |
-| `overclaim-interventions` | 22.8 [0.6, 37.1] | <0 [all draws < 0] | n/i | (in item x arm) | 22.3 [14.8, 28.7] | 0.51 |
+| `overclaim-interventions` | 22.8 [0.6, 37.1] | <0 [upper bound < 0] | n/i | (in item x arm) | 22.3 [14.8, 28.7] | 0.51 |
 | `ruleproof-main` | 9.5 [0.0, 12.0] | 19.6 [10.6, 21.3] | <0 [0.0, 8.8] | <0 [0.0, 7.5] | 22.4 [18.3, 25.8] | 0.09 |
 | `ruleproof-pressure` | 26.2 [0.0, 35.9] | 7.5 [0.0, 14.8] | n/i | (in item x arm) | 36.5 [20.0, 47.6] | 0.33 |
 
@@ -53,13 +55,35 @@ paired comparisons.
 | `mm-arena-all` | claude-cli:claude-haiku-5-5@high | 5.6 [2.5, 37.1] | 2 | 18.0 | 189 | 2.0 [0.7, 14.1] |
 | `mm-arena-all` | claude-cli:claude-opus-5-5@high | 2.6 [0.7, 88.5] | 1 | 10.9 | 119 | 4.7 [2.3, 18.4] |
 | `mm-arena-all` | Bartlett test, equal item x run | p = 1.1e-25 |  |  |  |  |
-| `ruleproof-main` | haiku45-long-hook | 0.0 [0.0, 0.0] | 1 | 0.0 | 4 | 0.0 [0.0, 20.0] |
-| `ruleproof-main` | haiku55-long-hook | 0.0 [0.0, 0.0] | 1 | 10.5 | 4 | 0.0 [0.0, 20.7] |
-| `ruleproof-main` | sonnet-long-hook | 0.0 [0.0, 150.4] | 1 | 0.0 | 4 | 0.0 [0.0, 0.0] |
+| `ruleproof-main` | haiku45-long-hook | 0.0 [degenerate] | 1 | 0.0 | 4 | <0 [0.0, 20.0] |
+| `ruleproof-main` | haiku55-long-hook | <0 [degenerate] | 1 | 10.5 | 4 | <0 [0.0, 20.7] |
+| `ruleproof-main` | sonnet-long-hook | <0 [0.0, 150.4] | 1 | 0.0 | 4 | <0 [degenerate] |
 | `ruleproof-main` | Bartlett test, equal item x run | p = - |  |  |  |  |
 
 Arms with two or more runs, each fitted alone. The pooled run and item x run terms
 assume these arms share one variance; the Bartlett test checks that for item x run.
+It assumes normal residuals, so with heavy-tailed residuals its p-value is too small.
+
+## Run shifts by family
+
+| dataset | arm | runs | items | run means | mean shift | median shift | by family |
+| --- | --- | --- | ---: | ---: | ---: | ---: | --- |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high | r1 to r2 | 84 | 81.3 / 79.7 | -1.6 | -0.2 | cards -2.2; coin 0.1; dice -2.6; transform -0.8 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r1 to r2 | 120 | 79.9 / 90.4 | 10.5 | 2.3 | cards 22.8; coin 8.6; dice 13.0; transform 1.7; urn 6.3 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r1 to r3 | 71 | 61.8 / 67.2 | 5.4 | 0.7 | cards 9.1; dice 4.6; transform 2.3 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r2 to r3 | 71 | 74.8 / 67.2 | -7.7 | -1.1 | cards -13.7; dice -8.5; transform -0.5 |
+| `mm-arena-replicated` | claude-cli:claude-opus-5-5@high | r1 to r2 | 120 | 87.7 / 83.8 | -3.9 | -0.4 | cards -2.9; coin -8.2; dice -6.2; transform -1.0; urn -1.2 |
+| `mm-arena-all` | claude-cli:claude-fable-5-1@high | r1 to r2 | 84 | 81.3 / 79.7 | -1.6 | -0.2 | cards -2.2; coin 0.1; dice -2.6; transform -0.8 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r1 to r2 | 120 | 79.9 / 90.4 | 10.5 | 2.3 | cards 22.8; coin 8.6; dice 13.0; transform 1.7; urn 6.3 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r1 to r3 | 71 | 61.8 / 67.2 | 5.4 | 0.7 | cards 9.1; dice 4.6; transform 2.3 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r2 to r3 | 71 | 74.8 / 67.2 | -7.7 | -1.1 | cards -13.7; dice -8.5; transform -0.5 |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high | r1 to r2 | 120 | 87.7 / 83.8 | -3.9 | -0.4 | cards -2.9; coin -8.2; dice -6.2; transform -1.0; urn -1.2 |
+
+Run means and the mean change from one run to the other, over the items both runs
+cover.
+The model's run term is a shift shared by every item; shifts that differ by family
+are partly a family x run effect, which more families would average out but more
+items per family would not.
 
 ## Moment estimates vs REML (SD)
 
@@ -114,9 +138,11 @@ One run per arm, the observed tasks and repeats. SE: of the difference in arm me
 MDE: smallest difference detected with 80% power at alpha 0.05 (two-sided t,
 Satterthwaite df). Where identified, the run variance is borrowed from this
 dataset with its degrees of freedom, so the MDE is large when the dataset has few
-replicate runs. Where it is not identified the MDE assumes it is zero: a lower bound.
+replicate runs. Where it is not identified the MDE assumes it is zero, which
+understates the MDE if runs vary.
 Naive false-positive rate: how often a paired test over items, which ignores run
-effects, declares a difference between single runs of two identical arms.
+effects, declares a difference between single runs of two arms with equal mean
+scores (their item x arm effects still differ; identical arms give a higher rate).
 
 ## Tasks per arm needed for a target MDE
 
@@ -148,9 +174,11 @@ effects, declares a difference between single runs of two identical arms.
 - `mm-arena-replicated`: within-run noise is not separated from item x run noise: repeats inside a run are assumed not to help (conservative)
 - `mm-arena-replicated`: the replicated arms do not share one item x run variance (Bartlett p = 1.1e-25; SD by arm: claude-cli:claude-fable-5-1@high 5.93, claude-cli:claude-haiku-5-5@high 18, claude-cli:claude-opus-5-5@high 10.9): pooled components describe an average arm
 - `mm-arena-replicated`: items are clustered (median design effect 1.33 over pairs): the planner treats items as independent, so its task counts are about 1.33x too small
+- `mm-arena-replicated`: items are also clustered by family (median design effect 2.85 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information
 - `mm-arena-all`: within-run noise is not separated from item x run noise: repeats inside a run are assumed not to help (conservative)
 - `mm-arena-all`: the replicated arms do not share one item x run variance (Bartlett p = 1.1e-25; SD by arm: claude-cli:claude-fable-5-1@high 5.93, claude-cli:claude-haiku-5-5@high 18, claude-cli:claude-opus-5-5@high 10.9): pooled components describe an average arm
 - `mm-arena-all`: items are clustered (median design effect 1.15 over pairs): the planner treats items as independent, so its task counts are about 1.15x too small
+- `mm-arena-all`: items are also clustered by family (median design effect 2.66 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information
 - `agent-ab-no-tests`: run variance set to 0 (not identified by the data)
 - `agent-ab-no-tests`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
 - `agent-ab-no-tests`: arms differ on fewer than 10 items (control - no-tests: 9): SEs, MDEs and their intervals rest on those few items and are unreliable
@@ -173,37 +201,41 @@ effects, declares a difference between single runs of two identical arms.
 
 ## Pairwise differences
 
-| dataset | pair | difference [item bootstrap] | SE, items only | SE, clusters | p, clusters | SE with run term | df / p with run term | item x arm SD |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-haiku-5-5@high | 5.1 [0.5, 9.1] | 1.8 | 2.1 | 0.018 | 4.6 | 6.3 / 0.309 | 9.7 [0.0, 16.6] |
-| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.1 [1.9, 6.5] | 1.2 | 1.2 | 0.001 | 4.5 | 4.6 / 0.404 | 0.0 [0.0, 6.0] |
-| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high - claude-cli:claude-opus-5-5@high | -1.0 [-5.5, 3.9] | 2.0 | 2.5 | 0.693 | 4.6 | 7.6 / 0.839 | 12.0 [5.0, 17.5] |
-| `mm-arena-all` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.1 [1.8, 6.6] | 1.2 | 1.2 | 0.001 | 4.5 | 4.6 / 0.404 | 0.0 [0.0, 6.4] |
-| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-opus-5-5@medium | 13.1 [10.2, 16.2] | 1.5 | 1.6 | <0.001 | 5.4 | 4.8 / 0.061 | 0.0 [0.0, 8.0] |
-| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-haiku-5-5@high | 1.0 [-4.1, 5.5] | 2.0 | 2.5 | 0.693 | 4.6 | 7.6 / 0.839 | 12.0 [5.4, 17.7] |
-| `mm-arena-all` | claude-cli:claude-sonnet-5-5@high - claude-cli:claude-sonnet-5-5@low | 54.4 [47.5, 61.6] | 3.4 | 3.7 | <0.001 | 7.0 | 7.7 / <0.001 | 22.0 [16.6, 26.5] |
-| `agent-ab-no-tests` | control - no-tests | 2.7 [-1.3, 7.3] | 2.3 | 2.3 | 0.252 | - | - | 3.2 [0.0, 8.7] |
-| `agent-ab-no-tests-cost` | control - no-tests | 0.398 [0.327, 0.478] | 0.040 | 0.040 | <0.001 | - | - | 0.166 [0.027, 0.258] |
-| `agent-ab-haiku-vs-sonnet` | haiku - sonnet | -2.0 [-10.0, 4.0] | 3.5 | 3.5 | 0.569 | - | - | 17.4 [0.0, 26.4] |
-| `overclaim-setups` | haiku-high - haiku-low | 4.3 [0.0, 10.9] | 3.0 | 3.0 | 0.162 | - | - | 0.0 [0.0, 7.2] |
-| `overclaim-setups` | haiku-high - sonnet-high | 0.0 [-6.5, 6.5] | 3.1 | 3.1 | 1.000 | - | - | 0.0 [0.0, 6.3] |
-| `overclaim-setups` | haiku-high - sonnet-low | 0.0 [-6.5, 6.5] | 3.1 | 3.1 | 1.000 | - | - | 0.0 [0.0, 7.2] |
-| `overclaim-setups` | haiku-low - sonnet-high | -4.3 [-13.0, 4.3] | 4.3 | 4.3 | 0.328 | - | - | 7.4 [0.0, 12.3] |
-| `overclaim-setups` | haiku-low - sonnet-low | -4.3 [-13.0, 4.3] | 4.3 | 4.3 | 0.328 | - | - | 7.4 [0.0, 12.6] |
-| `overclaim-setups` | sonnet-high - sonnet-low | 0.0 [-6.5, 6.5] | 3.1 | 3.1 | 1.000 | - | - | 0.0 [0.0, 9.3] |
-| `overclaim-interventions` | stop-hook - control | -4.2 [-8.3, 0.0] | 2.3 | 2.3 | 0.083 | - | - | 0.0 [0.0, 0.0] |
-| `overclaim-interventions` | stop-audit - control | -1.4 [-6.9, 4.2] | 3.2 | 3.2 | 0.668 | - | - | 0.0 [0.0, 0.0] |
-| `overclaim-interventions` | ask-verify - control | -4.2 [-8.3, 0.0] | 2.3 | 2.3 | 0.083 | - | - | 0.0 [0.0, 0.0] |
-| `ruleproof-main` | haiku45-long-hook - haiku45-long | 66.7 [33.3, 93.3] | 18.3 | 18.3 | 0.022 | 18.3 | 4.0 / 0.022 | 27.1 [5.3, 36.3] |
-| `ruleproof-main` | haiku45-short - haiku45-long | 46.7 [20.0, 80.0] | 17.0 | 17.0 | 0.052 | 17.0 | 4.0 / 0.052 | 24.3 [8.6, 32.2] |
-| `ruleproof-main` | haiku55-long-hook - haiku55-long | 6.7 [-13.3, 36.7] | 15.5 | 15.5 | 0.688 | 15.5 | 4.0 / 0.688 | 22.4 [0.0, 30.0] |
-| `ruleproof-main` | haiku55-short - haiku55-long | 26.7 [0.0, 53.3] | 16.3 | 16.3 | 0.178 | 16.3 | 4.0 / 0.178 | 23.2 [0.0, 25.8] |
-| `ruleproof-pressure` | haiku45-long-hook - haiku45-long | 26.7 [6.7, 53.3] | 12.5 | 12.5 | 0.099 | - | - | 0.0 [0.0, 17.6] |
-| `ruleproof-pressure` | haiku45-long-control - haiku45-long | 33.3 [6.7, 60.0] | 14.9 | 14.9 | 0.089 | - | - | 10.5 [0.0, 18.9] |
+| dataset | pair | difference [item bootstrap] | SE, items only | SE, clusters | p, clusters | SE, families | SE with run term | df / p with run term | p, run variance without one arm | item x arm SD |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-haiku-5-5@high | 5.1 [0.5, 9.1] | 1.8 | 2.1 | 0.018 | 3.1 | 4.4 | 6.8 / 0.280 | 0.100 to 0.337 | 9.7 [0.0, 16.6] |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.1 [1.9, 6.5] | 1.2 | 1.2 | 0.001 | 0.7 | 4.3 | 4.7 / 0.387 | 0.164 to 0.448 | 0.0 [0.0, 6.0] |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high - claude-cli:claude-opus-5-5@high | -1.0 [-5.5, 3.9] | 2.0 | 2.5 | 0.693 | 3.6 | 4.5 | 7.9 / 0.836 | 0.758 to 0.851 | 12.0 [5.0, 17.5] |
+| `mm-arena-all` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.1 [1.8, 6.6] | 1.2 | 1.2 | 0.001 | 0.7 | 4.3 | 4.7 / 0.387 | 0.164 to 0.448 | 0.0 [0.0, 6.4] |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-opus-5-5@medium | 13.1 [10.2, 16.2] | 1.5 | 1.6 | <0.001 | 2.2 | 5.4 | 4.8 / 0.061 | 0.012 to 0.104 | 0.0 [0.0, 8.0] |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-haiku-5-5@high | 1.0 [-4.1, 5.5] | 2.0 | 2.5 | 0.693 | 3.6 | 4.5 | 7.9 / 0.836 | 0.758 to 0.851 | 12.0 [5.4, 17.7] |
+| `mm-arena-all` | claude-cli:claude-sonnet-5-5@high - claude-cli:claude-sonnet-5-5@low | 54.4 [47.5, 61.6] | 3.4 | 3.7 | <0.001 | 6.4 | 7.0 | 7.7 / <0.001 | <0.001 to <0.001 | 22.0 [16.6, 26.5] |
+| `agent-ab-no-tests` | control - no-tests | 2.7 [-1.3, 7.3] | 2.3 | 2.3 | 0.252 | - | - | - | - | 3.2 [0.0, 8.7] |
+| `agent-ab-no-tests-cost` | control - no-tests | 0.398 [0.327, 0.478] | 0.040 | 0.040 | <0.001 | - | - | - | - | 0.166 [0.027, 0.258] |
+| `agent-ab-haiku-vs-sonnet` | haiku - sonnet | -2.0 [-10.0, 4.0] | 3.5 | 3.5 | 0.569 | - | - | - | - | 17.4 [0.0, 26.4] |
+| `overclaim-setups` | haiku-high - haiku-low | 4.3 [0.0, 10.9] | 3.0 | 3.0 | 0.162 | - | - | - | - | 0.0 [0.0, 7.2] |
+| `overclaim-setups` | haiku-high - sonnet-high | 0.0 [-6.5, 6.5] | 3.1 | 3.1 | 1.000 | - | - | - | - | 0.0 [0.0, 6.3] |
+| `overclaim-setups` | haiku-high - sonnet-low | 0.0 [-6.5, 6.5] | 3.1 | 3.1 | 1.000 | - | - | - | - | 0.0 [0.0, 7.2] |
+| `overclaim-setups` | haiku-low - sonnet-high | -4.3 [-13.0, 4.3] | 4.3 | 4.3 | 0.328 | - | - | - | - | 7.4 [0.0, 12.3] |
+| `overclaim-setups` | haiku-low - sonnet-low | -4.3 [-13.0, 4.3] | 4.3 | 4.3 | 0.328 | - | - | - | - | 7.4 [0.0, 12.6] |
+| `overclaim-setups` | sonnet-high - sonnet-low | 0.0 [-6.5, 6.5] | 3.1 | 3.1 | 1.000 | - | - | - | - | 0.0 [0.0, 9.3] |
+| `overclaim-interventions` | stop-hook - control | -4.2 [-8.3, 0.0] | 2.3 | 2.3 | 0.083 | - | - | - | - | 0.0 [0.0, 0.0] |
+| `overclaim-interventions` | stop-audit - control | -1.4 [-6.9, 4.2] | 3.2 | 3.2 | 0.668 | - | - | - | - | 0.0 [0.0, 0.0] |
+| `overclaim-interventions` | ask-verify - control | -4.2 [-8.3, 0.0] | 2.3 | 2.3 | 0.083 | - | - | - | - | 0.0 [0.0, 0.0] |
+| `ruleproof-main` | haiku45-long-hook - haiku45-long | 66.7 [33.3, 93.3] | 18.3 | 18.3 | 0.022 | - | 18.3 | 4.0 / 0.022 | 0.022 | 27.1 [5.3, 36.3] |
+| `ruleproof-main` | haiku45-short - haiku45-long | 46.7 [20.0, 80.0] | 17.0 | 17.0 | 0.052 | - | 17.0 | 4.0 / 0.052 | 0.052 | 24.3 [8.6, 32.2] |
+| `ruleproof-main` | haiku55-long-hook - haiku55-long | 6.7 [-13.3, 36.7] | 15.5 | 15.5 | 0.688 | - | 15.5 | 4.0 / 0.688 | 0.688 | 22.4 [0.0, 30.0] |
+| `ruleproof-main` | haiku55-short - haiku55-long | 26.7 [0.0, 53.3] | 16.3 | 16.3 | 0.178 | - | 16.3 | 4.0 / 0.178 | 0.178 | 23.2 [0.0, 25.8] |
+| `ruleproof-pressure` | haiku45-long-hook - haiku45-long | 26.7 [6.7, 53.3] | 12.5 | 12.5 | 0.099 | - | - | - | - | 0.0 [0.0, 17.6] |
+| `ruleproof-pressure` | haiku45-long-control - haiku45-long | 33.3 [6.7, 60.0] | 14.9 | 14.9 | 0.089 | - | - | - | - | 10.5 [0.0, 18.9] |
 
 The bootstrap interval and the item-level SEs ignore run-to-run variation. SE,
 clusters: cluster-robust, tested with clusters - 1 df (equals the items-only SE when
-each item is its own cluster). Where the run variance is identified, the SE with run
-term adds run / R_eff for each arm (R_eff: trials / (items x repeats), so a partial
-replicate run counts fractionally), tested with Satterthwaite df using the run
-term's own df.
+each item is its own cluster). SE, families: clustered by item family where the
+dataset defines one (few families, so rough). Where the run variance is identified,
+the SE with run term adds run / R for each arm (R: its number of runs; the
+run-adjusted item means average every run equally, so a partial replicate run counts
+as a whole run), tested with Satterthwaite df using the run term's own df. p, run
+variance without one arm: the range of that p-value when the run variance (and its
+df) is re-estimated without each replicated arm in turn, since the pooled value
+averages arms that differ.

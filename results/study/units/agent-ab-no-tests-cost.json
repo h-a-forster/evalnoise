@@ -8,7 +8,7 @@
  "scale": 1.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T05:37:46Z",
+ "created": "2026-10-30T06:59:08Z",
  "arms": [
   "control",
   "no-tests"
@@ -768,7 +768,7 @@
   },
   "reference_mde_unpaired": 0.4405409400656508
  },
- "key": "008a4bbc83f3ae16",
+ "key": "0f25e812a611d35d",
  "table_sha256": "91cfb1d7a719124da07926186b1d273c64f0d4a5f19405a7f89378d44bcdfe2a",
- "seconds": 6.74
+ "seconds": 19.15
 }

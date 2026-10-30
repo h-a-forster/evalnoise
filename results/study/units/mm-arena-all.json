@@ -8,7 +8,7 @@
  "scale": 1.0,
  "note": "Pools single-run setups with the replicated ones: the residual is assumed equal across setups.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T05:37:31Z",
+ "created": "2026-10-30T06:58:34Z",
  "arms": [
   "claude-cli:claude-fable-5-1@high",
   "claude-cli:claude-fable-5-1@low",
@@ -291,28 +291,133 @@
     "run_interval": [
      5.464132619690487,
      336.72046083173643
-    ]
+    ],
+    "run_df": 3
    },
    "claude-cli:claude-haiku-5-5@high": {
     "run": 4.1964007040856,
     "run_interval": [
      0.5319739432487756,
      197.73433728354212
-    ]
+    ],
+    "run_df": 2
    },
    "claude-cli:claude-opus-5-5@high": {
     "run": 22.031707328781952,
     "run_interval": [
      5.322437532040421,
      339.49214776831946
-    ]
+    ],
+    "run_df": 3
    }
   },
   "residual_homogeneity": {
    "statistic": 114.93770882177681,
    "df": 2,
    "p": 1.1005091253600177e-25
-  }
+  },
+  "shifts": [
+   {
+    "arm": "claude-cli:claude-fable-5-1@high",
+    "runs": [
+     "r1",
+     "r2"
+    ],
+    "items": 84,
+    "run_means": [
+     81.26577792119048,
+     79.69796087869047
+    ],
+    "mean": -1.5678170425000009,
+    "median": -0.19156190500000037,
+    "by_family": {
+     "cards": -2.1819097162500007,
+     "coin": 0.0709992133333337,
+     "dice": -2.555812992916669,
+     "transform": -0.7851365462500013
+    }
+   },
+   {
+    "arm": "claude-cli:claude-haiku-5-5@high",
+    "runs": [
+     "r1",
+     "r2"
+    ],
+    "items": 120,
+    "run_means": [
+     79.89813967605666,
+     90.3864259222
+    ],
+    "mean": 10.488286246143332,
+    "median": 2.2593492150000003,
+    "by_family": {
+     "cards": 22.795569452916666,
+     "coin": 8.596968233500002,
+     "dice": 13.031504787508334,
+     "transform": 1.682396510416666,
+     "urn": 6.334992246375002
+    }
+   },
+   {
+    "arm": "claude-cli:claude-haiku-5-5@high",
+    "runs": [
+     "r1",
+     "r3"
+    ],
+    "items": 71,
+    "run_means": [
+     61.82358032267324,
+     67.17542320046479
+    ],
+    "mean": 5.351842877791549,
+    "median": 0.6926375899999968,
+    "by_family": {
+     "cards": 9.075576963041668,
+     "dice": 4.570270435008335,
+     "transform": 2.2817611639130444
+    }
+   },
+   {
+    "arm": "claude-cli:claude-haiku-5-5@high",
+    "runs": [
+     "r2",
+     "r3"
+    ],
+    "items": 71,
+    "run_means": [
+     74.83458688211265,
+     67.17542320046479
+    ],
+    "mean": -7.659163681647887,
+    "median": -1.093480190000001,
+    "by_family": {
+     "cards": -13.719992489874999,
+     "dice": -8.4612343525,
+     "transform": -0.4978772686956504
+    }
+   },
+   {
+    "arm": "claude-cli:claude-opus-5-5@high",
+    "runs": [
+     "r1",
+     "r2"
+    ],
+    "items": 120,
+    "run_means": [
+     87.6897367209,
+     83.76902716666667
+    ],
+    "mean": -3.920709554233333,
+    "median": -0.4278673949999998,
+    "by_family": {
+     "cards": -2.91667899,
+     "coin": -8.245078202083334,
+     "dice": -6.214068003166666,
+     "transform": -1.0212796841666665,
+     "urn": -1.2064428917500016
+    }
+   }
+  ]
  },
  "pair_estimates": {
   "claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high": {
@@ -325,13 +430,20 @@
    "clusters": 60,
    "se_clusters": 1.201055322981143,
    "p_items": 0.0010423717596061044,
-   "runs_eff": [
-    1.7,
-    2.0
+   "runs": [
+    2,
+    2
    ],
-   "se_with_run": 4.5184652001618595,
-   "df_with_run": 4.62952136452412,
-   "p_with_run": 0.40439497449115785
+   "se_with_run": 4.344893074537581,
+   "df_with_run": 4.687086488749709,
+   "p_with_run": 0.3868303783685935,
+   "families": 5,
+   "se_families": 0.7191944819032634,
+   "p_with_run_without": {
+    "claude-cli:claude-fable-5-1@high": 0.4483936311985106,
+    "claude-cli:claude-haiku-5-5@high": 0.16393295943276096,
+    "claude-cli:claude-opus-5-5@high": 0.44842983398596975
+   }
   },
   "claude-cli:claude-opus-5-5@high - claude-cli:claude-opus-5-5@medium": {
    "items": 120,
@@ -343,13 +455,20 @@
    "clusters": 60,
    "se_clusters": 1.5881841827351328,
    "p_items": 2.201243371719726e-11,
-   "runs_eff": [
-    2.0,
-    1.0
+   "runs": [
+    2,
+    1
    ],
    "se_with_run": 5.354967031527366,
    "df_with_run": 4.80572592504706,
-   "p_with_run": 0.06051219811868546
+   "p_with_run": 0.06051219811868546,
+   "families": 5,
+   "se_families": 2.1715505325588706,
+   "p_with_run_without": {
+    "claude-cli:claude-fable-5-1@high": 0.10365642928133052,
+    "claude-cli:claude-haiku-5-5@high": 0.012311927637779317,
+    "claude-cli:claude-opus-5-5@high": 0.1036780077720192
+   }
   },
   "claude-cli:claude-opus-5-5@high - claude-cli:claude-haiku-5-5@high": {
    "items": 120,
@@ -361,13 +480,20 @@
    "clusters": 60,
    "se_clusters": 2.45265098937922,
    "p_items": 0.6934130009345851,
-   "runs_eff": [
-    2.0,
-    2.591666666666667
+   "runs": [
+    2,
+    3
    ],
-   "se_with_run": 4.632583065785829,
-   "df_with_run": 7.643901921721335,
-   "p_with_run": 0.8393499488969406
+   "se_with_run": 4.53267380537753,
+   "df_with_run": 7.905887600150202,
+   "p_with_run": 0.8356870621885298,
+   "families": 5,
+   "se_families": 3.5681529646725987,
+   "p_with_run_without": {
+    "claude-cli:claude-fable-5-1@high": 0.8513505084155211,
+    "claude-cli:claude-haiku-5-5@high": 0.7575668633766675,
+    "claude-cli:claude-opus-5-5@high": 0.851361091727254
+   }
   },
   "claude-cli:claude-sonnet-5-5@high - claude-cli:claude-sonnet-5-5@low": {
    "items": 120,
@@ -379,13 +505,20 @@
    "clusters": 60,
    "se_clusters": 3.7117877104183257,
    "p_items": 2.5034113334724572e-21,
-   "runs_eff": [
-    1.0,
-    1.0
+   "runs": [
+    1,
+    1
    ],
    "se_with_run": 6.974847087056398,
    "df_with_run": 7.703620475297862,
-   "p_with_run": 6.430946420691315e-05
+   "p_with_run": 6.430946420691315e-05,
+   "families": 5,
+   "se_families": 6.428833887543758,
+   "p_with_run_without": {
+    "claude-cli:claude-fable-5-1@high": 0.0007356329980293767,
+    "claude-cli:claude-haiku-5-5@high": 3.885181820922817e-08,
+    "claude-cli:claude-opus-5-5@high": 0.0007361353589819218
+   }
   }
  },
  "planning": {
@@ -394,10 +527,12 @@
   "run_df": 4.0,
   "run_assumption": "estimated",
   "design_effect": 1.1529251064158599,
+  "design_effect_families": 2.662093545342697,
   "notes": [
    "within-run noise is not separated from item x run noise: repeats inside a run are assumed not to help (conservative)",
    "the replicated arms do not share one item x run variance (Bartlett p = 1.1e-25; SD by arm: claude-cli:claude-fable-5-1@high 5.93, claude-cli:claude-haiku-5-5@high 18, claude-cli:claude-opus-5-5@high 10.9): pooled components describe an average arm",
-   "items are clustered (median design effect 1.15 over pairs): the planner treats items as independent, so its task counts are about 1.15x too small"
+   "items are clustered (median design effect 1.15 over pairs): the planner treats items as independent, so its task counts are about 1.15x too small",
+   "items are also clustered by family (median design effect 2.66 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information"
   ],
   "observed_design": {
    "tasks": 120,
@@ -1312,7 +1447,7 @@
   },
   "reference_mde_unpaired": 25.8307936916927
  },
- "key": "22510bc2547583d5",
+ "key": "59633dcb93624879",
  "table_sha256": "70863b757a07a3104658dc1b657c7cb3b9e1018d07a0bd0c43c02c63f43e0ddc",
- "seconds": 25.37
+ "seconds": 55.93
 }

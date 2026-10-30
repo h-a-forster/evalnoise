@@ -14,12 +14,20 @@ All notable changes are listed here. The format follows
   of clustered items; a flag for pairs that differ on fewer than 10 items. The summary
   lists all planning notes.
 - Validation: pass/fail checks near a 90% pass rate with gains and losses, and a check of
-  tests that borrow the run variance from a small pilot.
+  tests that borrow the run variance from a small pilot; coverage of the item x run
+  bootstrap interval.
+- Study: an optional item family column (mm-arena: task family) adds family-clustered
+  pair SEs, a family design effect and run shifts (run means, mean, median, by family)
+  for every two runs of a replicated arm.
+- Study: each pair's run-aware p-value with the run variance re-estimated without each
+  replicated arm in turn.
 
 ### Changed
 
 - The mm-arena planning grid covers every run count where the plan changes (1 to 20).
-- Negative moment estimates are shown as `<0` in the study summary instead of 0.
+- Negative moment estimates are shown as `<0` in the study summary instead of 0; the
+  label for a negative bootstrap upper bound says `upper bound < 0` (it was `all draws <
+  0`, which the test did not check).
 
 ### Fixed
 
@@ -28,6 +36,10 @@ All notable changes are listed here. The format follows
   that component into another.
 - `Components.from_dict` could not read the nulls that study unit files use for nan.
 - A test depended on a scipy release in which `nct.cdf` returns nan.
+- The run-aware pair test counted a partial replicate run fractionally; the run-adjusted
+  item means weight every run equally, so it now adds run / R with R the number of runs.
+- The run chi-square interval returned a zero-width [0, 0] when even its upper end fell
+  below zero; it is now reported as degenerate.
 
 ## [0.1.0] - 2026-10-30
 

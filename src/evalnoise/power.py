@@ -262,7 +262,9 @@ def naive_false_positive_rate(r: Resolved, d: Design, *, alpha: float = 0.05) ->
     """False-positive rate of a test that ignores run effects (e.g. paired over items).
 
     Such a test estimates only the item-level term of the variance, so a run-to-run shift
-    reads as an arm difference. Equals ``alpha`` when the run variance is zero.
+    reads as an arm difference. The arms have equal mean scores but keep their item x arm
+    effects; for literally identical arms pass ``item_arm = 0``. Equals ``alpha`` when the
+    run variance is zero.
     """
     v_items, v_run = variance_terms(r, d)
     if v_items + v_run == 0:

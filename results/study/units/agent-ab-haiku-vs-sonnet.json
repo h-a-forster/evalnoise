@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T05:37:54Z",
+ "created": "2026-10-30T06:59:33Z",
  "arms": [
   "haiku",
   "sonnet"
@@ -775,7 +775,7 @@
   },
   "reference_mde_unpaired": 12.44520915691512
  },
- "key": "8af718618d761504",
+ "key": "eee8dd84113b0169",
  "table_sha256": "e112d08b30680b4e0de790a74201ae7509301cbbf2eaab9152f7787d0cd77d30",
- "seconds": 7.91
+ "seconds": 25.2
 }

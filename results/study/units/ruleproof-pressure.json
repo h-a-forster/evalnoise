@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "Only 5 tasks; opus-long has one repeat per task.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T05:38:34Z",
+ "created": "2026-10-30T07:00:55Z",
  "arms": [
   "haiku45-long",
   "haiku45-long-control",
@@ -838,7 +838,7 @@
   },
   "reference_mde_unpaired": 69.69439863860852
  },
- "key": "073f858166af864c",
+ "key": "95cf34b08b130d3a",
  "table_sha256": "5f4a02c6d45504d5265b8fd915a11889a84e3d8a06b61afdef460c7143be8b7d",
- "seconds": 9.35
+ "seconds": 18.15
 }
