@@ -162,6 +162,8 @@ def from_lm_eval(
             if filter_name is not None and str(d.get("filter")) != filter_name:
                 continue
             where = f"{path.name}: doc {d.get('doc_id')}"
+            if "doc_id" not in d:
+                raise DataError(f"{where}: no doc_id")
             name = metric
             if name is None:
                 logged = d.get("metrics") or []

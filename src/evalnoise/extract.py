@@ -41,6 +41,12 @@ def load_config(path: Path) -> tuple[Path, list[dict[str, Any]]]:
             raise DataError(f"{path}: duplicate table name {t['name']!r}")
         if not all(ch.isalnum() or ch in "-_" for ch in t["name"]):
             raise DataError(f"{path}: table name {t['name']!r} must be alphanumeric, - or _")
+        if t["extractor"] == "ruleproof":
+            runs = t.get("runs")
+            if not isinstance(runs, list) or not runs or not all(isinstance(r, str) for r in runs):
+                raise DataError(f'{path}: table {t["name"]!r} needs runs = ["run id", ...]')
+            if not isinstance(t.get("rename", {}), dict):
+                raise DataError(f"{path}: table {t['name']!r}: rename must be a table")
         names.add(t["name"])
     return path.resolve().parent.parent, tables
 
@@ -58,14 +64,17 @@ def run_extract(config: Path, out_dir: Path, only: list[str] | None = None) -> d
         for p in t["paths"]:
             if not (root / p).exists():
                 raise DataError(f"table {t['name']}: source path {p!r} not found under {root.name}")
+    # Extract everything before writing, so a failing table leaves every file unchanged.
+    extracted = []
+    for t in tables:
+        paths = [root / p for p in t["paths"]]
+        extracted.append((t, paths, _extract_one(t, paths)))
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = out_dir / "MANIFEST.json"
     manifest: dict[str, Any] = {}
     if manifest_path.is_file():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    for t in tables:
-        paths = [root / p for p in t["paths"]]
-        ex = _extract_one(t, paths)
+    for t, paths, ex in extracted:
         csv_path = out_dir / f"{t['name']}.csv"
         tmp = csv_path.with_suffix(".csv.tmp")
         ex.table.to_csv(tmp, index=False, lineterminator="\n", float_format="%.10g")

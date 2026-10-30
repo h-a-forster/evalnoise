@@ -1,4 +1,6 @@
 import json
+import shutil
+import subprocess
 
 import pytest
 
@@ -77,6 +79,29 @@ def test_mm_arena_corrupt_middle_line_fails(arena):
     (a / "claude-cli_m@high.jsonl").write_text('{"x": 1\n{"y": 2}\n', encoding="utf-8")
     with pytest.raises(DataError, match="invalid JSON"):
         mm_arena([a])
+
+
+def test_malformed_records_are_data_errors(arena, tmp_path):
+    # Regression: missing fields raised raw KeyErrors, and prior_std 0 was silently 1.
+    _, a = arena
+    bad = _trace("claude-cli:m@high", "g1", 0, 1.0)
+    del bad["seed"]
+    _write(a / "claude-cli_m@high.jsonl", [bad])
+    with pytest.raises(DataError, match="record 1"):
+        mm_arena([a])
+    _write(a / "claude-cli_m@high.jsonl", [_trace("claude-cli:m@high", "g1", 0, 1.0, prior_std=0)])
+    with pytest.raises(DataError, match="prior_std"):
+        mm_arena([a])
+    d = tmp_path / "exp"
+    d.mkdir()
+    _write(d / "trials.jsonl", [{"arm": "a", "repeat": 0, "status": "pass"}])
+    with pytest.raises(DataError, match="record 1"):
+        agent_ab(d)
+    res = tmp_path / "results"
+    _rp(res, "p2", "p2", "y", "t1", 1)
+    (res / "p2" / "trials" / "y" / "t1" / "r1.json").write_text("{", encoding="utf-8")
+    with pytest.raises(DataError, match="r1.json"):
+        ruleproof(res, runs=["p2"])
 
 
 def test_agent_ab(tmp_path):
@@ -164,6 +189,48 @@ def test_extract_validates_before_writing(tmp_path, arena):
     assert "../a" in m["arena"]["source_paths"]
     manifest = (out / "MANIFEST.json").read_text(encoding="utf-8")
     assert str(root) not in manifest  # no absolute local paths
+    # Regression: a later table failing left earlier CSVs rewritten and the manifest stale.
+    before = {p.name: p.read_bytes() for p in out.iterdir()}
+    _write(a / "claude-cli_m@high.jsonl", [_trace("claude-cli:m@high", "g1", 0, 9.0)])
+    exp = root / "exp"
+    exp.mkdir()
+    _write(exp / "trials.jsonl", [{"task": "t", "arm": "a", "repeat": 0, "status": "pass"}] * 2)
+    cfg.write_text(
+        '[[table]]\nname = "arena"\nextractor = "mm-arena"\nrepo = "x"\npaths = ["../a"]\n'
+        '[[table]]\nname = "ab"\nextractor = "agent-ab"\nrepo = "x"\npaths = ["../exp"]\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(DataError, match="duplicate"):
+        run_extract(cfg, out)
+    assert {p.name: p.read_bytes() for p in out.iterdir()} == before
+    cfg.write_text(
+        '[[table]]\nname = "rp"\nextractor = "ruleproof"\nrepo = "x"\npaths = ["../a"]\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(DataError, match="runs"):
+        run_extract(cfg, out)
+
+
+@pytest.mark.skipif(shutil.which("git") is None, reason="needs git")
+def test_manifest_lists_files_not_committed_upstream(tmp_path, arena):
+    root, a = arena
+
+    def git(*args):
+        subprocess.run(["git", "-C", str(a), *args], check=True, capture_output=True)
+
+    git("init", "-q")
+    git("add", "bayes.jsonl")
+    git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
+    repo = root / "repo"
+    (repo / "configs").mkdir(parents=True)
+    cfg = repo / "configs" / "sources.toml"
+    cfg.write_text(
+        '[[table]]\nname = "arena"\nextractor = "mm-arena"\nrepo = "x"\npaths = ["../a"]\n',
+        encoding="utf-8",
+    )
+    m = run_extract(cfg, repo / "out")
+    assert m["arena"]["untracked_files"] == ["../a/claude-cli_m@high.jsonl"]
+    assert m["arena"]["commit"]
 
 
 def test_manifest_keeps_files_from_same_named_roots_apart(tmp_path, arena):

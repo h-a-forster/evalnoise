@@ -17,6 +17,7 @@ import math
 import re
 import subprocess
 from collections.abc import Iterable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -109,6 +110,17 @@ def _bump(d: dict[str, int], key: str) -> None:
     d[key] = d.get(key, 0) + 1
 
 
+@contextmanager
+def _record(where: str) -> Iterator[None]:
+    """Turn a missing or mistyped field in a source record into a DataError naming it."""
+    try:
+        yield
+    except DataError:
+        raise
+    except (KeyError, TypeError, ValueError, AttributeError) as exc:
+        raise DataError(f"{where}: malformed record ({type(exc).__name__}: {exc})") from None
+
+
 # --------------------------------------------------------------------------- mm-arena
 
 _REPLICATE = re.compile(r"^(?P<setup>.+)#r(?P<n>\d+)$")
@@ -137,40 +149,43 @@ def mm_arena(roots: Iterable[Path], reference: str = "bayes") -> Extract:
             if not (is_ref or agent_file.startswith(("claude-cli_", "anthropic_"))):
                 continue
             out.files[str(path.resolve())] = sha256(path)
-            for t in iter_jsonl(path, out.excluded):
-                gid, seed = str(t["game"]["id"]), int(t["seed"])
-                if t.get("status") != "ok":
-                    _bump(out.excluded, f"status {t.get('status')}")
-                    continue
-                prior_std = float(t["game"]["prior_std"]) or 1.0
-                xsd = float(t["xpnl"]) / prior_std
-                if is_ref:
-                    old = ref.setdefault((gid, seed), xsd)
-                    if not math.isclose(old, xsd, rel_tol=1e-12, abs_tol=1e-12):
-                        raise DataError(f"reference episode {gid}/{seed} differs between roots")
-                    continue
-                agent = str(t["agent"])
-                m = _REPLICATE.match(agent)
-                setup, run = (m["setup"], f"r{m['n']}") if m else (agent, "r1")
-                key = (setup, run, gid, seed)
-                row = {
-                    "item": f"{gid}/s{seed}",
-                    "cluster": gid,
-                    "arm": setup,
-                    "run": run,
-                    "repeat": 0,
-                    "harness": str((t.get("provenance") or {}).get("harness") or "unrecorded"),
-                    "family": str(t["game"]["family"]),
-                    "variant": str(t["game"]["variant"]),
-                    "xpnl_sd": xsd,
-                }
-                prev = episodes.get(key)
-                if prev is not None:
-                    if not math.isclose(prev["xpnl_sd"], xsd, rel_tol=1e-12, abs_tol=1e-12):
-                        raise DataError(f"{setup} {run} {gid}/{seed}: conflicting copies")
-                    _bump(out.excluded, "duplicate copy (identical)")
-                    continue
-                episodes[key] = row
+            for n, t in enumerate(iter_jsonl(path, out.excluded), 1):
+                with _record(f"{path.name}: record {n}"):
+                    gid, seed = str(t["game"]["id"]), int(t["seed"])
+                    if t.get("status") != "ok":
+                        _bump(out.excluded, f"status {t.get('status')}")
+                        continue
+                    prior_std = float(t["game"]["prior_std"])
+                    if not prior_std > 0:
+                        raise DataError(f"episode {gid}/{seed}: prior_std {prior_std} <= 0")
+                    xsd = float(t["xpnl"]) / prior_std
+                    if is_ref:
+                        old = ref.setdefault((gid, seed), xsd)
+                        if not math.isclose(old, xsd, rel_tol=1e-12, abs_tol=1e-12):
+                            raise DataError(f"reference episode {gid}/{seed} differs between roots")
+                        continue
+                    agent = str(t["agent"])
+                    m = _REPLICATE.match(agent)
+                    setup, run = (m["setup"], f"r{m['n']}") if m else (agent, "r1")
+                    key = (setup, run, gid, seed)
+                    row = {
+                        "item": f"{gid}/s{seed}",
+                        "cluster": gid,
+                        "arm": setup,
+                        "run": run,
+                        "repeat": 0,
+                        "harness": str((t.get("provenance") or {}).get("harness") or "unrecorded"),
+                        "family": str(t["game"]["family"]),
+                        "variant": str(t["game"]["variant"]),
+                        "xpnl_sd": xsd,
+                    }
+                    prev = episodes.get(key)
+                    if prev is not None:
+                        if not math.isclose(prev["xpnl_sd"], xsd, rel_tol=1e-12, abs_tol=1e-12):
+                            raise DataError(f"{setup} {run} {gid}/{seed}: conflicting copies")
+                        _bump(out.excluded, "duplicate copy (identical)")
+                        continue
+                    episodes[key] = row
     if not ref:
         raise DataError(f"no reference agent {reference!r} found")
     if not episodes:
@@ -212,30 +227,31 @@ def agent_ab(run_dir: Path, run_label: str | None = None) -> Extract:
     label = run_label or run_dir.name
     rows = []
     seen: set[tuple[str, str, int]] = set()
-    for t in iter_jsonl(path, out.excluded):
-        status = t.get("status")
-        if status not in ("pass", "fail"):
-            _bump(out.excluded, f"status {status}")
-            continue
-        key = (str(t["task"]), str(t["arm"]), int(t["repeat"]))
-        if key in seen:
-            raise DataError(f"{path.name}: duplicate trial {key}")
-        seen.add(key)
-        cost = t.get("cost_usd")
-        cost = float(cost) if cost is not None else math.nan
-        rows.append(
-            {
-                "item": key[0],
-                "cluster": key[0],
-                "arm": key[1],
-                "run": label,
-                "repeat": key[2],
-                "harness": str(t.get("agent_version") or "unrecorded"),
-                "passed": 1.0 if status == "pass" else 0.0,
-                "cost_usd": cost,
-                "log_cost": math.log(cost) if cost and cost > 0 else math.nan,
-            }
-        )
+    for n, t in enumerate(iter_jsonl(path, out.excluded), 1):
+        with _record(f"{path.name}: record {n}"):
+            status = t.get("status")
+            if status not in ("pass", "fail"):
+                _bump(out.excluded, f"status {status}")
+                continue
+            key = (str(t["task"]), str(t["arm"]), int(t["repeat"]))
+            if key in seen:
+                raise DataError(f"{path.name}: duplicate trial {key}")
+            seen.add(key)
+            cost = t.get("cost_usd")
+            cost = float(cost) if cost is not None else math.nan
+            rows.append(
+                {
+                    "item": key[0],
+                    "cluster": key[0],
+                    "arm": key[1],
+                    "run": label,
+                    "repeat": key[2],
+                    "harness": str(t.get("agent_version") or "unrecorded"),
+                    "passed": 1.0 if status == "pass" else 0.0,
+                    "cost_usd": cost,
+                    "log_cost": math.log(cost) if cost and cost > 0 else math.nan,
+                }
+            )
     if not rows:
         raise DataError(f"{path}: no scored trials")
     out.table = pd.DataFrame(rows).sort_values(["arm", "item", "repeat"]).reset_index(drop=True)
@@ -267,45 +283,47 @@ def ruleproof(
     chosen: dict[tuple[str, str, str, int], tuple[bool, dict, str]] = {}
     for run_dir in sorted(p for p in results_dir.iterdir() if (p / "trials").is_dir()):
         for path in sorted((run_dir / "trials").glob("*/*/r*.json")):
-            rec = json.loads(path.read_text(encoding="utf-8"))
-            t = rec["trial"]
-            run_id = str(t["run_id"])
-            if run_id not in wanted:
-                continue
-            key = (run_id, str(t["arm"]), str(t["task"]), int(t["rep"]))
-            own = run_dir.name == run_id
             rel = path.relative_to(results_dir).as_posix()
-            prev = chosen.get(key)
-            if prev is not None and _verdict(prev[1]) != _verdict(rec):
-                raise DataError(f"trial {key}: copies disagree ({prev[2]} vs {rel})")
-            if prev is None or (own and not prev[0]):
-                if prev is not None:
+            with _record(rel):
+                rec = json.loads(path.read_text(encoding="utf-8"))
+                t = rec["trial"]
+                run_id = str(t["run_id"])
+                if run_id not in wanted:
+                    continue
+                key = (run_id, str(t["arm"]), str(t["task"]), int(t["rep"]))
+                own = run_dir.name == run_id
+                prev = chosen.get(key)
+                if prev is not None and _verdict(prev[1]) != _verdict(rec):
+                    raise DataError(f"trial {key}: copies disagree ({prev[2]} vs {rel})")
+                if prev is None or (own and not prev[0]):
+                    if prev is not None:
+                        _bump(out.excluded, "copy outside its run directory")
+                    chosen[key] = (own, rec, rel)
+                else:
                     _bump(out.excluded, "copy outside its run directory")
-                chosen[key] = (own, rec, rel)
-            else:
-                _bump(out.excluded, "copy outside its run directory")
     rows = []
     for (run_id, arm, task, rep), (_, rec, rel) in sorted(chosen.items()):
-        t, report = rec["trial"], rec.get("report")
-        if t.get("error") or not report:
-            _bump(out.excluded, "errored or unscored")
-            continue
-        out.files[str((results_dir / rel).resolve())] = sha256(results_dir / rel)
-        summary = report["summary"]
-        rows.append(
-            {
-                "item": task,
-                "cluster": task,
-                "arm": rename.get(f"{run_id}:{arm}", arm),
-                "run": run_id,
-                "repeat": rep,
-                "harness": str(t.get("agent_version") or "unrecorded"),
-                "model": str(t.get("model") or ""),
-                "all_rules": float(summary["failed"] == 0 and summary["unverified"] == 0),
-                "hidden_pass": float(bool(t.get("hidden_pass"))),
-                "rules_failed": float(summary["failed"]),
-            }
-        )
+        with _record(rel):
+            t, report = rec["trial"], rec.get("report")
+            if t.get("error") or not report:
+                _bump(out.excluded, "errored or unscored")
+                continue
+            out.files[str((results_dir / rel).resolve())] = sha256(results_dir / rel)
+            summary = report["summary"]
+            rows.append(
+                {
+                    "item": task,
+                    "cluster": task,
+                    "arm": rename.get(f"{run_id}:{arm}", arm),
+                    "run": run_id,
+                    "repeat": rep,
+                    "harness": str(t.get("agent_version") or "unrecorded"),
+                    "model": str(t.get("model") or ""),
+                    "all_rules": float(summary["failed"] == 0 and summary["unverified"] == 0),
+                    "hidden_pass": float(bool(t.get("hidden_pass"))),
+                    "rules_failed": float(summary["failed"]),
+                }
+            )
     if not rows:
         raise DataError(f"{results_dir}: no trials for runs {wanted}")
     out.table = pd.DataFrame(rows)

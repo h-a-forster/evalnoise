@@ -98,3 +98,7 @@ def test_lm_eval_errors(tmp_path):
     p2 = _samples(tmp_path / "m" / "samples_wmt_2026-10-01T10-00-00.jsonl", corpus)
     with pytest.raises(DataError, match="corpus level"):
         from_lm_eval([p2])
+    no_id = [{"filter": "none", "metrics": ["em"], "em": 1}]
+    p3 = _samples(tmp_path / "m" / "samples_x_2026-10-01T10-00-00.jsonl", no_id)
+    with pytest.raises(DataError, match="doc_id"):
+        from_lm_eval([p3])
