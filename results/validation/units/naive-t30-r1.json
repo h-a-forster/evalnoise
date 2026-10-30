@@ -1,0 +1,33 @@
+{
+ "name": "naive-t30-r1",
+ "kind": "naive",
+ "key": "bb1790ab78ec3161",
+ "seed": 1235085377,
+ "sims": 2000,
+ "design": {
+  "tasks": 30,
+  "runs": 1,
+  "repeats": 1,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 20.0,
+  "item_run": 100.0,
+  "within": 0.0,
+  "absorbed": {}
+ },
+ "context": {},
+ "rates": {
+  "null": {
+   "rate": 0.3705,
+   "mc95": [
+    0.34928752897704257,
+    0.39209284687935986
+   ],
+   "nominal": 0.36849653412685623
+  }
+ },
+ "seconds": 0.03
+}

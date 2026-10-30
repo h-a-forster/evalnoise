@@ -1,0 +1,930 @@
+{
+ "id": "ruleproof-main",
+ "name": "ruleproof: AGENTS.md compliance (all rules followed)",
+ "table": "ruleproof-main",
+ "score": "all_rules",
+ "unit": "pp",
+ "digits": 1,
+ "scale": 100.0,
+ "note": "Only 5 tasks: item components are very imprecise. Replicate runs exist for the 3 hook arms, on different hook builds.",
+ "evalnoise": "0.1.0",
+ "created": "2026-10-30T04:42:45Z",
+ "arms": [
+  "haiku45-long",
+  "haiku45-long-hook",
+  "haiku45-short",
+  "haiku55-long",
+  "haiku55-long-hook",
+  "haiku55-short",
+  "sonnet-long",
+  "sonnet-long-hook",
+  "sonnet-short"
+ ],
+ "pairs": [
+  [
+   "haiku45-long-hook",
+   "haiku45-long"
+  ],
+  [
+   "haiku45-short",
+   "haiku45-long"
+  ],
+  [
+   "haiku55-long-hook",
+   "haiku55-long"
+  ],
+  [
+   "haiku55-short",
+   "haiku55-long"
+  ]
+ ],
+ "counts": {
+  "trials": 180,
+  "items": 5,
+  "clusters": 5,
+  "arms": 9,
+  "runs_per_arm": {
+   "haiku45-long": 1,
+   "haiku45-long-hook": 2,
+   "haiku45-short": 1,
+   "haiku55-long": 1,
+   "haiku55-long-hook": 2,
+   "haiku55-short": 1,
+   "sonnet-long": 1,
+   "sonnet-long-hook": 2,
+   "sonnet-short": 1
+  },
+  "max_repeats_per_run": 3,
+  "cells_with_repeats": 60
+ },
+ "components": {
+  "item": 89.89197530864195,
+  "item_arm": 385.41666666666646,
+  "run": -18.51851851851852,
+  "item_run": -37.037037037037095,
+  "within": 500.0,
+  "absorbed": {}
+ },
+ "components_clipped": {
+  "item": 89.89197530864195,
+  "item_arm": 385.41666666666646,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 500.0,
+  "absorbed": {}
+ },
+ "bootstrap": {
+  "draws": 1000,
+  "level": 0.95,
+  "components": {
+   "item": [
+    -3.858024691357997,
+    144.2901234567901
+   ],
+   "item_arm": [
+    112.65432098765422,
+    453.31790123456796
+   ],
+   "run": [
+    -18.518518518518526,
+    111.11111111111107
+   ],
+   "item_run": [
+    -166.6666666666667,
+    55.55555555555554
+   ],
+   "within": [
+    333.3333333333333,
+    666.6666666666666
+   ]
+  },
+  "pairs": {
+   "haiku45-long-hook - haiku45-long": {
+    "difference": [
+     33.33333333333333,
+     93.33333333333333
+    ],
+    "item_arm": [
+     27.77777777777787,
+     1319.4444444444446
+    ],
+    "se_items": [
+     6.666666666666668,
+     24.49489742783178
+    ]
+   },
+   "haiku45-short - haiku45-long": {
+    "difference": [
+     20.0,
+     79.99999999999997
+    ],
+    "item_arm": [
+     74.07407407407412,
+     1037.0370370370372
+    ],
+    "se_items": [
+     6.666666666666663,
+     22.60776661041756
+    ]
+   },
+   "haiku55-long-hook - haiku55-long": {
+    "difference": [
+     -13.333333333333332,
+     36.666666666666664
+    ],
+    "item_arm": [
+     -152.77777777777774,
+     902.7777777777778
+    ],
+    "se_items": [
+     3.3333333333333313,
+     20.412414523193146
+    ]
+   },
+   "haiku55-short - haiku55-long": {
+    "difference": [
+     0.0,
+     53.33333333333333
+    ],
+    "item_arm": [
+     -55.55555555555551,
+     666.6666666666665
+    ],
+    "se_items": [
+     0.0,
+     16.329931618554518
+    ]
+   }
+  }
+ },
+ "run_interval": [
+  0.0,
+  77.05233176357393
+ ],
+ "run_term": {
+  "ss": 111.11111111111107,
+  "df": 3,
+  "k": 15.0,
+  "df_res": 12
+ },
+ "reml": {
+  "item": 86.08330768307908,
+  "item_arm": 356.9069551735122,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 482.02370032654545,
+  "absorbed": {}
+ },
+ "shares": {
+  "item": 0.09216772151898733,
+  "item_arm": 0.3951740506329113,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 0.5126582278481013
+ },
+ "per_arm": {
+  "haiku45-long": {
+   "mean": 33.333333333333336,
+   "trials": 15,
+   "runs": 1,
+   "item_plus_item_arm": 1537.037037037037,
+   "within": 1333.3333333333333
+  },
+  "haiku45-long-hook": {
+   "mean": 100.0,
+   "trials": 30,
+   "runs": 2,
+   "item_plus_item_arm": -64.81481481481478,
+   "within": 0.0
+  },
+  "haiku45-short": {
+   "mean": 80.0,
+   "trials": 15,
+   "runs": 1,
+   "item_plus_item_arm": 759.2592592592591,
+   "within": 1333.3333333333333
+  },
+  "haiku55-long": {
+   "mean": 73.33333333333333,
+   "trials": 15,
+   "runs": 1,
+   "item_plus_item_arm": 1203.7037037037037,
+   "within": 1333.3333333333333
+  },
+  "haiku55-long-hook": {
+   "mean": 80.0,
+   "trials": 30,
+   "runs": 2,
+   "item_plus_item_arm": 1240.7407407407406,
+   "within": 666.6666666666666
+  },
+  "haiku55-short": {
+   "mean": 100.0,
+   "trials": 15,
+   "runs": 1,
+   "item_plus_item_arm": -129.62962962962956,
+   "within": 0.0
+  },
+  "sonnet-long": {
+   "mean": 100.0,
+   "trials": 15,
+   "runs": 1,
+   "item_plus_item_arm": -129.62962962962956,
+   "within": 0.0
+  },
+  "sonnet-long-hook": {
+   "mean": 96.66666666666667,
+   "trials": 30,
+   "runs": 2,
+   "item_plus_item_arm": -9.25925925925928,
+   "within": 333.3333333333333
+  },
+  "sonnet-short": {
+   "mean": 100.0,
+   "trials": 15,
+   "runs": 1,
+   "item_plus_item_arm": -129.62962962962956,
+   "within": 0.0
+  }
+ },
+ "pair_estimates": {
+  "haiku45-long-hook - haiku45-long": {
+   "items": 5,
+   "difference": 66.66666666666666,
+   "se_items": 18.257418583505537,
+   "var_d": 1666.6666666666665,
+   "item_arm": 736.1111111111111,
+   "runs_eff": [
+    2.0,
+    1.0
+   ],
+   "se_with_run": 18.257418583505537
+  },
+  "haiku45-short - haiku45-long": {
+   "items": 5,
+   "difference": 46.66666666666667,
+   "se_items": 16.996731711975947,
+   "var_d": 1444.4444444444443,
+   "item_arm": 592.5925925925926,
+   "runs_eff": [
+    1.0,
+    1.0
+   ],
+   "se_with_run": 16.996731711975947
+  },
+  "haiku55-long-hook - haiku55-long": {
+   "items": 5,
+   "difference": 6.666666666666666,
+   "se_items": 15.45603082582617,
+   "var_d": 1194.4444444444441,
+   "item_arm": 499.9999999999999,
+   "runs_eff": [
+    2.0,
+    1.0
+   ],
+   "se_with_run": 15.45603082582617
+  },
+  "haiku55-short - haiku55-long": {
+   "items": 5,
+   "difference": 26.666666666666664,
+   "se_items": 16.329931618554518,
+   "var_d": 1333.333333333333,
+   "item_arm": 537.037037037037,
+   "runs_eff": [
+    1.0,
+    1.0
+   ],
+   "se_with_run": 16.329931618554518
+  }
+ },
+ "planning": {
+  "alpha": 0.05,
+  "power": 0.8,
+  "run_df": 3.0,
+  "run_assumption": "estimated",
+  "notes": [],
+  "observed_design": {
+   "tasks": 5,
+   "runs": 1,
+   "repeats": 3
+  },
+  "reference_design": {
+   "tasks": 5,
+   "runs": 1,
+   "repeats": 3
+  },
+  "reference_mde": 55.89108289317336,
+  "reference_mde_bootstrap_ci": [
+   37.02563616282857,
+   59.81708854911559
+  ],
+  "reference_se": 14.86046208343917,
+  "reference_se_items_only": 14.86046208343917,
+  "run_share_of_variance": 0.0,
+  "reference_mde_run_ci": [
+   55.89108289317336,
+   63.32714667044709
+  ],
+  "naive_fpr": 0.05,
+  "naive_fpr_run_ci": [
+   0.05,
+   0.13253425238040367
+  ],
+  "grid": [
+   {
+    "tasks": 10,
+    "runs": 1,
+    "repeats": 1,
+    "trials_per_arm": 10,
+    "se": 13.307266185559426,
+    "mde": 41.913003206790236,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 1,
+    "repeats": 1,
+    "trials_per_arm": 20,
+    "se": 9.409658158863511,
+    "mde": 27.792223968188647,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 1,
+    "repeats": 1,
+    "trials_per_arm": 30,
+    "se": 7.682953714410739,
+    "mde": 22.27090711829317,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 1,
+    "repeats": 1,
+    "trials_per_arm": 50,
+    "se": 5.9511903571190405,
+    "mde": 17.008534275312375,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 1,
+    "repeats": 1,
+    "trials_per_arm": 100,
+    "se": 4.208127057650866,
+    "mde": 11.90532304958596,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 1,
+    "repeats": 1,
+    "trials_per_arm": 200,
+    "se": 2.9755951785595203,
+    "mde": 8.376873427379778,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 1,
+    "repeats": 1,
+    "trials_per_arm": 500,
+    "se": 1.8819316317727024,
+    "mde": 5.282559504941009,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 10,
+    "runs": 1,
+    "repeats": 3,
+    "trials_per_arm": 30,
+    "se": 10.507933510765408,
+    "mde": 33.096132954143236,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 1,
+    "repeats": 3,
+    "trials_per_arm": 60,
+    "se": 7.430231041719585,
+    "mde": 21.945817984082808,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 1,
+    "repeats": 3,
+    "trials_per_arm": 90,
+    "se": 6.066758241067098,
+    "mde": 17.58597205167566,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 1,
+    "repeats": 3,
+    "trials_per_arm": 150,
+    "se": 4.699290726623894,
+    "mde": 13.430598350433726,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 1,
+    "repeats": 3,
+    "trials_per_arm": 300,
+    "se": 3.3229003395628136,
+    "mde": 9.400904835358789,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 1,
+    "repeats": 3,
+    "trials_per_arm": 600,
+    "se": 2.349645363311947,
+    "mde": 6.614704160537826,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 1,
+    "repeats": 3,
+    "trials_per_arm": 1500,
+    "se": 1.486046208343917,
+    "mde": 4.171313872478039,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 10,
+    "runs": 2,
+    "repeats": 1,
+    "trials_per_arm": 20,
+    "se": 11.273124382057235,
+    "mde": 35.506203286775765,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 2,
+    "repeats": 1,
+    "trials_per_arm": 40,
+    "se": 7.971302695712079,
+    "mde": 23.543919034803007,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 2,
+    "repeats": 1,
+    "trials_per_arm": 60,
+    "se": 6.508541396588877,
+    "mde": 18.866587813371243,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 2,
+    "repeats": 1,
+    "trials_per_arm": 100,
+    "se": 5.041494487418057,
+    "mde": 14.408618552332623,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 2,
+    "repeats": 1,
+    "trials_per_arm": 200,
+    "se": 3.564874939367906,
+    "mde": 10.085481546329602,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 2,
+    "repeats": 1,
+    "trials_per_arm": 400,
+    "se": 2.5207472437090286,
+    "mde": 7.096388902333544,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 2,
+    "repeats": 1,
+    "trials_per_arm": 1000,
+    "se": 1.5942605391424158,
+    "mde": 4.475070200327192,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 10,
+    "runs": 2,
+    "repeats": 3,
+    "trials_per_arm": 60,
+    "se": 9.68245836551854,
+    "mde": 30.496189289726093,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 2,
+    "repeats": 3,
+    "trials_per_arm": 120,
+    "se": 6.846531968814575,
+    "mde": 20.221813233823166,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 2,
+    "repeats": 3,
+    "trials_per_arm": 180,
+    "se": 5.590169943749473,
+    "mde": 16.204465134184048,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 2,
+    "repeats": 3,
+    "trials_per_arm": 300,
+    "se": 4.330127018922192,
+    "mde": 12.375526474244337,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 2,
+    "repeats": 3,
+    "trials_per_arm": 600,
+    "se": 3.0618621784789717,
+    "mde": 8.662394901272377,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 2,
+    "repeats": 3,
+    "trials_per_arm": 1200,
+    "se": 2.165063509461096,
+    "mde": 6.09507069767941,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 2,
+    "repeats": 3,
+    "trials_per_arm": 3000,
+    "se": 1.3693063937629149,
+    "mde": 3.843626613967467,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 10,
+    "runs": 3,
+    "repeats": 1,
+    "trials_per_arm": 30,
+    "se": 10.507933510765408,
+    "mde": 33.096132954143236,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 3,
+    "repeats": 1,
+    "trials_per_arm": 60,
+    "se": 7.430231041719585,
+    "mde": 21.945817984082808,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 3,
+    "repeats": 1,
+    "trials_per_arm": 90,
+    "se": 6.066758241067098,
+    "mde": 17.58597205167566,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 3,
+    "repeats": 1,
+    "trials_per_arm": 150,
+    "se": 4.699290726623894,
+    "mde": 13.430598350433726,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 3,
+    "repeats": 1,
+    "trials_per_arm": 300,
+    "se": 3.3229003395628136,
+    "mde": 9.400904835358789,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 3,
+    "repeats": 1,
+    "trials_per_arm": 600,
+    "se": 2.349645363311947,
+    "mde": 6.614704160537826,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 3,
+    "repeats": 1,
+    "trials_per_arm": 1500,
+    "se": 1.486046208343917,
+    "mde": 4.171313872478039,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 10,
+    "runs": 3,
+    "repeats": 3,
+    "trials_per_arm": 90,
+    "se": 9.391189724653868,
+    "mde": 29.578799999666952,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 3,
+    "repeats": 3,
+    "trials_per_arm": 180,
+    "se": 6.640573937712176,
+    "mde": 19.613498709341396,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 3,
+    "repeats": 3,
+    "trials_per_arm": 270,
+    "se": 5.422005915539758,
+    "mde": 15.717000860401965,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 3,
+    "repeats": 3,
+    "trials_per_arm": 450,
+    "se": 4.199867722784716,
+    "mde": 12.003244700333,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 3,
+    "repeats": 3,
+    "trials_per_arm": 900,
+    "se": 2.969754946867576,
+    "mde": 8.401811907338528,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 3,
+    "repeats": 3,
+    "trials_per_arm": 1800,
+    "se": 2.099933861392358,
+    "mde": 5.9117181965822265,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 3,
+    "repeats": 3,
+    "trials_per_arm": 4500,
+    "se": 1.3281147875424353,
+    "mde": 3.7280022696554402,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 10,
+    "runs": 5,
+    "repeats": 1,
+    "trials_per_arm": 50,
+    "se": 9.853087502571633,
+    "mde": 31.033608431175203,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 5,
+    "repeats": 1,
+    "trials_per_arm": 100,
+    "se": 6.967184988692825,
+    "mde": 20.57817216783354,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 5,
+    "repeats": 1,
+    "trials_per_arm": 150,
+    "se": 5.68868272195867,
+    "mde": 16.49002834528954,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 5,
+    "repeats": 1,
+    "trials_per_arm": 250,
+    "se": 4.40643468880076,
+    "mde": 12.593614208078339,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 5,
+    "repeats": 1,
+    "trials_per_arm": 500,
+    "se": 3.1158198493066522,
+    "mde": 8.815047968398483,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 5,
+    "repeats": 1,
+    "trials_per_arm": 1000,
+    "se": 2.20321734440038,
+    "mde": 6.2024810901812035,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 5,
+    "repeats": 1,
+    "trials_per_arm": 2500,
+    "se": 1.393436997738565,
+    "mde": 3.9113609297308223,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 10,
+    "runs": 5,
+    "repeats": 3,
+    "trials_per_arm": 150,
+    "se": 9.151502608861561,
+    "mde": 28.823873577308998,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 20,
+    "runs": 5,
+    "repeats": 3,
+    "trials_per_arm": 300,
+    "se": 6.471089552772391,
+    "mde": 19.11291219431266,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 30,
+    "runs": 5,
+    "repeats": 3,
+    "trials_per_arm": 450,
+    "se": 5.283622494715784,
+    "mde": 15.315862909238511,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 50,
+    "runs": 5,
+    "repeats": 3,
+    "trials_per_arm": 750,
+    "se": 4.092676385936223,
+    "mde": 11.696891279017347,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 100,
+    "runs": 5,
+    "repeats": 3,
+    "trials_per_arm": 1500,
+    "se": 2.8939592256975555,
+    "mde": 8.187376237040784,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 200,
+    "runs": 5,
+    "repeats": 3,
+    "trials_per_arm": 3000,
+    "se": 2.0463381929681117,
+    "mde": 5.760836069241547,
+    "naive_fpr": 0.05
+   },
+   {
+    "tasks": 500,
+    "runs": 5,
+    "repeats": 3,
+    "trials_per_arm": 7500,
+    "se": 1.2942179105544782,
+    "mde": 3.632854142753572,
+    "naive_fpr": 0.05
+   }
+  ],
+  "targets": {
+   "10": [
+    {
+     "runs": 1,
+     "repeats": 1,
+     "tasks": 141
+    },
+    {
+     "runs": 1,
+     "repeats": 3,
+     "tasks": 89
+    },
+    {
+     "runs": 2,
+     "repeats": 1,
+     "tasks": 102
+    },
+    {
+     "runs": 2,
+     "repeats": 3,
+     "tasks": 76
+    },
+    {
+     "runs": 3,
+     "repeats": 1,
+     "tasks": 89
+    },
+    {
+     "runs": 3,
+     "repeats": 3,
+     "tasks": 72
+    },
+    {
+     "runs": 5,
+     "repeats": 1,
+     "tasks": 79
+    },
+    {
+     "runs": 5,
+     "repeats": 3,
+     "tasks": 68
+    }
+   ],
+   "20": [
+    {
+     "runs": 1,
+     "repeats": 1,
+     "tasks": 37
+    },
+    {
+     "runs": 1,
+     "repeats": 3,
+     "tasks": 24
+    },
+    {
+     "runs": 2,
+     "repeats": 1,
+     "tasks": 27
+    },
+    {
+     "runs": 2,
+     "repeats": 3,
+     "tasks": 21
+    },
+    {
+     "runs": 3,
+     "repeats": 1,
+     "tasks": 24
+    },
+    {
+     "runs": 3,
+     "repeats": 3,
+     "tasks": 20
+    },
+    {
+     "runs": 5,
+     "repeats": 1,
+     "tasks": 22
+    },
+    {
+     "runs": 5,
+     "repeats": 3,
+     "tasks": 19
+    }
+   ]
+  },
+  "reference_mde_unpaired": 51.293688541559995
+ },
+ "key": "ace1d4a6d6a075bb",
+ "table_sha256": "36b16ad4867ed5d75ccf35248b3de0df198da1dea33487fc45cf7ce71445a5e0",
+ "seconds": 24.01
+}

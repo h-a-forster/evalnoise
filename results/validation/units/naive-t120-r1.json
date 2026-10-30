@@ -1,0 +1,33 @@
+{
+ "name": "naive-t120-r1",
+ "kind": "naive",
+ "key": "54cc324844bcf037",
+ "seed": 1817617302,
+ "sims": 2000,
+ "design": {
+  "tasks": 120,
+  "runs": 1,
+  "repeats": 1,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 20.0,
+  "item_run": 100.0,
+  "within": 0.0,
+  "absorbed": {}
+ },
+ "context": {},
+ "rates": {
+  "null": {
+   "rate": 0.615,
+   "mc95": [
+    0.5932684147867071,
+    0.6363938383368993
+   ],
+   "nominal": 0.6241402702064649
+  }
+ },
+ "seconds": 0.08
+}

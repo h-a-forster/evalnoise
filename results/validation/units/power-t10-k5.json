@@ -1,0 +1,43 @@
+{
+ "name": "power-t10-k5",
+ "kind": "power",
+ "key": "259b09c3fb66dae8",
+ "seed": 3258659945,
+ "sims": 2000,
+ "design": {
+  "tasks": 10,
+  "runs": 1,
+  "repeats": 5,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 300.0,
+  "absorbed": {}
+ },
+ "context": {
+  "mde": 15.429986897786614
+ },
+ "rates": {
+  "null": {
+   "rate": 0.0445,
+   "mc95": [
+    0.03588694450453102,
+    0.05447801135748333
+   ],
+   "nominal": 0.05
+  },
+  "at_mde": {
+   "rate": 0.793,
+   "mc95": [
+    0.7745701313582654,
+    0.810566739090586
+   ],
+   "nominal": 0.8
+  }
+ },
+ "seconds": 0.05
+}

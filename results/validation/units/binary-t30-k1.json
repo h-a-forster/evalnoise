@@ -1,0 +1,54 @@
+{
+ "name": "binary-t30-k1",
+ "kind": "binary",
+ "key": "8ef746cbfc887d1e",
+ "seed": 1255966230,
+ "sims": 500,
+ "design": {
+  "tasks": 30,
+  "runs": 1,
+  "repeats": 1,
+  "paired": true
+ },
+ "components": {
+  "item": 3.0,
+  "item_arm": 0.5,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 0.0,
+  "absorbed": {}
+ },
+ "context": {
+  "mde": 0.30542862334901566,
+  "logit_shift": 2.5595473085661204,
+  "pilot": {
+   "item": 0.07814838279426475,
+   "item_arm": 0.012196232077359148,
+   "run": NaN,
+   "item_run": NaN,
+   "within": 0.15433333333333332,
+   "absorbed": {
+    "item_run": "item_arm"
+   }
+  }
+ },
+ "rates": {
+  "null": {
+   "rate": 0.044,
+   "mc95": [
+    0.02777676728557174,
+    0.06586100032359485
+   ],
+   "nominal": 0.05
+  },
+  "at_mde": {
+   "rate": 0.866,
+   "mc95": [
+    0.8329700763861786,
+    0.8946210357386056
+   ],
+   "nominal": 0.8
+  }
+ },
+ "seconds": 5.02
+}

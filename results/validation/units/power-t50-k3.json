@@ -1,0 +1,43 @@
+{
+ "name": "power-t50-k3",
+ "kind": "power",
+ "key": "2eec206b20660040",
+ "seed": 3738711966,
+ "sims": 2000,
+ "design": {
+  "tasks": 50,
+  "runs": 1,
+  "repeats": 3,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 300.0,
+  "absorbed": {}
+ },
+ "context": {
+  "mde": 7.230245345009068
+ },
+ "rates": {
+  "null": {
+   "rate": 0.0565,
+   "mc95": [
+    0.04678767628081571,
+    0.06753645583358901
+   ],
+   "nominal": 0.05
+  },
+  "at_mde": {
+   "rate": 0.806,
+   "mc95": [
+    0.7879764531699422,
+    0.8231217216433898
+   ],
+   "nominal": 0.8
+  }
+ },
+ "seconds": 0.11
+}

@@ -1,0 +1,49 @@
+{
+ "name": "coverage-t40-a2-k3",
+ "kind": "coverage",
+ "key": "c3291e9490c3d65b",
+ "seed": 1968490604,
+ "sims": 120,
+ "design": {
+  "tasks": 40,
+  "runs": 1,
+  "repeats": 3,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 300.0,
+  "absorbed": {}
+ },
+ "context": {},
+ "rates": {
+  "item": {
+   "rate": 0.8916666666666667,
+   "mc95": [
+    0.8218725616110573,
+    0.941041693770915
+   ],
+   "nominal": 0.95
+  },
+  "item_arm": {
+   "rate": 0.85,
+   "mc95": [
+    0.7733328565873716,
+    0.90861042747177
+   ],
+   "nominal": 0.95
+  },
+  "within": {
+   "rate": 0.925,
+   "mc95": [
+    0.8623989421096327,
+    0.9651326093880379
+   ],
+   "nominal": 0.95
+  }
+ },
+ "seconds": 27.45
+}

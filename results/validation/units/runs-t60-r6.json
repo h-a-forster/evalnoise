@@ -1,0 +1,43 @@
+{
+ "name": "runs-t60-r6",
+ "kind": "runs",
+ "key": "1374822ff8178a2a",
+ "seed": 1768038684,
+ "sims": 400,
+ "design": {
+  "tasks": 60,
+  "runs": 6,
+  "repeats": 1,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 20.0,
+  "item_run": 100.0,
+  "within": 0.0,
+  "absorbed": {}
+ },
+ "context": {
+  "mde": 8.978206885397007
+ },
+ "rates": {
+  "null": {
+   "rate": 0.0525,
+   "mc95": [
+    0.03278842457715371,
+    0.07913463048694427
+   ],
+   "nominal": 0.05
+  },
+  "at_mde": {
+   "rate": 0.7975,
+   "mc95": [
+    0.7547278713800812,
+    0.8358052274395471
+   ],
+   "nominal": 0.8
+  }
+ },
+ "seconds": 10.03
+}

@@ -1,0 +1,43 @@
+{
+ "name": "power-t20-k1",
+ "kind": "power",
+ "key": "896a5c564f9587d0",
+ "seed": 2197195442,
+ "sims": 2000,
+ "design": {
+  "tasks": 20,
+  "runs": 1,
+  "repeats": 1,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 300.0,
+  "absorbed": {}
+ },
+ "context": {
+  "mde": 17.721509218914303
+ },
+ "rates": {
+  "null": {
+   "rate": 0.0435,
+   "mc95": [
+    0.03498586284676858,
+    0.05338259889337252
+   ],
+   "nominal": 0.05
+  },
+  "at_mde": {
+   "rate": 0.799,
+   "mc95": [
+    0.7807540932664592,
+    0.8163649274896854
+   ],
+   "nominal": 0.8
+  }
+ },
+ "seconds": 0.05
+}
