@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import math
 import sys
@@ -13,7 +14,7 @@ from typing import Any
 import pandas as pd
 
 from evalnoise import __version__
-from evalnoise.data import DataError, describe, load_trials
+from evalnoise.data import DataError, describe, read_table, to_trials
 from evalnoise.report import LABELS, fmt, fmt_ci, pct, sd, study_markdown, table
 
 EXIT_USAGE = 2
@@ -64,13 +65,17 @@ def _add_input(p: argparse.ArgumentParser, required: bool) -> None:
         "--input-format",
         choices=["auto", "table", "inspect", "lm-eval"],
         default="auto",
-        help="auto: .csv/.jsonl = table, .json = Inspect log, samples_*.jsonl = lm-eval",
+        help="auto: .csv/.jsonl = table, .json/.eval = Inspect log, samples_*.jsonl = lm-eval",
     )
     for name in ("item", "arm", "run", "cluster", "score"):
         g.add_argument(
             f"--{name}-col", dest=f"{name}_col", metavar="COL", help=f"column for {name}"
         )
-    g.add_argument("--arm-label", help="arm label when the input has no arm (or to override)")
+    g.add_argument(
+        "--arm-label",
+        help="arm label for a table without an arm column; for Inspect and lm-eval, replaces "
+        "the model name",
+    )
     g.add_argument("--metric", help="metric name (Inspect dict scores, lm-eval)")
     g.add_argument("--scorer", help="Inspect scorer name when there are several")
     g.add_argument("--filter", dest="filter_name", help="lm-eval filter name")
@@ -88,7 +93,7 @@ def _load(args: argparse.Namespace) -> pd.DataFrame:
         for f in files:
             if f.name.startswith("samples_") and f.suffix == ".jsonl":
                 kinds.add("lm-eval")
-            elif f.suffix == ".json":
+            elif f.suffix in (".json", ".eval"):
                 kinds.add("inspect")
             else:
                 kinds.add("table")
@@ -97,6 +102,12 @@ def _load(args: argparse.Namespace) -> pd.DataFrame:
         fmt_ = kinds.pop()
     if fmt_ == "inspect":
         df = from_inspect(files, scorer=args.scorer, metric=args.metric, arm=args.arm_label)
+        if df.attrs.get("skipped_errored"):
+            print(
+                f"evalnoise: note: skipped {df.attrs['skipped_errored']} errored sample(s) "
+                "without a score",
+                file=sys.stderr,
+            )
     elif fmt_ == "lm-eval":
         df = from_lm_eval(
             files, metric=args.metric, filter_name=args.filter_name, arm=args.arm_label
@@ -104,7 +115,21 @@ def _load(args: argparse.Namespace) -> pd.DataFrame:
     else:
         cols = {k: getattr(args, f"{k}_col") for k in ("item", "arm", "run", "cluster", "score")}
         cols = {k: v for k, v in cols.items() if v}
-        frames = [load_trials(f, cols, default_arm=args.arm_label) for f in files]
+        frames, runless = [], []
+        for f in files:
+            raw = read_table(f)
+            frame = to_trials(raw, cols, default_arm=args.arm_label)
+            frames.append(frame)
+            if cols.get("run", "run") not in raw.columns:
+                runless.append((f, set(frame["arm"])))
+        # Files without a run column all get run "run-1": an arm in two of them would
+        # silently merge two runs into one.
+        for (f1, a1), (f2, a2) in itertools.combinations(runless, 2):
+            if a1 & a2:
+                raise DataError(
+                    f"{f1.name} and {f2.name} have no run column but share arm(s) "
+                    f"{', '.join(sorted(a1 & a2))}; add a run column (or --run-col)"
+                )
         df = pd.concat(frames, ignore_index=True)
     if args.arms:
         keep = [a.strip() for a in args.arms.split(",") if a.strip()]
@@ -260,7 +285,14 @@ def cmd_power(args: argparse.Namespace) -> int:
                     method=args.method,
                 )
                 needed.append({"mde": target, "runs": nr, "repeats": k, "tasks": t})
-    k_opt = optimal_repeats(r, task_cost=args.task_cost) if args.task_cost is not None else None
+    k_opt = (
+        [
+            {"runs": nr, "repeats": optimal_repeats(r, runs=nr, task_cost=args.task_cost)}
+            for nr in args.runs
+        ]
+        if args.task_cost is not None
+        else None
+    )
     if args.json:
         print(
             json.dumps(
@@ -311,8 +343,8 @@ def cmd_power(args: argparse.Namespace) -> int:
         t = x["tasks"]
         what = f"{t} tasks per arm" if t is not None else "unreachable (add runs, not tasks)"
         print(f"MDE {x['mde']:g} with {x['runs']} run(s) x {x['repeats']} repeat(s): {what}")
-    if k_opt is not None:
-        print(f"cost-optimal repeats per item per run: {k_opt:.2f}")
+    for x in k_opt or []:
+        print(f"cost-optimal repeats per item per run with {x['runs']} run(s): {x['repeats']:.2f}")
     return 0
 
 

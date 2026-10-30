@@ -31,6 +31,7 @@ def test_inspect_json(tmp_path):
         ]
     )
     assert len(df) == 6  # errored sample skipped
+    assert df.attrs["skipped_errored"] == 2
     first = df[(df["arm"] == "openai/m") & (df["item"] == "1")]
     assert first["score"].tolist() == [1.0, 0.0]
     assert first["repeat"].tolist() == [0, 1]

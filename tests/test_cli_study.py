@@ -83,6 +83,37 @@ def test_cli_errors_exit_2(argv, capsys):
     assert code == 2
 
 
+def test_power_cli_task_cost_per_run_count(capsys):
+    # Regression: --task-cost ignored --runs and always answered for one run.
+    comps = "item=400,item_arm=60,run=20,item_run=100,within=300"
+    argv = ["power", "--components", comps, "--runs", "1,2", "--task-cost", "20", "--json"]
+    assert main(argv) == 0
+    k = {x["runs"]: x["repeats"] for x in json.loads(capsys.readouterr().out)["optimal_repeats"]}
+    assert k[1] == pytest.approx((300 * 20 / 160) ** 0.5)
+    assert k[2] == pytest.approx((150 * 20 / (110 * 2)) ** 0.5)
+
+
+def test_cli_refuses_merging_runs_from_files_without_run_column(tmp_path, capsys):
+    df = simulate(Components(4.0, 1.0, 0.0, 0.0, 2.0), tasks=10, arms=2, repeats=2, seed=0)
+    paths = []
+    for n in (1, 2):
+        p = tmp_path / f"run{n}.csv"
+        df.drop(columns="run").to_csv(p, index=False)
+        paths.append(str(p))
+    assert main(["components", *paths, "--bootstrap", "0"]) == 2
+    # Different arms per file are fine: run labels are scoped to their arm.
+    df[df["arm"] == "arm0"].drop(columns="run").to_csv(paths[0], index=False)
+    df[df["arm"] == "arm1"].drop(columns="run").to_csv(paths[1], index=False)
+    assert main(["components", *paths, "--bootstrap", "0", "--json"]) == 0
+
+
+def test_cli_routes_eval_logs_to_the_inspect_reader(tmp_path, capsys):
+    p = tmp_path / "log.eval"
+    p.write_bytes(b"\x28\xb5\x2f\xfd")
+    assert main(["components", str(p)]) == 2
+    assert "inspect log convert" in capsys.readouterr().err
+
+
 def _study_files(tmp_path, table):
     repo = tmp_path / "repo"
     (repo / "configs").mkdir(parents=True)

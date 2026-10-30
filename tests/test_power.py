@@ -124,6 +124,10 @@ def test_optimal_repeats():
     k = optimal_repeats(r, task_cost=20.0)
     a, b = C.item_arm + C.item_run, C.within
     assert k == pytest.approx(math.sqrt(b * 20.0 / a))
+    a2, b2 = C.item_arm + C.item_run / 2, C.within / 2
+    assert optimal_repeats(r, runs=2, task_cost=20.0) == pytest.approx(
+        math.sqrt(b2 * 20.0 / (a2 * 2))
+    )
 
 
 def test_plan_grid_shape():

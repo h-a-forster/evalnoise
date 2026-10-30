@@ -57,10 +57,11 @@ def from_inspect(
     """Trials from Inspect JSON logs: item = sample id, arm = model, run = log, repeat = epoch.
 
     ``scorer`` picks a scorer when samples have several; ``metric`` picks a key when a
-    score value is a dict. Samples that errored without a score are skipped; any other
-    missing score is an error.
+    score value is a dict. Samples that errored without a score are skipped and counted in
+    ``attrs["skipped_errored"]``; any other missing score is an error.
     """
     rows: list[dict[str, Any]] = []
+    skipped = 0
     tasks: set[str] = set()
     for path in map(Path, paths):
         if path.suffix == ".eval":
@@ -91,6 +92,7 @@ def from_inspect(
             scores = s.get("scores") or {}
             if not scores:
                 if s.get("error"):
+                    skipped += 1
                     continue
                 raise DataError(f"{where}: no scores")
             name = scorer
@@ -120,7 +122,9 @@ def from_inspect(
     frame = pd.DataFrame(rows)
     if len(tasks) > 1:
         frame["item"] = frame["task"] + "/" + frame["item"]
-    return to_trials(frame.drop(columns="task"))
+    out = to_trials(frame.drop(columns="task"))
+    out.attrs["skipped_errored"] = skipped
+    return out
 
 
 _LM_EVAL_NAME = re.compile(r"^samples_(?P<task>.+)_(?P<date>\d{4}-\d{2}-\d{2}T[\w.\-]+)$")
