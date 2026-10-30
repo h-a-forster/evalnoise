@@ -1,0 +1,121 @@
+# Study over the committed per-trial tables in results/trials (see configs/sources.toml).
+# Run: uv run evalnoise study --profile quick   (writes results/study/)
+# Scores are multiplied by `scale` first, so every component is in squared `unit`s.
+
+trials_dir = "results/trials"
+
+[profiles.quick]
+bootstrap = 1000
+seed = 20261030
+
+[profiles.full]
+bootstrap = 10000
+seed = 20261030
+
+[defaults]
+alpha = 0.05
+power = 0.8
+tasks = [10, 20, 30, 50, 100, 200, 500]
+runs = [1, 2, 3, 5]
+repeats = [1, 3]
+
+[[dataset]]
+id = "mm-arena-replicated"
+name = "mm-arena, setups with replicate runs"
+table = "mm-arena"
+score = "edge_pp"
+unit = "pp"
+arms = "replicated"
+runs = [1, 2, 3, 5, 10, 20]
+targets = [5, 10]
+note = "Episode = item, game = bootstrap cluster. Partial replicate runs are included; the run fit adjusts for which episodes they cover."
+
+[[dataset]]
+id = "mm-arena-all"
+name = "mm-arena, all LLM setups"
+table = "mm-arena"
+score = "edge_pp"
+unit = "pp"
+arms = "all"
+pairs = [
+  ["claude-cli:claude-fable-5-1@high", "claude-cli:claude-opus-5-5@high"],
+  ["claude-cli:claude-opus-5-5@high", "claude-cli:claude-opus-5-5@medium"],
+  ["claude-cli:claude-opus-5-5@high", "claude-cli:claude-haiku-5-5@high"],
+  ["claude-cli:claude-sonnet-5-5@high", "claude-cli:claude-sonnet-5-5@low"],
+]
+runs = [1, 2, 3, 5, 10, 20]
+targets = [5, 10]
+note = "Pools single-run setups with the replicated ones: the residual is assumed equal across setups."
+
+[[dataset]]
+id = "agent-ab-no-tests"
+name = "agent-ab: Haiku 5.5, control vs no-tests (pass rate)"
+table = "agent-ab-no-tests"
+score = "passed"
+scale = 100
+unit = "pp"
+targets = [5, 10]
+
+[[dataset]]
+id = "agent-ab-no-tests-cost"
+name = "agent-ab: Haiku 5.5, control vs no-tests (log cost)"
+table = "agent-ab-no-tests"
+score = "log_cost"
+unit = "log USD"
+digits = 3
+targets = [0.1, 0.2]
+
+[[dataset]]
+id = "agent-ab-haiku-vs-sonnet"
+name = "agent-ab: Haiku 5.5 vs Sonnet 5.5 (pass rate)"
+table = "agent-ab-haiku-vs-sonnet"
+score = "passed"
+scale = 100
+unit = "pp"
+targets = [5, 10]
+
+[[dataset]]
+id = "overclaim-setups"
+name = "overclaim study 1: model x effort (pass rate)"
+table = "overclaim-setups"
+score = "passed"
+scale = 100
+unit = "pp"
+targets = [10, 20]
+
+[[dataset]]
+id = "overclaim-interventions"
+name = "overclaim study 2: interventions (pass rate)"
+table = "overclaim-interventions"
+score = "passed"
+pairs = [["stop-hook", "control"], ["stop-audit", "control"], ["ask-verify", "control"]]
+scale = 100
+unit = "pp"
+targets = [10, 20]
+
+[[dataset]]
+id = "ruleproof-main"
+name = "ruleproof: AGENTS.md compliance (all rules followed)"
+table = "ruleproof-main"
+score = "all_rules"
+pairs = [
+  ["haiku45-long-hook", "haiku45-long"],
+  ["haiku45-short", "haiku45-long"],
+  ["haiku55-long-hook", "haiku55-long"],
+  ["haiku55-short", "haiku55-long"],
+]
+scale = 100
+unit = "pp"
+targets = [10, 20]
+note = "Only 5 tasks: item components are very imprecise. Replicate runs exist for the 3 hook arms, on different hook builds."
+
+[[dataset]]
+id = "ruleproof-pressure"
+name = "ruleproof: compliance under pressure tasks (all rules followed)"
+table = "ruleproof-pressure"
+score = "all_rules"
+pairs = [["haiku45-long-hook", "haiku45-long"], ["haiku45-long-control", "haiku45-long"]]
+scale = 100
+unit = "pp"
+targets = [10, 20]
+note = "Only 5 tasks; opus-long has one repeat per task."
