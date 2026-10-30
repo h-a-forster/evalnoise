@@ -16,8 +16,8 @@ runs and residual are both exactly 0, which carries no information).
 
 | dataset | arms | items | runs per arm | max repeats | trials | unit |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `mm-arena-replicated` | 3 | 120 | 2/3 | 1 | 755 | pp |
-| `mm-arena-all` | 9 | 120 | 1/2/3 | 1 | 1475 | pp |
+| `mm-arena-replicated` | 4 | 120 | 2/3/4 | 1 | 1320 | pp |
+| `mm-arena-all` | 9 | 120 | 1/2/3/4 | 1 | 1920 | pp |
 | `agent-ab-no-tests` | 2 | 50 | 1 | 3 | 300 | pp |
 | `agent-ab-no-tests-cost` | 2 | 50 | 1 | 3 | 300 | log USD |
 | `agent-ab-haiku-vs-sonnet` | 2 | 50 | 1 | 1 | 100 | pp |
@@ -30,8 +30,8 @@ runs and residual are both exactly 0, which carries no information).
 
 | dataset | item | item x arm | run | item x run | within run | ICC item |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `mm-arena-replicated` | 54.8 [39.6, 67.8] | 8.4 [0.0, 14.0] | 4.2 [2.2, 12.6] | 14.2 [10.9, 17.1] | (in item x run) | 0.91 |
-| `mm-arena-all` | 43.6 [33.0, 53.0] | 19.7 [15.9, 23.3] | 4.2 [2.2, 12.6] | 14.2 [10.8, 17.1] | (in item x run) | 0.76 |
+| `mm-arena-replicated` | 51.6 [38.3, 63.0] | 10.6 [7.4, 13.3] | 2.9 [1.6, 6.4] | 14.5 [11.1, 17.7] | (in item x run) | 0.89 |
+| `mm-arena-all` | 43.4 [32.9, 52.6] | 19.2 [16.2, 22.0] | 2.9 [1.6, 6.4] | 14.5 [11.2, 17.6] | (in item x run) | 0.76 |
 | `agent-ab-no-tests` | 13.9 [0.0, 24.3] | 3.2 [0.0, 8.7] | n/i | (in item x arm) | 19.1 [12.9, 23.8] | 0.34 |
 | `agent-ab-no-tests-cost` | 0.753 [0.489, 0.993] | 0.166 [0.027, 0.258] | n/i | (in item x arm) | 0.191 [0.140, 0.245] | 0.90 |
 | `agent-ab-haiku-vs-sonnet` | 13.4 [0.0, 23.7] | 17.4 [0.0, 26.4] | n/i | (in item x arm) | (in item x arm) | 0.37 |
@@ -48,14 +48,16 @@ paired comparisons.
 
 | dataset | arm | run SD [chi-square] | df | item x run SD | df | run SD without this arm |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high | 0.9 [0.0, 35.4] | 1 | 5.9 | 83 | 4.7 [2.3, 18.3] |
-| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | 5.6 [2.5, 37.1] | 2 | 18.0 | 189 | 2.0 [0.7, 14.1] |
-| `mm-arena-replicated` | claude-cli:claude-opus-5-5@high | 2.6 [0.7, 88.5] | 1 | 10.9 | 119 | 4.7 [2.3, 18.4] |
-| `mm-arena-replicated` | Bartlett test, equal item x run | p = 1.1e-25 |  |  |  |  |
-| `mm-arena-all` | claude-cli:claude-fable-5-1@high | 0.9 [0.0, 35.4] | 1 | 5.9 | 83 | 4.7 [2.3, 18.3] |
-| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | 5.6 [2.5, 37.1] | 2 | 18.0 | 189 | 2.0 [0.7, 14.1] |
-| `mm-arena-all` | claude-cli:claude-opus-5-5@high | 2.6 [0.7, 88.5] | 1 | 10.9 | 119 | 4.7 [2.3, 18.4] |
-| `mm-arena-all` | Bartlett test, equal item x run | p = 1.1e-25 |  |  |  |  |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high | 1.3 [0.0, 47.5] | 1 | 7.6 | 119 | 3.1 [1.7, 7.3] |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | 4.0 [1.8, 16.2] | 3 | 18.3 | 357 | 1.6 [0.5, 5.2] |
+| `mm-arena-replicated` | claude-cli:claude-opus-5-5@high | 1.7 [0.3, 12.4] | 2 | 10.8 | 238 | 3.3 [1.7, 8.6] |
+| `mm-arena-replicated` | claude-cli:claude-sonnet-5-5@high | 1.5 [0.0, 61.3] | 1 | 13.2 | 119 | 3.1 [1.7, 7.3] |
+| `mm-arena-replicated` | Bartlett test, equal item x run | p = 5.1e-32 |  |  |  |  |
+| `mm-arena-all` | claude-cli:claude-fable-5-1@high | 1.3 [0.0, 47.5] | 1 | 7.6 | 119 | 3.1 [1.7, 7.3] |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | 4.0 [1.8, 16.2] | 3 | 18.3 | 357 | 1.6 [0.5, 5.2] |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high | 1.7 [0.3, 12.4] | 2 | 10.8 | 238 | 3.3 [1.7, 8.6] |
+| `mm-arena-all` | claude-cli:claude-sonnet-5-5@high | 1.5 [0.0, 61.3] | 1 | 13.2 | 119 | 3.1 [1.7, 7.3] |
+| `mm-arena-all` | Bartlett test, equal item x run | p = 5.1e-32 |  |  |  |  |
 | `ruleproof-main` | haiku45-long-hook | 0.0 [degenerate] | 1 | 0.0 | 4 | <0 [0.0, 20.0] |
 | `ruleproof-main` | haiku55-long-hook | <0 [degenerate] | 1 | 10.5 | 4 | <0 [0.0, 20.7] |
 | `ruleproof-main` | sonnet-long-hook | <0 [0.0, 150.4] | 1 | 0.0 | 4 | <0 [degenerate] |
@@ -69,16 +71,28 @@ It assumes normal residuals, so with heavy-tailed residuals its p-value is too s
 
 | dataset | arm | runs | items | run means | mean shift | median shift | by family |
 | --- | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high | r1 to r2 | 84 | 81.3 / 79.7 | -1.6 | -0.2 | cards -2.2; coin 0.1; dice -2.6; transform -0.8 |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high | r1 to r2 | 120 | 90.7 / 88.6 | -2.1 | -0.2 | cards -2.2; coin -0.6; dice -2.6; transform -0.8; urn -4.4 |
 | `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r1 to r2 | 120 | 79.9 / 90.4 | 10.5 | 2.3 | cards 22.8; coin 8.6; dice 13.0; transform 1.7; urn 6.3 |
-| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r1 to r3 | 71 | 61.8 / 67.2 | 5.4 | 0.7 | cards 9.1; dice 4.6; transform 2.3 |
-| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r2 to r3 | 71 | 74.8 / 67.2 | -7.7 | -1.1 | cards -13.7; dice -8.5; transform -0.5 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r1 to r3 | 120 | 79.9 / 83.2 | 3.3 | 0.4 | cards 9.1; coin 1.3; dice 4.6; transform 1.6; urn -0.0 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r1 to r4 | 120 | 79.9 / 84.6 | 4.7 | 1.8 | cards 13.1; coin -7.6; dice 11.2; transform 1.7; urn 5.0 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r2 to r3 | 120 | 90.4 / 83.2 | -7.2 | -1.2 | cards -13.7; coin -7.3; dice -8.5; transform -0.1; urn -6.4 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r2 to r4 | 120 | 90.4 / 84.6 | -5.8 | -0.3 | cards -9.7; coin -16.2; dice -1.8; transform 0.0; urn -1.3 |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high | r3 to r4 | 120 | 83.2 / 84.6 | 1.4 | 0.0 | cards 4.0; coin -8.9; dice 6.6; transform 0.1; urn 5.0 |
 | `mm-arena-replicated` | claude-cli:claude-opus-5-5@high | r1 to r2 | 120 | 87.7 / 83.8 | -3.9 | -0.4 | cards -2.9; coin -8.2; dice -6.2; transform -1.0; urn -1.2 |
-| `mm-arena-all` | claude-cli:claude-fable-5-1@high | r1 to r2 | 84 | 81.3 / 79.7 | -1.6 | -0.2 | cards -2.2; coin 0.1; dice -2.6; transform -0.8 |
+| `mm-arena-replicated` | claude-cli:claude-opus-5-5@high | r1 to r3 | 120 | 87.7 / 85.3 | -2.4 | -0.1 | cards -2.5; coin -8.2; dice -1.1; transform 0.5; urn -0.7 |
+| `mm-arena-replicated` | claude-cli:claude-opus-5-5@high | r2 to r3 | 120 | 83.8 / 85.3 | 1.5 | 0.1 | cards 0.5; coin 0.1; dice 5.1; transform 1.5; urn 0.5 |
+| `mm-arena-replicated` | claude-cli:claude-sonnet-5-5@high | r1 to r2 | 120 | 69.2 / 71.9 | 2.7 | 0.7 | cards 1.1; coin 5.1; dice -4.1; transform 5.1; urn 6.4 |
+| `mm-arena-all` | claude-cli:claude-fable-5-1@high | r1 to r2 | 120 | 90.7 / 88.6 | -2.1 | -0.2 | cards -2.2; coin -0.6; dice -2.6; transform -0.8; urn -4.4 |
 | `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r1 to r2 | 120 | 79.9 / 90.4 | 10.5 | 2.3 | cards 22.8; coin 8.6; dice 13.0; transform 1.7; urn 6.3 |
-| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r1 to r3 | 71 | 61.8 / 67.2 | 5.4 | 0.7 | cards 9.1; dice 4.6; transform 2.3 |
-| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r2 to r3 | 71 | 74.8 / 67.2 | -7.7 | -1.1 | cards -13.7; dice -8.5; transform -0.5 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r1 to r3 | 120 | 79.9 / 83.2 | 3.3 | 0.4 | cards 9.1; coin 1.3; dice 4.6; transform 1.6; urn -0.0 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r1 to r4 | 120 | 79.9 / 84.6 | 4.7 | 1.8 | cards 13.1; coin -7.6; dice 11.2; transform 1.7; urn 5.0 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r2 to r3 | 120 | 90.4 / 83.2 | -7.2 | -1.2 | cards -13.7; coin -7.3; dice -8.5; transform -0.1; urn -6.4 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r2 to r4 | 120 | 90.4 / 84.6 | -5.8 | -0.3 | cards -9.7; coin -16.2; dice -1.8; transform 0.0; urn -1.3 |
+| `mm-arena-all` | claude-cli:claude-haiku-5-5@high | r3 to r4 | 120 | 83.2 / 84.6 | 1.4 | 0.0 | cards 4.0; coin -8.9; dice 6.6; transform 0.1; urn 5.0 |
 | `mm-arena-all` | claude-cli:claude-opus-5-5@high | r1 to r2 | 120 | 87.7 / 83.8 | -3.9 | -0.4 | cards -2.9; coin -8.2; dice -6.2; transform -1.0; urn -1.2 |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high | r1 to r3 | 120 | 87.7 / 85.3 | -2.4 | -0.1 | cards -2.5; coin -8.2; dice -1.1; transform 0.5; urn -0.7 |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high | r2 to r3 | 120 | 83.8 / 85.3 | 1.5 | 0.1 | cards 0.5; coin 0.1; dice 5.1; transform 1.5; urn 0.5 |
+| `mm-arena-all` | claude-cli:claude-sonnet-5-5@high | r1 to r2 | 120 | 69.2 / 71.9 | 2.7 | 0.7 | cards 1.1; coin 5.1; dice -4.1; transform 5.1; urn 6.4 |
 
 Run means and the mean change from one run to the other, over the items both runs
 cover.
@@ -90,14 +104,14 @@ items per family would not.
 
 | dataset | component | moments | REML |
 | --- | ---: | ---: | ---: |
-| `mm-arena-replicated` | item | 54.78 | 55.01 |
-| `mm-arena-replicated` | item x arm | 8.44 | 8.77 |
-| `mm-arena-replicated` | run | 4.18 | 3.98 |
-| `mm-arena-replicated` | item x run | 14.16 | 14.09 |
-| `mm-arena-all` | item | 43.61 | 44.19 |
-| `mm-arena-all` | item x arm | 19.68 | 19.21 |
-| `mm-arena-all` | run | 4.18 | 4.03 |
-| `mm-arena-all` | item x run | 14.16 | 14.36 |
+| `mm-arena-replicated` | item | 51.62 | 52.05 |
+| `mm-arena-replicated` | item x arm | 10.59 | 10.75 |
+| `mm-arena-replicated` | run | 2.90 | 2.91 |
+| `mm-arena-replicated` | item x run | 14.46 | 14.42 |
+| `mm-arena-all` | item | 43.44 | 44.45 |
+| `mm-arena-all` | item x arm | 19.16 | 18.38 |
+| `mm-arena-all` | run | 2.90 | 2.90 |
+| `mm-arena-all` | item x run | 14.46 | 14.66 |
 | `agent-ab-no-tests` | item | 13.85 | 13.85 |
 | `agent-ab-no-tests` | item x arm | 3.19 | 3.19 |
 | `agent-ab-no-tests` | within run | 19.15 | 19.15 |
@@ -125,8 +139,8 @@ items per family would not.
 
 | dataset | tasks x repeats | SE, items only | SE with run term | MDE [item bootstrap] | MDE at run CI ends | run share of SE^2 | naive false-positive rate [run CI] |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `mm-arena-replicated` | 120 x 1 | 2.1 | 6.3 | 21.9 [21.9, 22.0] | [12.1, 66.8] | 89% | 50% [27%, 81%] |
-| `mm-arena-all` | 120 x 1 | 3.1 | 6.7 | 22.1 [22.0, 22.3] | [13.3, 66.7] | 78% | 36% [17%, 73%] |
+| `mm-arena-replicated` | 120 x 1 | 2.3 | 4.7 | 14.4 [13.9, 15.0] | [9.5, 29.7] | 76% | 33% [17%, 62%] |
+| `mm-arena-all` | 120 x 1 | 3.1 | 5.1 | 15.3 [14.7, 15.8] | [11.1, 30.1] | 64% | 24% [12%, 52%] |
 | `agent-ab-no-tests` (few) | 50 x 3 | 2.3 | - | 6.6 [4.7, 8.7] | - | n/i | n/i |
 | `agent-ab-no-tests-cost` | 50 x 3 | 0.040 | - | 0.114 [0.063, 0.164] | - | n/i | n/i |
 | `agent-ab-haiku-vs-sonnet` (few) | 50 x 1 | 3.5 | - | 10.0 [0.0, 15.1] | - | n/i | n/i |
@@ -152,10 +166,10 @@ use the other arms, but that pair's numbers stay unreliable (see the planning no
 
 | dataset | target | tasks needed (R runs, K repeats) |
 | --- | --- | --- |
-| `mm-arena-replicated` | 5 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: never; R5 K1: never; R6 K1: never; R8 K1: never; R10 K1: never; R12 K1: 3286; R13 K1: 526; R15 K1: 226; R20 K1: 118 |
-| `mm-arena-replicated` | 10 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: 95; R5 K1: 45; R6 K1: 34; R8 K1: 25; R10 K1: 22; R12 K1: 20; R13 K1: 19; R15 K1: 18; R20 K1: 17 |
-| `mm-arena-all` | 5 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: never; R5 K1: never; R6 K1: never; R8 K1: never; R10 K1: never; R12 K1: 15077; R13 K1: 2439; R15 K1: 1067; R20 K1: 570 |
-| `mm-arena-all` | 10 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: 340; R5 K1: 169; R6 K1: 130; R8 K1: 102; R10 K1: 91; R12 K1: 85; R13 K1: 82; R15 K1: 79; R20 K1: 74 |
+| `mm-arena-replicated` | 5 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: never; R5 K1: never; R6 K1: 13759; R8 K1: 297; R10 K1: 188; R12 K1: 151; R13 K1: 140; R15 K1: 126; R20 K1: 107 |
+| `mm-arena-replicated` | 10 pp | R1 K1: never; R2 K1: 157; R3 K1: 56; R4 K1: 41; R5 K1: 35; R6 K1: 32; R8 K1: 28; R10 K1: 26; R12 K1: 25; R13 K1: 25; R15 K1: 24; R20 K1: 23 |
+| `mm-arena-all` | 5 pp | R1 K1: never; R2 K1: never; R3 K1: never; R4 K1: never; R5 K1: never; R6 K1: 37591; R8 K1: 841; R10 K1: 545; R12 K1: 444; R13 K1: 415; R15 K1: 376; R20 K1: 326 |
+| `mm-arena-all` | 10 pp | R1 K1: never; R2 K1: 340; R3 K1: 133; R4 K1: 103; R5 K1: 90; R6 K1: 84; R8 K1: 76; R10 K1: 72; R12 K1: 70; R13 K1: 69; R15 K1: 68; R20 K1: 66 |
 | `agent-ab-no-tests` (few) | 5 pp | R1 K1: 239; R1 K3: 86; R2 K1: 124; R2 K3: 47; R3 K1: 86; R3 K3: 34; R5 K1: 55; R5 K3: 24 |
 | `agent-ab-no-tests` (few) | 10 pp | R1 K1: 62; R1 K3: 23; R2 K1: 33; R2 K3: 14; R3 K1: 23; R3 K3: 11; R5 K1: 16; R5 K3: 8 |
 | `agent-ab-no-tests-cost` | 0.1 log USD | R1 K1: 103; R1 K3: 65; R2 K1: 74; R2 K3: 55; R3 K1: 65; R3 K3: 52; R5 K1: 57; R5 K3: 49 |
@@ -176,13 +190,13 @@ use the other arms, but that pair's numbers stay unreliable (see the planning no
 ## Planning notes
 
 - `mm-arena-replicated`: within-run noise is not separated from item x run noise: repeats inside a run are assumed not to help (conservative)
-- `mm-arena-replicated`: the replicated arms do not share one item x run variance (Bartlett p = 1.1e-25; SD by arm: claude-cli:claude-fable-5-1@high 5.93, claude-cli:claude-haiku-5-5@high 18, claude-cli:claude-opus-5-5@high 10.9): pooled components describe an average arm
-- `mm-arena-replicated`: items are clustered (median design effect 1.33 over pairs): the planner treats items as independent, so its task counts are about 1.33x too small
-- `mm-arena-replicated`: items are also clustered by family (median design effect 2.85 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information
+- `mm-arena-replicated`: the replicated arms do not share one item x run variance (Bartlett p = 5.1e-32; SD by arm: claude-cli:claude-fable-5-1@high 7.6, claude-cli:claude-haiku-5-5@high 18.3, claude-cli:claude-opus-5-5@high 10.8, claude-cli:claude-sonnet-5-5@high 13.2): pooled components describe an average arm
+- `mm-arena-replicated`: items are clustered (median design effect 1.24 over pairs): the planner treats items as independent, so its task counts are about 1.24x too small
+- `mm-arena-replicated`: items are also clustered by family (median design effect 2.42 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information
 - `mm-arena-all`: within-run noise is not separated from item x run noise: repeats inside a run are assumed not to help (conservative)
-- `mm-arena-all`: the replicated arms do not share one item x run variance (Bartlett p = 1.1e-25; SD by arm: claude-cli:claude-fable-5-1@high 5.93, claude-cli:claude-haiku-5-5@high 18, claude-cli:claude-opus-5-5@high 10.9): pooled components describe an average arm
-- `mm-arena-all`: items are clustered (median design effect 1.15 over pairs): the planner treats items as independent, so its task counts are about 1.15x too small
-- `mm-arena-all`: items are also clustered by family (median design effect 2.66 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information
+- `mm-arena-all`: the replicated arms do not share one item x run variance (Bartlett p = 5.1e-32; SD by arm: claude-cli:claude-fable-5-1@high 7.6, claude-cli:claude-haiku-5-5@high 18.3, claude-cli:claude-opus-5-5@high 10.8, claude-cli:claude-sonnet-5-5@high 13.2): pooled components describe an average arm
+- `mm-arena-all`: items are clustered (median design effect 1.18 over pairs): the planner treats items as independent, so its task counts are about 1.18x too small
+- `mm-arena-all`: items are also clustered by family (median design effect 2.74 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information
 - `agent-ab-no-tests`: run variance set to 0 (not identified by the data)
 - `agent-ab-no-tests`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
 - `agent-ab-no-tests`: arms differ on fewer than 10 items (control - no-tests: 9): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable
@@ -207,13 +221,16 @@ use the other arms, but that pair's numbers stay unreliable (see the planning no
 
 | dataset | pair | difference [item bootstrap] | SE, items only | SE, clusters | p, clusters | SE, families | SE with run term | df / p with run term | p, run variance without one arm | item x arm SD |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-haiku-5-5@high | 5.1 [0.5, 9.1] | 1.8 | 2.1 | 0.018 | 3.1 | 4.4 | 6.8 / 0.280 | 0.100 to 0.337 | 9.7 [0.0, 16.6] |
-| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.1 [1.9, 6.5] | 1.2 | 1.2 | 0.001 | 0.7 | 4.3 | 4.7 / 0.387 | 0.164 to 0.448 | 0.0 [0.0, 6.0] |
-| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high - claude-cli:claude-opus-5-5@high | -1.0 [-5.5, 3.9] | 2.0 | 2.5 | 0.693 | 3.6 | 4.5 | 7.9 / 0.836 | 0.758 to 0.851 | 12.0 [5.0, 17.5] |
-| `mm-arena-all` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.1 [1.8, 6.6] | 1.2 | 1.2 | 0.001 | 0.7 | 4.3 | 4.7 / 0.387 | 0.164 to 0.448 | 0.0 [0.0, 6.4] |
-| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-opus-5-5@medium | 13.1 [10.2, 16.2] | 1.5 | 1.6 | <0.001 | 2.2 | 5.4 | 4.8 / 0.061 | 0.012 to 0.104 | 0.0 [0.0, 8.0] |
-| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-haiku-5-5@high | 1.0 [-4.1, 5.5] | 2.0 | 2.5 | 0.693 | 3.6 | 4.5 | 7.9 / 0.836 | 0.758 to 0.851 | 12.0 [5.4, 17.7] |
-| `mm-arena-all` | claude-cli:claude-sonnet-5-5@high - claude-cli:claude-sonnet-5-5@low | 54.4 [47.5, 61.6] | 3.4 | 3.7 | <0.001 | 6.4 | 7.0 | 7.7 / <0.001 | <0.001 to <0.001 | 22.0 [16.6, 26.5] |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-haiku-5-5@high | 5.1 [1.6, 8.6] | 1.6 | 1.7 | 0.005 | 2.9 | 3.1 | 14.9 / 0.117 | 0.030 to 0.158 | 8.6 [4.7, 11.4] |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.0 [1.8, 6.1] | 1.1 | 1.2 | <0.001 | 0.8 | 2.9 | 9.8 / 0.195 | 0.052 to 0.251 | 0.0 [0.0, 3.5] |
+| `mm-arena-replicated` | claude-cli:claude-fable-5-1@high - claude-cli:claude-sonnet-5-5@high | 19.1 [14.7, 23.7] | 2.0 | 2.3 | <0.001 | 2.6 | 3.7 | 18.0 / <0.001 | <0.001 to <0.001 | 12.1 [8.8, 14.7] |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high - claude-cli:claude-opus-5-5@high | -1.1 [-4.8, 2.9] | 1.7 | 2.0 | 0.597 | 3.2 | 3.0 | 21.5 / 0.725 | 0.651 to 0.744 | 10.2 [6.3, 13.2] |
+| `mm-arena-replicated` | claude-cli:claude-haiku-5-5@high - claude-cli:claude-sonnet-5-5@high | 14.0 [8.7, 20.0] | 2.4 | 3.1 | <0.001 | 4.5 | 4.0 | 34.5 / 0.001 | <0.001 to 0.003 | 16.5 [9.6, 22.5] |
+| `mm-arena-replicated` | claude-cli:claude-opus-5-5@high - claude-cli:claude-sonnet-5-5@high | 15.0 [11.4, 18.8] | 1.7 | 1.9 | <0.001 | 1.8 | 3.3 | 15.5 / <0.001 | <0.001 to 0.002 | 9.8 [6.7, 12.3] |
+| `mm-arena-all` | claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high | 4.0 [1.9, 6.3] | 1.1 | 1.2 | <0.001 | 0.8 | 2.9 | 9.8 / 0.195 | 0.052 to 0.251 | 0.0 [0.0, 3.6] |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-opus-5-5@medium | 12.9 [10.2, 15.9] | 1.4 | 1.5 | <0.001 | 2.0 | 3.7 | 10.0 / 0.006 | <0.001 to 0.016 | 0.0 [0.0, 5.9] |
+| `mm-arena-all` | claude-cli:claude-opus-5-5@high - claude-cli:claude-haiku-5-5@high | 1.1 [-3.0, 4.9] | 1.7 | 2.0 | 0.597 | 3.2 | 3.0 | 21.5 / 0.725 | 0.651 to 0.744 | 10.2 [6.5, 13.3] |
+| `mm-arena-all` | claude-cli:claude-sonnet-5-5@high - claude-cli:claude-sonnet-5-5@low | 55.8 [49.2, 62.7] | 3.2 | 3.5 | <0.001 | 5.9 | 5.0 | 24.5 / <0.001 | <0.001 to <0.001 | 21.8 [16.7, 25.8] |
 | `agent-ab-no-tests` | control - no-tests | 2.7 [-1.3, 7.3] | 2.3 | 2.3 | 0.252 | - | - | - | - | 3.2 [0.0, 8.7] |
 | `agent-ab-no-tests-cost` | control - no-tests | 0.398 [0.327, 0.478] | 0.040 | 0.040 | <0.001 | - | - | - | - | 0.166 [0.027, 0.258] |
 | `agent-ab-haiku-vs-sonnet` | haiku - sonnet | -2.0 [-10.0, 4.0] | 3.5 | 3.5 | 0.569 | - | - | - | - | 17.4 [0.0, 26.4] |

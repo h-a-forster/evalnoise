@@ -32,65 +32,38 @@
     "untracked_files": []
   },
   "mm-arena": {
-    "commit": "564fca1d38bb1e82c4303d02743f8e0b45c6f0a1",
+    "commit": "76f335b3595a881d5def7bedcc57f5ef838d2f9d",
     "description": "core-v1 suite: 60 games x 2 seeds, LLM market makers, edge captured (pp) per episode",
-    "excluded": {
-      "duplicate copy (identical)": 1320
-    },
+    "excluded": {},
     "extractor": "mm-arena",
     "files": {
       "../mm-arena/results/core-v1/bayes.jsonl": "0628e900489b16fa01ac10b5b247e29b78d71315a3b767f8a19034fe5264cf01",
       "../mm-arena/results/core-v1/claude-cli_claude-fable-5-1@high.jsonl": "67587a9ba3c34ad18cffad14dc3902fac662d5dd175fccfe414bb9212c80fa08",
+      "../mm-arena/results/core-v1/claude-cli_claude-fable-5-1@high_r2.jsonl": "1b3b32d311917759afbf6bb2beaae3db695574bf9fb3b20eebd9553a14204264",
       "../mm-arena/results/core-v1/claude-cli_claude-fable-5-1@low.jsonl": "765b2c0d54c5b47f1a39accfde21340c0d818c95ccb8c5e979cda780fba84518",
       "../mm-arena/results/core-v1/claude-cli_claude-haiku-5-5@high.jsonl": "2863822b28da53c36fe1dce943ac8fbd428c3000ab470580baea369ed0f4a758",
       "../mm-arena/results/core-v1/claude-cli_claude-haiku-5-5@high_r2.jsonl": "5eeecff504683889ccdb3bed5925dcbb1fc95ebec29da38addeaffe6120c58a6",
+      "../mm-arena/results/core-v1/claude-cli_claude-haiku-5-5@high_r3.jsonl": "666016311f5a27d00842b204335d156ac301705b2e49d11a7ead656ee3fe8d90",
+      "../mm-arena/results/core-v1/claude-cli_claude-haiku-5-5@high_r4.jsonl": "5464eeaa04cf094dae6160b965eb79459ce13e4dc7e3403a386d58ab10f47d93",
       "../mm-arena/results/core-v1/claude-cli_claude-haiku-5-5@low.jsonl": "7fbfb5c52512beb9585b3819bc01a9ddbf1a25333618f55ec27d82a57e864c83",
       "../mm-arena/results/core-v1/claude-cli_claude-opus-5-5@high.jsonl": "d21318361aee5a3a67ef9313bd1b65c426c1592eb782a10be63acf0813bcc8bb",
       "../mm-arena/results/core-v1/claude-cli_claude-opus-5-5@high_r2.jsonl": "eb4a8cad06a9abb824e08528ede35817311d4ef40f622e264e6a19f10eadae94",
+      "../mm-arena/results/core-v1/claude-cli_claude-opus-5-5@high_r3.jsonl": "cc5d11a64ae037a1679588fa2338a8a1f8946123424ed71562fd0e8e303305a6",
       "../mm-arena/results/core-v1/claude-cli_claude-opus-5-5@low.jsonl": "53fdeae54e15f137a659231e1ed6813bb2b9414f19984068a979eac9d5ccab04",
       "../mm-arena/results/core-v1/claude-cli_claude-opus-5-5@medium.jsonl": "1b88d44568af930f29b603061590d55e98a6d68b539f7c464dc804221a81d9fb",
       "../mm-arena/results/core-v1/claude-cli_claude-sonnet-5-5@high.jsonl": "a1438d6df0e2afd9e71411478fb5aa46309bf481d7d5e58c90c7e585283ad97b",
-      "../mm-arena/results/core-v1/claude-cli_claude-sonnet-5-5@low.jsonl": "29626f6edb8c03549c19cdf7354a504e404f1d24db4ba0a34892b5afb6411513",
-      "../mm-arena/runs/core-v1/bayes.jsonl": "0628e900489b16fa01ac10b5b247e29b78d71315a3b767f8a19034fe5264cf01",
-      "../mm-arena/runs/core-v1/claude-cli_claude-fable-5-1@high.jsonl": "67587a9ba3c34ad18cffad14dc3902fac662d5dd175fccfe414bb9212c80fa08",
-      "../mm-arena/runs/core-v1/claude-cli_claude-fable-5-1@high_r2.jsonl": "d96a412c71b55073551c6e400dba5a1fc08ee5c021308271aacac7e1142b9dd7",
-      "../mm-arena/runs/core-v1/claude-cli_claude-fable-5-1@low.jsonl": "765b2c0d54c5b47f1a39accfde21340c0d818c95ccb8c5e979cda780fba84518",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@high.jsonl": "2863822b28da53c36fe1dce943ac8fbd428c3000ab470580baea369ed0f4a758",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@high_r2.jsonl": "5eeecff504683889ccdb3bed5925dcbb1fc95ebec29da38addeaffe6120c58a6",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@high_r3.jsonl": "1491a807080f767b60685135d94c60b49d8cf8f6d1a56c39ca894ecc7e9296d4",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@low.jsonl": "7fbfb5c52512beb9585b3819bc01a9ddbf1a25333618f55ec27d82a57e864c83",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@high.jsonl": "d21318361aee5a3a67ef9313bd1b65c426c1592eb782a10be63acf0813bcc8bb",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@high_r2.jsonl": "eb4a8cad06a9abb824e08528ede35817311d4ef40f622e264e6a19f10eadae94",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@low.jsonl": "53fdeae54e15f137a659231e1ed6813bb2b9414f19984068a979eac9d5ccab04",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@medium.jsonl": "1b88d44568af930f29b603061590d55e98a6d68b539f7c464dc804221a81d9fb",
-      "../mm-arena/runs/core-v1/claude-cli_claude-sonnet-5-5@high.jsonl": "a1438d6df0e2afd9e71411478fb5aa46309bf481d7d5e58c90c7e585283ad97b",
-      "../mm-arena/runs/core-v1/claude-cli_claude-sonnet-5-5@low.jsonl": "29626f6edb8c03549c19cdf7354a504e404f1d24db4ba0a34892b5afb6411513"
+      "../mm-arena/results/core-v1/claude-cli_claude-sonnet-5-5@high_r2.jsonl": "3b657d569f961ecc15bec2e466b1a03aed426aa0121d823c64bcae141f950838",
+      "../mm-arena/results/core-v1/claude-cli_claude-sonnet-5-5@low.jsonl": "29626f6edb8c03549c19cdf7354a504e404f1d24db4ba0a34892b5afb6411513"
     },
     "notes": [
       "edge_pp = 100 * xpnl_sd / 1.510772 (mean bayes xpnl_sd over 120 episodes)"
     ],
     "repo": "https://github.com/h-a-forster/mm-arena",
-    "rows": 1475,
+    "rows": 1920,
     "source_paths": [
-      "../mm-arena/results/core-v1",
-      "../mm-arena/runs/core-v1"
+      "../mm-arena/results/core-v1"
     ],
-    "untracked_files": [
-      "../mm-arena/runs/core-v1/bayes.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-fable-5-1@high.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-fable-5-1@high_r2.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-fable-5-1@low.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@high.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@high_r2.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@high_r3.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-haiku-5-5@low.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@high.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@high_r2.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@low.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-opus-5-5@medium.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-sonnet-5-5@high.jsonl",
-      "../mm-arena/runs/core-v1/claude-cli_claude-sonnet-5-5@low.jsonl"
-    ]
+    "untracked_files": []
   },
   "overclaim-interventions": {
     "commit": "c877e463bdf5f1c15235279108b4c8b94e68fe3d",

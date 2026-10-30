@@ -2,14 +2,15 @@
 # source repositories checked out next to this one:
 #   git clone https://github.com/h-a-forster/mm-arena ../mm-arena   (and agent-ab, overclaim,
 #   ruleproof). Regenerate with: uv run evalnoise extract
-# mm-arena replicate runs not yet published in that repository live in its runs/ folder;
-# the extractor merges both roots and fails if a shared episode differs.
+# mm-arena: every replicate run is committed in results/core-v1 (on its branch
+# polish-2026-10-30 until that is merged; the extractor still accepts
+# several roots, merging them and failing if a shared episode differs).
 
 [[table]]
 name = "mm-arena"
 extractor = "mm-arena"
 repo = "https://github.com/h-a-forster/mm-arena"
-paths = ["../mm-arena/results/core-v1", "../mm-arena/runs/core-v1"]
+paths = ["../mm-arena/results/core-v1"]
 description = "core-v1 suite: 60 games x 2 seeds, LLM market makers, edge captured (pp) per episode"
 
 [[table]]

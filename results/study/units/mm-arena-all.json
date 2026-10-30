@@ -8,7 +8,7 @@
  "scale": 1.0,
  "note": "Pools single-run setups with the replicated ones: the residual is assumed equal across setups.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T09:24:03Z",
+ "created": "2026-10-30T11:06:02Z",
  "arms": [
   "claude-cli:claude-fable-5-1@high",
   "claude-cli:claude-fable-5-1@low",
@@ -39,39 +39,39 @@
   ]
  ],
  "counts": {
-  "trials": 1475,
+  "trials": 1920,
   "items": 120,
   "clusters": 60,
   "arms": 9,
   "runs_per_arm": {
    "claude-cli:claude-fable-5-1@high": 2,
    "claude-cli:claude-fable-5-1@low": 1,
-   "claude-cli:claude-haiku-5-5@high": 3,
+   "claude-cli:claude-haiku-5-5@high": 4,
    "claude-cli:claude-haiku-5-5@low": 1,
-   "claude-cli:claude-opus-5-5@high": 2,
+   "claude-cli:claude-opus-5-5@high": 3,
    "claude-cli:claude-opus-5-5@low": 1,
    "claude-cli:claude-opus-5-5@medium": 1,
-   "claude-cli:claude-sonnet-5-5@high": 1,
+   "claude-cli:claude-sonnet-5-5@high": 2,
    "claude-cli:claude-sonnet-5-5@low": 1
   },
   "max_repeats_per_run": 1,
   "cells_with_repeats": 0
  },
  "components": {
-  "item": 1902.1264558517748,
-  "item_arm": 387.1961267037998,
-  "run": 17.4355619403033,
-  "item_run": 200.4388289892902,
+  "item": 1887.0013226090518,
+  "item_arm": 366.97344064632637,
+  "run": 8.43763060262626,
+  "item_run": 209.01575732716685,
   "within": null,
   "absorbed": {
    "within": "item_run"
   }
  },
  "components_clipped": {
-  "item": 1902.1264558517748,
-  "item_arm": 387.1961267037998,
-  "run": 17.4355619403033,
-  "item_run": 200.4388289892902,
+  "item": 1887.0013226090518,
+  "item_arm": 366.97344064632637,
+  "run": 8.43763060262626,
+  "item_run": 209.01575732716685,
   "within": null,
   "absorbed": {
    "within": "item_run"
@@ -82,20 +82,20 @@
   "level": 0.95,
   "components": {
    "item": [
-    1087.7062039345424,
-    2811.1589771659046
+    1081.850483222605,
+    2768.1690873445227
    ],
    "item_arm": [
-    253.61247587537008,
-    544.531812207645
+    262.2483469941006,
+    482.81962255078787
    ],
    "run": [
-    7.9840101724982295,
-    36.52031223443053
+    4.573916688797172,
+    19.045069549592377
    ],
    "item_run": [
-    117.31728807477727,
-    293.9781536597148
+    125.77203416748183,
+    309.3443553234435
    ],
    "within": [
     null,
@@ -105,216 +105,234 @@
   "pairs": {
    "claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high": {
     "difference": [
-     1.8121465692895322,
-     6.623971760390805
+     1.8588385547432644,
+     6.349915619781598
     ],
     "item_arm": [
-     -85.16619567105077,
-     40.492052781002954
+     -53.04477733240134,
+     13.039738613997152
     ],
     "se_items": [
-     0.8502861198631547,
-     1.5779215102269741
+     0.7889653570756336,
+     1.2920052126475392
     ]
    },
    "claude-cli:claude-opus-5-5@high - claude-cli:claude-opus-5-5@medium": {
     "difference": [
-     10.177186177156836,
-     16.18332742776273
+     10.20758049496283,
+     15.867355247650535
     ],
     "item_arm": [
-     -82.81571343884487,
-     63.26603276093523
+     -90.84174538940661,
+     34.32962620766785
     ],
     "se_items": [
-     1.1456679274831816,
-     1.860631039847778
+     1.1096314866703842,
+     1.6207756354473561
     ]
    },
    "claude-cli:claude-opus-5-5@high - claude-cli:claude-haiku-5-5@high": {
     "difference": [
-     -4.068490679018456,
-     5.489133480207147
+     -3.019287618226452,
+     4.9108616165537144
     ],
     "item_arm": [
-     28.794448099999194,
-     313.4154433839218
+     42.351018300272266,
+     176.39076485696174
     ],
     "se_items": [
-     1.3065995892217568,
-     2.6186456354182486
+     1.181465244427461,
+     2.0699504253241163
     ]
    },
    "claude-cli:claude-sonnet-5-5@high - claude-cli:claude-sonnet-5-5@low": {
     "difference": [
-     47.51290795298741,
-     61.63634797446544
+     49.23587682471446,
+     62.703952770217604
     ],
     "item_arm": [
-     276.45247559116274,
-     701.033694731111
+     279.89423132158345,
+     665.7460791056146
     ],
     "se_items": [
-     2.796980099777432,
-     3.92536586346483
+     2.6454854626641024,
+     3.735463933871286
     ]
    }
   }
  },
  "run_interval": [
-  4.957521866498988,
-  158.70167287762754
+  2.708152002200986,
+  40.42477969422497
  ],
  "run_term": {
-  "ss": 7688.802282376977,
-  "df": 4,
-  "k": 395.0000000000007,
-  "df_res": 391
+  "ss": 8550.72000749624,
+  "df": 7,
+  "k": 840.0000000000017,
+  "df_res": 833
  },
  "reml": {
-  "item": 1952.441863237394,
-  "item_arm": 368.8586698362728,
-  "run": 16.203446075663646,
-  "item_run": 206.26047548652215,
+  "item": 1976.2254716045359,
+  "item_arm": 337.8032250623404,
+  "run": 8.388609494529625,
+  "item_run": 214.89854291941668,
   "within": null,
   "absorbed": {
    "within": "item_run"
   }
  },
  "shares": {
-  "item": 0.7586665411484181,
-  "item_arm": 0.154433868099949,
-  "run": 0.006954205084280525,
-  "item_run": 0.07994538566735228
+  "item": 0.7635266765510225,
+  "item_arm": 0.14848638851602647,
+  "run": 0.003414070766564669,
+  "item_run": 0.08457286416638635
  },
  "per_arm": {
   "claude-cli:claude-fable-5-1@high": {
-   "mean": 86.14422880049021,
-   "trials": 204,
+   "mean": 89.60493062475001,
+   "trials": 240,
    "runs": 2,
-   "item_plus_item_arm": 2819.5612926927984,
+   "item_plus_item_arm": 2709.230258397326,
    "within": null
   },
   "claude-cli:claude-fable-5-1@low": {
    "mean": 59.833186505068326,
    "trials": 120,
    "runs": 1,
-   "item_plus_item_arm": 1173.386177412209,
+   "item_plus_item_arm": 1164.8092490743325,
    "within": null
   },
   "claude-cli:claude-haiku-5-5@high": {
-   "mean": 81.04052385538199,
-   "trials": 311,
-   "runs": 3,
-   "item_plus_item_arm": 3832.4051950643116,
+   "mean": 84.51821012164208,
+   "trials": 480,
+   "runs": 4,
+   "item_plus_item_arm": 3620.374012342929,
    "within": null
   },
   "claude-cli:claude-haiku-5-5@low": {
    "mean": -0.43547596099749925,
    "trials": 120,
    "runs": 1,
-   "item_plus_item_arm": 2610.1052249879103,
+   "item_plus_item_arm": 2601.528296650034,
    "within": null
   },
   "claude-cli:claude-opus-5-5@high": {
-   "mean": 85.72938194378334,
-   "trials": 240,
-   "runs": 2,
-   "item_plus_item_arm": 2563.028256043607,
+   "mean": 85.58622581271666,
+   "trials": 360,
+   "runs": 3,
+   "item_plus_item_arm": 2485.5977904741953,
    "within": null
   },
   "claude-cli:claude-opus-5-5@low": {
    "mean": 60.018635270616656,
    "trials": 120,
    "runs": 1,
-   "item_plus_item_arm": 1520.7193049078537,
+   "item_plus_item_arm": 1512.1423765699772,
    "within": null
   },
   "claude-cli:claude-opus-5-5@medium": {
    "mean": 72.65208634310083,
    "trials": 120,
    "runs": 1,
-   "item_plus_item_arm": 2206.0050740582255,
+   "item_plus_item_arm": 2197.428145720349,
    "within": null
   },
   "claude-cli:claude-sonnet-5-5@high": {
-   "mean": 69.19358876165582,
-   "trials": 120,
-   "runs": 1,
-   "item_plus_item_arm": 2167.3894857519367,
+   "mean": 70.5531334066179,
+   "trials": 240,
+   "runs": 2,
+   "item_plus_item_arm": 2291.9364363258155,
    "within": null
   },
   "claude-cli:claude-sonnet-5-5@low": {
    "mean": 14.785996684629168,
    "trials": 120,
    "runs": 1,
-   "item_plus_item_arm": 1711.3032320813209,
+   "item_plus_item_arm": 1702.7263037434443,
    "within": null
   }
  },
  "run_by_arm": {
   "arms": {
    "claude-cli:claude-fable-5-1@high": {
-    "run": 0.8105490600219508,
+    "run": 1.7313160147255857,
     "run_interval": [
      0.0,
-     1251.0465357843627
+     2251.993799377577
     ],
     "run_df": 1,
-    "item_run": 35.15199066580105,
-    "residual_df": 83
+    "item_run": 57.69236361419924,
+    "residual_df": 119
    },
    "claude-cli:claude-haiku-5-5@high": {
-    "run": 31.49249047886678,
+    "run": 16.401605469261053,
     "run_interval": [
-     6.063485135716719,
-     1374.5339931714595
+     3.3770638118418903,
+     263.85567027188415
     ],
-    "run_df": 2,
-    "item_run": 324.090342343182,
-    "residual_df": 189
+    "run_df": 3,
+    "item_run": 333.337235535387,
+    "residual_df": 357
    },
    "claude-cli:claude-opus-5-5@high": {
-    "run": 6.691521465764574,
+    "run": 2.9394942631382666,
     "run_interval": [
-     0.5354274654482027,
-     7825.319971107762
+     0.09346625833308093,
+     153.25342423006083
+    ],
+    "run_df": 2,
+    "item_run": 115.79731471341142,
+    "residual_df": 238
+   },
+   "claude-cli:claude-sonnet-5-5@high": {
+    "run": 2.2482932695986113,
+    "run_interval": [
+     0.0,
+     3762.7706240617467
     ],
     "run_df": 1,
-    "item_run": 119.33522862764362,
+    "item_run": 173.81160164298484,
     "residual_df": 119
    }
   },
   "leave_one_out": {
    "claude-cli:claude-fable-5-1@high": {
-    "run": 22.027726477611985,
+    "run": 9.555349700609705,
     "run_interval": [
-     5.464132619690487,
-     336.72046083173643
+     2.826362767075502,
+     53.848115853495166
     ],
-    "run_df": 3
+    "run_df": 6
    },
    "claude-cli:claude-haiku-5-5@high": {
-    "run": 4.1964007040856,
+    "run": 2.464649452650184,
     "run_interval": [
-     0.5319739432487756,
-     197.73433728354212
+     0.266244172173518,
+     27.35318662676846
     ],
-    "run_df": 2
+    "run_df": 4
    },
    "claude-cli:claude-opus-5-5@high": {
-    "run": 22.031707328781952,
+    "run": 10.636885138421473,
     "run_interval": [
-     5.322437532040421,
-     339.49214776831946
+     2.8917206312109713,
+     74.27828454446855
     ],
-    "run_df": 3
+    "run_df": 5
+   },
+   "claude-cli:claude-sonnet-5-5@high": {
+    "run": 9.469186824797532,
+    "run_interval": [
+     2.8848919602957706,
+     52.80953442773866
+    ],
+    "run_df": 6
    }
   },
   "residual_homogeneity": {
-   "statistic": 114.93770882177681,
-   "df": 2,
-   "p": 1.1005091253600177e-25
+   "statistic": 148.68871807586032,
+   "df": 3,
+   "p": 5.053893654704766e-32
   },
   "shifts": [
    {
@@ -323,18 +341,19 @@
      "r1",
      "r2"
     ],
-    "items": 84,
+    "items": 120,
     "run_means": [
-     81.26577792119048,
-     79.69796087869047
+     90.65661634575001,
+     88.55324490375
     ],
-    "mean": -1.5678170425000009,
-    "median": -0.19156190500000037,
+    "mean": -2.103371442,
+    "median": -0.16887101000000015,
     "by_family": {
      "cards": -2.1819097162500007,
-     "coin": 0.0709992133333337,
+     "coin": -0.5745745204166658,
      "dice": -2.555812992916669,
-     "transform": -0.7851365462500013
+     "transform": -0.7851365462500013,
+     "urn": -4.419423434166664
     }
    },
    {
@@ -364,17 +383,40 @@
      "r1",
      "r3"
     ],
-    "items": 71,
+    "items": 120,
     "run_means": [
-     61.82358032267324,
-     67.17542320046479
+     79.89813967605666,
+     83.194742606275
     ],
-    "mean": 5.351842877791549,
-    "median": 0.6926375899999968,
+    "mean": 3.2966029302183344,
+    "median": 0.41307480999999946,
     "by_family": {
      "cards": 9.075576963041668,
+     "coin": 1.282359729583337,
      "dice": 4.570270435008335,
-     "transform": 2.2817611639130444
+     "transform": 1.5826720654166675,
+     "urn": -0.027864541958333877
+    }
+   },
+   {
+    "arm": "claude-cli:claude-haiku-5-5@high",
+    "runs": [
+     "r1",
+     "r4"
+    ],
+    "items": 120,
+    "run_means": [
+     79.89813967605666,
+     84.59353228203666
+    ],
+    "mean": 4.69539260598,
+    "median": 1.7982202250000014,
+    "by_family": {
+     "cards": 13.114621939766666,
+     "coin": -7.574875412083332,
+     "dice": 11.196965201675004,
+     "transform": 1.7304176679166654,
+     "urn": 5.009833632625001
     }
    },
    {
@@ -383,17 +425,61 @@
      "r2",
      "r3"
     ],
-    "items": 71,
+    "items": 120,
     "run_means": [
-     74.83458688211265,
-     67.17542320046479
+     90.3864259222,
+     83.194742606275
     ],
-    "mean": -7.659163681647887,
-    "median": -1.093480190000001,
+    "mean": -7.191683315925,
+    "median": -1.243138609999992,
     "by_family": {
      "cards": -13.719992489874999,
+     "coin": -7.314608503916664,
      "dice": -8.4612343525,
-     "transform": -0.4978772686956504
+     "transform": -0.09972444499999848,
+     "urn": -6.362856788333335
+    }
+   },
+   {
+    "arm": "claude-cli:claude-haiku-5-5@high",
+    "runs": [
+     "r2",
+     "r4"
+    ],
+    "items": 120,
+    "run_means": [
+     90.3864259222,
+     84.59353228203666
+    ],
+    "mean": -5.792893640163332,
+    "median": -0.3290696000000004,
+    "by_family": {
+     "cards": -9.68094751315,
+     "coin": -16.171843645583333,
+     "dice": -1.8345395858333327,
+     "transform": 0.04802115749999943,
+     "urn": -1.32515861375
+    }
+   },
+   {
+    "arm": "claude-cli:claude-haiku-5-5@high",
+    "runs": [
+     "r3",
+     "r4"
+    ],
+    "items": 120,
+    "run_means": [
+     83.194742606275,
+     84.59353228203666
+    ],
+    "mean": 1.3987896757616662,
+    "median": 0.029210559999992114,
+    "by_family": {
+     "cards": 4.039044976724999,
+     "coin": -8.857235141666669,
+     "dice": 6.626694766666667,
+     "transform": 0.1477456024999979,
+     "urn": 5.037698174583335
     }
    },
    {
@@ -416,6 +502,69 @@
      "transform": -1.0212796841666665,
      "urn": -1.2064428917500016
     }
+   },
+   {
+    "arm": "claude-cli:claude-opus-5-5@high",
+    "runs": [
+     "r1",
+     "r3"
+    ],
+    "items": 120,
+    "run_means": [
+     87.6897367209,
+     85.29991355058333
+    ],
+    "mean": -2.3898231703166677,
+    "median": -0.1392136199999996,
+    "by_family": {
+     "cards": -2.45705219,
+     "coin": -8.189682690416669,
+     "dice": -1.0710227748333334,
+     "transform": 0.5002273308333333,
+     "urn": -0.7315855271666685
+    }
+   },
+   {
+    "arm": "claude-cli:claude-opus-5-5@high",
+    "runs": [
+     "r2",
+     "r3"
+    ],
+    "items": 120,
+    "run_means": [
+     83.76902716666667,
+     85.29991355058333
+    ],
+    "mean": 1.5308863839166664,
+    "median": 0.06128604999999965,
+    "by_family": {
+     "cards": 0.4596267999999995,
+     "coin": 0.055395511666665044,
+     "dice": 5.1430452283333326,
+     "transform": 1.5215070149999999,
+     "urn": 0.4748573645833328
+    }
+   },
+   {
+    "arm": "claude-cli:claude-sonnet-5-5@high",
+    "runs": [
+     "r1",
+     "r2"
+    ],
+    "items": 120,
+    "run_means": [
+     69.19358876165582,
+     71.91267805158
+    ],
+    "mean": 2.7190892899241663,
+    "median": 0.6860204100000011,
+    "by_family": {
+     "cards": 1.059139845625,
+     "coin": 5.072589160416666,
+     "dice": -4.079379434041666,
+     "transform": 5.104703217041668,
+     "urn": 6.438393660579165
+    }
    }
   ]
  },
@@ -423,116 +572,120 @@
   "claude-cli:claude-fable-5-1@high - claude-cli:claude-opus-5-5@high": {
    "items": 120,
    "items_differing": 120,
-   "difference": 4.143325880716668,
-   "se_items": 1.2330178552170898,
-   "var_d": 182.43996375409824,
-   "item_arm": -24.032344791792724,
+   "difference": 4.018704812033334,
+   "se_items": 1.0535640570823996,
+   "var_d": 133.19966668511108,
+   "item_arm": -20.49006554376402,
    "clusters": 60,
-   "se_clusters": 1.201055322981143,
-   "p_items": 0.0010423717596061044,
+   "se_clusters": 1.1503202694883397,
+   "p_items": 0.0009104803738763799,
    "runs": [
     2,
-    2
+    3
    ],
-   "se_with_run": 4.344893074537581,
-   "df_with_run": 4.687086488749709,
-   "p_with_run": 0.3868303783685935,
+   "se_with_run": 2.89043172517837,
+   "df_with_run": 9.841229314255894,
+   "p_with_run": 0.19506327634404094,
    "families": 5,
-   "se_families": 0.7191944819032634,
+   "se_families": 0.823734645711524,
    "p_with_run_without": {
-    "claude-cli:claude-fable-5-1@high": 0.4483936311985106,
-    "claude-cli:claude-haiku-5-5@high": 0.16393295943276096,
-    "claude-cli:claude-opus-5-5@high": 0.44842983398596975
+    "claude-cli:claude-fable-5-1@high": 0.223149485792166,
+    "claude-cli:claude-haiku-5-5@high": 0.05233560119748422,
+    "claude-cli:claude-opus-5-5@high": 0.25074976030882773,
+    "claude-cli:claude-sonnet-5-5@high": 0.22142852909091937
    }
   },
   "claude-cli:claude-opus-5-5@high - claude-cli:claude-opus-5-5@medium": {
    "items": 120,
    "items_differing": 120,
-   "difference": 13.077295600682502,
-   "se_items": 1.5165001115570853,
-   "var_d": 275.9727106023182,
-   "item_arm": -12.342766440808532,
+   "difference": 12.934139469615836,
+   "se_items": 1.3820187413992457,
+   "var_d": 229.1970961894506,
+   "item_arm": -24.745290123385914,
    "clusters": 60,
-   "se_clusters": 1.5881841827351328,
-   "p_items": 2.201243371719726e-11,
+   "se_clusters": 1.490659668033819,
+   "p_items": 3.9634986724586066e-12,
    "runs": [
-    2,
+    3,
     1
    ],
-   "se_with_run": 5.354967031527366,
-   "df_with_run": 4.80572592504706,
-   "p_with_run": 0.06051219811868546,
+   "se_with_run": 3.6704550648029612,
+   "df_with_run": 9.992029251668272,
+   "p_with_run": 0.0055096589406026675,
    "families": 5,
-   "se_families": 2.1715505325588706,
+   "se_families": 2.029274536145945,
    "p_with_run_without": {
-    "claude-cli:claude-fable-5-1@high": 0.10365642928133052,
-    "claude-cli:claude-haiku-5-5@high": 0.012311927637779317,
-    "claude-cli:claude-opus-5-5@high": 0.1036780077720192
+    "claude-cli:claude-fable-5-1@high": 0.009735621975768468,
+    "claude-cli:claude-haiku-5-5@high": 0.00018926622218036628,
+    "claude-cli:claude-opus-5-5@high": 0.016209910771834143,
+    "claude-cli:claude-sonnet-5-5@high": 0.00951114514903445
    }
   },
   "claude-cli:claude-opus-5-5@high - claude-cli:claude-haiku-5-5@high": {
    "items": 120,
    "items_differing": 120,
-   "difference": 0.971652611964388,
-   "se_items": 1.972074793078348,
-   "var_d": 466.689478739401,
-   "item_arm": 143.00807269327734,
+   "difference": 1.0680156910745844,
+   "se_items": 1.654424985141732,
+   "var_d": 328.4546437753465,
+   "item_arm": 103.26439266724955,
    "clusters": 60,
-   "se_clusters": 2.45265098937922,
-   "p_items": 0.6934130009345851,
+   "se_clusters": 2.008235562986035,
+   "p_items": 0.5968489913619368,
    "runs": [
-    2,
-    3
+    3,
+    4
    ],
-   "se_with_run": 4.53267380537753,
-   "df_with_run": 7.905887600150202,
-   "p_with_run": 0.8356870621885298,
+   "se_with_run": 2.9924841288312884,
+   "df_with_run": 21.461723942250856,
+   "p_with_run": 0.7246523608241947,
    "families": 5,
-   "se_families": 3.5681529646725987,
+   "se_families": 3.2175397638164758,
    "p_with_run_without": {
-    "claude-cli:claude-fable-5-1@high": 0.8513505084155211,
-    "claude-cli:claude-haiku-5-5@high": 0.7575668633766675,
-    "claude-cli:claude-opus-5-5@high": 0.851361091727254
+    "claude-cli:claude-fable-5-1@high": 0.7346585279343354,
+    "claude-cli:claude-haiku-5-5@high": 0.6505592461483115,
+    "claude-cli:claude-opus-5-5@high": 0.7438044388691595,
+    "claude-cli:claude-sonnet-5-5@high": 0.7339622235561732
    }
   },
   "claude-cli:claude-sonnet-5-5@high - claude-cli:claude-sonnet-5-5@low": {
    "items": 120,
    "items_differing": 120,
-   "difference": 54.40759207702668,
-   "se_items": 3.3756402124089266,
-   "var_d": 1367.393621235862,
-   "item_arm": 483.2579816286407,
+   "difference": 55.767136721988756,
+   "se_items": 3.247677725269418,
+   "var_d": 1265.689272865337,
+   "item_arm": 476.0828184372933,
    "clusters": 60,
-   "se_clusters": 3.7117877104183257,
-   "p_items": 2.5034113334724572e-21,
+   "se_clusters": 3.5071208704781385,
+   "p_items": 5.339363007734237e-23,
    "runs": [
-    1,
+    2,
     1
    ],
-   "se_with_run": 6.974847087056398,
-   "df_with_run": 7.703620475297862,
-   "p_with_run": 6.430946420691315e-05,
+   "se_with_run": 4.9956323627827866,
+   "df_with_run": 24.474324027963654,
+   "p_with_run": 4.3243767051326706e-11,
    "families": 5,
-   "se_families": 6.428833887543758,
+   "se_families": 5.926599804060141,
    "p_with_run_without": {
-    "claude-cli:claude-fable-5-1@high": 0.0007356329980293767,
-    "claude-cli:claude-haiku-5-5@high": 3.885181820922817e-08,
-    "claude-cli:claude-opus-5-5@high": 0.0007361353589819218
+    "claude-cli:claude-fable-5-1@high": 1.2731701882144898e-09,
+    "claude-cli:claude-haiku-5-5@high": 1.6322747188094543e-17,
+    "claude-cli:claude-opus-5-5@high": 2.7749676084818756e-08,
+    "claude-cli:claude-sonnet-5-5@high": 1.1303395127307223e-09
    }
   }
  },
  "planning": {
   "alpha": 0.05,
   "power": 0.8,
-  "run_df": 4.0,
+  "run_df": 7.0,
   "run_assumption": "estimated",
-  "design_effect": 1.1529251064158599,
-  "design_effect_families": 2.662093545342697,
+  "design_effect": 1.1791306772033878,
+  "design_effect_families": 2.7430933499754135,
   "notes": [
    "within-run noise is not separated from item x run noise: repeats inside a run are assumed not to help (conservative)",
-   "the replicated arms do not share one item x run variance (Bartlett p = 1.1e-25; SD by arm: claude-cli:claude-fable-5-1@high 5.93, claude-cli:claude-haiku-5-5@high 18, claude-cli:claude-opus-5-5@high 10.9): pooled components describe an average arm",
-   "items are clustered (median design effect 1.15 over pairs): the planner treats items as independent, so its task counts are about 1.15x too small",
-   "items are also clustered by family (median design effect 2.66 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information"
+   "the replicated arms do not share one item x run variance (Bartlett p = 5.1e-32; SD by arm: claude-cli:claude-fable-5-1@high 7.6, claude-cli:claude-haiku-5-5@high 18.3, claude-cli:claude-opus-5-5@high 10.8, claude-cli:claude-sonnet-5-5@high 13.2): pooled components describe an average arm",
+   "items are clustered (median design effect 1.18 over pairs): the planner treats items as independent, so its task counts are about 1.18x too small",
+   "items are also clustered by family (median design effect 2.74 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information"
   ],
   "observed_design": {
    "tasks": 120,
@@ -544,22 +697,22 @@
    "runs": 1,
    "repeats": 1
   },
-  "reference_mde": 22.11807352405736,
+  "reference_mde": 15.302021688349932,
   "reference_mde_bootstrap_ci": [
-   21.982773830531414,
-   22.315004201602534
+   14.740244960136051,
+   15.838244953133083
   ],
-  "reference_se": 6.683190840371444,
-  "reference_se_items_only": 3.129523274912357,
-  "run_share_of_variance": 0.7807252390205388,
+  "reference_se": 5.145394170661506,
+  "reference_se_items_only": 3.0983576240041897,
+  "run_share_of_variance": 0.6374016795624736,
   "reference_mde_run_ci": [
-   13.290124792389067,
-   66.65077928844006
+   11.092743015935842,
+   30.062723761575146
   ],
-  "naive_fpr": 0.35569060532798746,
+  "naive_fpr": 0.23550029485103943,
   "naive_fpr_run_ci": [
-   0.1653636611215911,
-   0.732519733710785
+   0.1160267298518833,
+   0.5201149119903831
   ],
   "grid": [
    {
@@ -567,756 +720,756 @@
     "runs": 1,
     "repeats": 1,
     "trials_per_arm": 10,
-    "se": 12.344963143696486,
-    "mde": 37.513104861447374,
-    "naive_fpr": 0.07822882705428831
+    "se": 11.492306156727254,
+    "mde": 35.219119921069336,
+    "naive_fpr": 0.06378952450358186
    },
    {
     "tasks": 20,
     "runs": 1,
     "repeats": 1,
     "trials_per_arm": 20,
-    "se": 9.676498305167815,
-    "mde": 28.663692836093226,
-    "naive_fpr": 0.113716576521915
+    "se": 8.629842466847345,
+    "mde": 25.126640505123717,
+    "naive_fpr": 0.0813406925883633
    },
    {
     "tasks": 30,
     "runs": 1,
     "repeats": 1,
     "trials_per_arm": 30,
-    "se": 8.605044310953852,
-    "mde": 25.75340493273118,
-    "naive_fpr": 0.1476401790085761
+    "se": 7.434685001407394,
+    "mde": 21.452608990307407,
+    "naive_fpr": 0.09894804705017689
    },
    {
     "tasks": 50,
     "runs": 1,
     "repeats": 1,
     "trials_per_arm": 50,
-    "se": 7.640453004130724,
-    "mde": 23.562477835247613,
-    "naive_fpr": 0.20826122295619146
+    "se": 6.317818383286453,
+    "mde": 18.273820119984517,
+    "naive_fpr": 0.13324731354736039
    },
    {
     "tasks": 100,
     "runs": 1,
     "repeats": 1,
     "trials_per_arm": 100,
-    "se": 6.828163954861395,
-    "mde": 22.26282409647072,
-    "naive_fpr": 0.32157337927905566
+    "se": 5.328700138375435,
+    "mde": 15.73031993954378,
+    "naive_fpr": 0.20925741895257355
    },
    {
     "tasks": 200,
     "runs": 1,
     "repeats": 1,
     "trials_per_arm": 200,
-    "se": 6.383374768689169,
-    "mde": 21.94687006988229,
-    "naive_fpr": 0.4548256322433426
+    "se": 4.757641557009886,
+    "mde": 14.466065400650612,
+    "naive_fpr": 0.3210671735010283
    },
    {
     "tasks": 500,
     "runs": 1,
     "repeats": 1,
     "trials_per_arm": 500,
-    "se": 6.100955966353057,
-    "mde": 21.999819969805397,
-    "naive_fpr": 0.6217148046528804
+    "se": 4.379408407210556,
+    "mde": 13.785825201374038,
+    "naive_fpr": 0.4962098328871525
    },
    {
     "tasks": 10,
     "runs": 2,
     "repeats": 1,
     "trials_per_arm": 20,
-    "se": 10.720012601671337,
-    "mde": 32.74098025565555,
-    "naive_fpr": 0.06688530829634168
+    "se": 10.135773007748753,
+    "mde": 31.322385925888632,
+    "naive_fpr": 0.058372368450726006
    },
    {
     "tasks": 20,
     "runs": 2,
     "repeats": 1,
     "trials_per_arm": 40,
-    "se": 8.134931841149488,
-    "mde": 23.717358344208396,
-    "naive_fpr": 0.08837161154980192
+    "se": 7.45558599532037,
+    "mde": 21.74354586953711,
+    "naive_fpr": 0.06898477600785483
    },
    {
     "tasks": 30,
     "runs": 2,
     "repeats": 1,
     "trials_per_arm": 60,
-    "se": 7.066111473330502,
-    "mde": 20.492130702916956,
-    "naive_fpr": 0.10974856776981165
+    "se": 6.31424726761791,
+    "mde": 18.154632228243834,
+    "naive_fpr": 0.07972833307675549
    },
    {
     "tasks": 50,
     "runs": 2,
     "repeats": 1,
     "trials_per_arm": 100,
-    "se": 6.077185498916509,
-    "mde": 17.767538560454973,
-    "naive_fpr": 0.15064591935965582
+    "se": 5.224641937494153,
+    "mde": 14.931307614907022,
+    "naive_fpr": 0.1012248127015786
    },
    {
     "tasks": 100,
     "runs": 2,
     "repeats": 1,
     "trials_per_arm": 200,
-    "se": 5.213815566767988,
-    "mde": 15.6841090576116,
-    "naive_fpr": 0.23758802235680382
+    "se": 4.226967824436858,
+    "mde": 12.167784774096203,
+    "naive_fpr": 0.15260596052517678
    },
    {
     "tasks": 200,
     "runs": 2,
     "repeats": 1,
     "trials_per_arm": 400,
-    "se": 4.7233163510702685,
-    "mde": 14.723278276467854,
-    "naive_fpr": 0.3577896530721782
+    "se": 3.6266298123361524,
+    "mde": 10.64189009698153,
+    "naive_fpr": 0.23914543838421934
    },
    {
     "tasks": 500,
     "runs": 2,
     "repeats": 1,
     "trials_per_arm": 1000,
-    "se": 4.4028654425381974,
-    "mde": 14.258553564254685,
-    "naive_fpr": 0.5335135997315752
+    "se": 3.2130290817024827,
+    "mde": 9.711770845316499,
+    "naive_fpr": 0.4014503770014509
    },
    {
     "tasks": 10,
     "runs": 3,
     "repeats": 1,
     "trials_per_arm": 30,
-    "se": 10.120549486082668,
-    "mde": 31.086549169916594,
-    "naive_fpr": 0.062028238794852385
+    "se": 9.64127372391708,
+    "mde": 29.93003327500941,
+    "naive_fpr": 0.05600848236992948
    },
    {
     "tasks": 20,
     "runs": 3,
     "repeats": 1,
     "trials_per_arm": 60,
-    "se": 7.551464422893429,
-    "mde": 21.980949527078685,
-    "naive_fpr": 0.07732777393201609
+    "se": 7.020656881229542,
+    "mde": 20.51861045039485,
+    "naive_fpr": 0.06359379636780053
    },
    {
     "tasks": 30,
     "runs": 3,
     "repeats": 1,
     "trials_per_arm": 90,
-    "se": 6.472324101399038,
-    "mde": 18.631906900813764,
-    "naive_fpr": 0.09273549343161343
+    "se": 5.893621782806927,
+    "mde": 16.948563271157003,
+    "naive_fpr": 0.07127861172172854
    },
    {
     "tasks": 50,
     "runs": 3,
     "repeats": 1,
     "trials_per_arm": 150,
-    "se": 5.457478423980382,
-    "mde": 15.694687580438028,
-    "naive_fpr": 0.12304036504266343
+    "se": 4.805299309994413,
+    "mde": 13.688224463238395,
+    "naive_fpr": 0.08677230723523413
    },
    {
     "tasks": 100,
     "runs": 3,
     "repeats": 1,
     "trials_per_arm": 300,
-    "se": 4.5501526737250035,
-    "mde": 13.282624865688343,
-    "naive_fpr": 0.1918675082585795
+    "se": 3.789194408251594,
+    "mde": 10.800389230839505,
+    "naive_fpr": 0.12494129044600182
    },
    {
     "tasks": 200,
     "runs": 3,
     "repeats": 1,
     "trials_per_arm": 600,
-    "se": 4.020422696334864,
-    "mde": 12.031673349848587,
-    "naive_fpr": 0.29724452982335486
+    "se": 3.160939839030684,
+    "mde": 9.119127825907269,
+    "naive_fpr": 0.1938748678153958
    },
    {
     "tasks": 500,
     "runs": 3,
     "repeats": 1,
     "trials_per_arm": 1500,
-    "se": 3.666025673533005,
-    "mde": 11.318637128636885,
-    "naive_fpr": 0.4704975514182191
+    "se": 2.7150816760162177,
+    "mde": 8.022713116125358,
+    "naive_fpr": 0.3393614089041579
    },
    {
     "tasks": 10,
     "runs": 4,
     "repeats": 1,
     "trials_per_arm": 40,
-    "se": 9.807086609201335,
-    "mde": 30.250539981653038,
-    "naive_fpr": 0.05933730367891476
+    "se": 9.384257631636972,
+    "mde": 29.214373841642548,
+    "naive_fpr": 0.05468498634282533
    },
    {
     "tasks": 20,
     "runs": 4,
     "repeats": 1,
     "trials_per_arm": 80,
-    "se": 7.242124299213863,
-    "mde": 21.097730518967893,
-    "naive_fpr": 0.07118730979962046
+    "se": 6.792757415006437,
+    "mde": 19.88540856524213,
+    "naive_fpr": 0.060581872165959415
    },
    {
     "tasks": 30,
     "runs": 4,
     "repeats": 1,
     "trials_per_arm": 120,
-    "se": 6.153982713134625,
-    "mde": 17.681865652796624,
-    "naive_fpr": 0.08317226244481817
+    "se": 5.671622986399425,
+    "mde": 16.322468771849085,
+    "naive_fpr": 0.06655157481782478
    },
    {
     "tasks": 50,
     "runs": 4,
     "repeats": 1,
     "trials_per_arm": 200,
-    "se": 5.119571693823278,
-    "mde": 14.628054797660777,
-    "naive_fpr": 0.10705632457549413
+    "se": 4.581256432512576,
+    "mde": 13.037982170695079,
+    "naive_fpr": 0.07861594931566963
    },
    {
     "tasks": 100,
     "runs": 4,
     "repeats": 1,
     "trials_per_arm": 400,
-    "se": 4.178982848633636,
-    "mde": 12.027961315652083,
-    "naive_fpr": 0.16339141229639811
+    "se": 3.5501215332542477,
+    "mde": 10.07318085880115,
+    "naive_fpr": 0.1087582058584876
    },
    {
     "tasks": 200,
     "runs": 4,
     "repeats": 1,
     "trials_per_arm": 800,
-    "se": 3.6181264916615166,
-    "mde": 10.600832601410259,
-    "naive_fpr": 0.2557641369310459
+    "se": 2.9001877699718532,
+    "mde": 8.290338787452379,
+    "naive_fpr": 0.16542108099447778
    },
    {
     "tasks": 500,
     "runs": 4,
     "repeats": 1,
     "trials_per_arm": 2000,
-    "se": 3.235274996960249,
-    "mde": 9.727705678954786,
-    "naive_fpr": 0.4222517312468768
+    "se": 2.4281113691973855,
+    "mde": 7.075002528616181,
+    "naive_fpr": 0.29522627215248315
    },
    {
     "tasks": 10,
     "runs": 5,
     "repeats": 1,
     "trials_per_arm": 50,
-    "se": 9.61410439284143,
-    "mde": 29.746695421855478,
-    "naive_fpr": 0.05762898815636671
+    "se": 9.226612090220465,
+    "mde": 28.778483822154936,
+    "naive_fpr": 0.05383911870743579
    },
    {
     "tasks": 20,
     "runs": 5,
     "repeats": 1,
     "trials_per_arm": 100,
-    "se": 7.050008086966078,
-    "mde": 20.563083602140864,
-    "naive_fpr": 0.06728843226926144
+    "se": 6.652271149932666,
+    "mde": 19.498479729027896,
+    "naive_fpr": 0.05866070694940253
    },
    {
     "tasks": 30,
     "runs": 5,
     "repeats": 1,
     "trials_per_arm": 150,
-    "se": 5.954814657868469,
-    "mde": 17.105194635171433,
-    "naive_fpr": 0.07707210242092814
+    "se": 5.534150797412477,
+    "mde": 15.93897078613068,
+    "naive_fpr": 0.0635369060548082
    },
    {
     "tasks": 50,
     "runs": 5,
     "repeats": 1,
     "trials_per_arm": 250,
-    "se": 4.905668198745981,
-    "mde": 13.977187685934267,
-    "naive_fpr": 0.09670235960479757
+    "se": 4.441409227432313,
+    "mde": 12.637956847698785,
+    "naive_fpr": 0.0733970808740231
    },
    {
     "tasks": 100,
     "runs": 5,
     "repeats": 1,
     "trials_per_arm": 500,
-    "se": 3.9395307621789777,
-    "mde": 11.253411945398105,
-    "naive_fpr": 0.1440921733238329
+    "se": 3.398615024283524,
+    "mde": 9.62123481145342,
+    "naive_fpr": 0.09820907743581261
    },
    {
     "tasks": 200,
     "runs": 5,
     "repeats": 1,
     "trials_per_arm": 1000,
-    "se": 3.353664220093881,
-    "mde": 9.704491683992737,
-    "naive_fpr": 0.2256356520318751
+    "se": 2.7318159092750194,
+    "mde": 7.7669739940819476,
+    "naive_fpr": 0.14601830574957123
    },
    {
     "tasks": 500,
     "runs": 5,
     "repeats": 1,
     "trials_per_arm": 2500,
-    "se": 2.9467542052448064,
-    "mde": 8.714481238372368,
-    "naive_fpr": 0.3838131054512352
+    "se": 2.238338359028309,
+    "mde": 6.461996380267385,
+    "naive_fpr": 0.2622295884826653
    },
    {
     "tasks": 10,
     "runs": 6,
     "repeats": 1,
     "trials_per_arm": 60,
-    "se": 9.483268087558427,
-    "mde": 29.409982791898504,
-    "naive_fpr": 0.05644857065733391
+    "se": 9.12000129245493,
+    "mde": 28.48511691149671,
+    "naive_fpr": 0.053251906644688866
    },
    {
     "tasks": 20,
     "runs": 6,
     "repeats": 1,
     "trials_per_arm": 120,
-    "se": 6.918967683137606,
-    "mde": 20.20460113894364,
-    "naive_fpr": 0.06459657445995187
+    "se": 6.556941631148944,
+    "mde": 19.237495891827503,
+    "naive_fpr": 0.05732918684174493
    },
    {
     "tasks": 30,
     "runs": 6,
     "repeats": 1,
     "trials_per_arm": 180,
-    "se": 5.81824949564461,
-    "mde": 16.71774008130985,
-    "naive_fpr": 0.0728518865493484
+    "se": 5.4405732125330655,
+    "mde": 15.679892800297294,
+    "naive_fpr": 0.06144865730342546
    },
    {
     "tasks": 50,
     "runs": 6,
     "repeats": 1,
     "trials_per_arm": 300,
-    "se": 4.757726127908341,
-    "mde": 13.538149563694684,
-    "naive_fpr": 0.08947707041077288
+    "se": 4.345678260322883,
+    "mde": 12.36693554634381,
+    "naive_fpr": 0.06977773084524001
    },
    {
     "tasks": 100,
     "runs": 6,
     "repeats": 1,
     "trials_per_arm": 600,
-    "se": 3.7714593918192194,
-    "mde": 10.72617040253832,
-    "naive_fpr": 0.1302192185843037
+    "se": 3.2937412676507907,
+    "mde": 9.312908316397191,
+    "naive_fpr": 0.09081655436951656
    },
    {
     "tasks": 200,
     "runs": 6,
     "repeats": 1,
     "trials_per_arm": 1200,
-    "se": 3.1651034678381764,
-    "mde": 9.08675085212778,
-    "naive_fpr": 0.2028266335203222
+    "se": 2.613548839455137,
+    "mde": 7.405719974328417,
+    "naive_fpr": 0.13200964704107662
    },
    {
     "tasks": 500,
     "runs": 6,
     "repeats": 1,
     "trials_per_arm": 3000,
-    "se": 2.737565409795565,
-    "mde": 8.00553540272411,
-    "naive_fpr": 0.3523541286202714
+    "se": 2.102327551789247,
+    "mde": 6.03052991401481,
+    "naive_fpr": 0.23666335623040813
    },
    {
     "tasks": 10,
     "runs": 8,
     "repeats": 1,
     "trials_per_arm": 80,
-    "se": 9.317139397399185,
-    "mde": 28.988234060592045,
-    "naive_fpr": 0.05492412026823911
+    "se": 8.984959082438884,
+    "mde": 28.115219436176105,
+    "naive_fpr": 0.05249007766243789
    },
    {
     "tasks": 20,
     "runs": 8,
     "repeats": 1,
     "trials_per_arm": 160,
-    "se": 6.751591554427884,
-    "mde": 19.75397631468795,
-    "naive_fpr": 0.061125590429526346
+    "se": 6.435794331850482,
+    "mde": 18.90772798367983,
+    "naive_fpr": 0.05560482789032317
    },
    {
     "tasks": 30,
     "runs": 8,
     "repeats": 1,
     "trials_per_arm": 240,
-    "se": 5.642897232235692,
-    "mde": 16.22960577349421,
-    "naive_fpr": 0.06740494666096718
+    "se": 5.321287595260322,
+    "mde": 15.352028146042503,
+    "naive_fpr": 0.05874674343027572
    },
    {
     "tasks": 50,
     "runs": 8,
     "repeats": 1,
     "trials_per_arm": 400,
-    "se": 4.566062822407755,
-    "mde": 12.982687420336594,
-    "naive_fpr": 0.0800912380913153
+    "se": 4.2229638955531525,
+    "mde": 12.022998055429795,
+    "naive_fpr": 0.06509384853613913
    },
    {
     "tasks": 100,
     "runs": 8,
     "repeats": 1,
     "trials_per_arm": 800,
-    "se": 3.550198598899088,
-    "mde": 10.052467956322403,
-    "naive_fpr": 0.11171396070273046
+    "se": 3.1577548759998786,
+    "mde": 8.918966983207255,
+    "naive_fpr": 0.0811756229548193
    },
    {
     "tasks": 200,
     "runs": 8,
     "repeats": 1,
     "trials_per_arm": 1600,
-    "se": 2.9122843762844375,
-    "mde": 8.285937005726833,
-    "naive_fpr": 0.1707346671423195
+    "se": 2.457724914179532,
+    "mde": 6.9385475655925415,
+    "naive_fpr": 0.11324172175071716
    },
    {
     "tasks": 500,
     "runs": 8,
     "repeats": 1,
     "trials_per_arm": 4000,
-    "se": 2.451100652030771,
-    "mde": 7.06858119788972,
-    "naive_fpr": 0.30382572860714685
+    "se": 1.9188041306776087,
+    "mde": 5.460047132604877,
+    "naive_fpr": 0.19974936627792475
    },
    {
     "tasks": 10,
     "runs": 10,
     "repeats": 1,
     "trials_per_arm": 100,
-    "se": 9.216024864799705,
-    "mde": 28.734730515525857,
-    "naive_fpr": 0.05398238810575032
+    "se": 8.902950600578095,
+    "mde": 27.891544151435067,
+    "naive_fpr": 0.05201741510681924
    },
    {
     "tasks": 20,
     "runs": 10,
     "repeats": 1,
     "trials_per_arm": 200,
-    "se": 6.649143805659007,
-    "mde": 19.48208907632048,
-    "naive_fpr": 0.05898585943521539
+    "se": 6.36199872354825,
+    "mde": 18.70790641449068,
+    "naive_fpr": 0.054536971331788524
    },
    {
     "tasks": 30,
     "runs": 10,
     "repeats": 1,
     "trials_per_arm": 300,
-    "se": 5.535019996492869,
-    "mde": 15.934375746323855,
-    "naive_fpr": 0.06404702458785425
+    "se": 5.248415050831516,
+    "mde": 15.153058427731398,
+    "naive_fpr": 0.057075414641447005
    },
    {
     "tasks": 50,
     "runs": 10,
     "repeats": 1,
     "trials_per_arm": 500,
-    "se": 4.44710161477898,
-    "mde": 12.645240584812669,
-    "naive_fpr": 0.07428081491498421
+    "se": 4.1475928893379805,
+    "mde": 11.813703619785361,
+    "naive_fpr": 0.06219833427633358
    },
    {
     "tasks": 100,
     "runs": 10,
     "repeats": 1,
     "trials_per_arm": 1000,
-    "se": 3.410558983526782,
-    "mde": 9.638893408870393,
-    "naive_fpr": 0.10000508867758329
+    "se": 3.0732761750461206,
+    "mde": 8.677659283537425,
+    "naive_fpr": 0.07518622030134106
    },
    {
     "tasks": 200,
     "runs": 10,
     "repeats": 1,
     "trials_per_arm": 2000,
-    "se": 2.749456761632732,
-    "mde": 7.786393514183021,
-    "naive_fpr": 0.14937044617279102
+    "se": 2.3592957178606673,
+    "mde": 6.648902930595625,
+    "naive_fpr": 0.10131793915819086
    },
    {
     "tasks": 500,
     "runs": 10,
     "repeats": 1,
     "trials_per_arm": 5000,
-    "se": 2.2618736539585,
-    "mde": 6.470314764847221,
-    "naive_fpr": 0.26812057770146075
+    "se": 1.7997294757939106,
+    "mde": 5.097721709694891,
+    "naive_fpr": 0.17451088454944955
    },
    {
     "tasks": 10,
     "runs": 12,
     "repeats": 1,
     "trials_per_arm": 120,
-    "se": 9.147994287308668,
-    "mde": 28.56553077292287,
-    "naive_fpr": 0.05334294791260374
+    "se": 8.847856003112982,
+    "mde": 27.741688176401873,
+    "naive_fpr": 0.05169555352298242
    },
    {
     "tasks": 20,
     "runs": 12,
     "repeats": 1,
     "trials_per_arm": 240,
-    "se": 6.5799592122855355,
-    "mde": 19.300112095140978,
-    "naive_fpr": 0.057535496729212855
+    "se": 6.312322378448632,
+    "mde": 18.57384126869709,
+    "naive_fpr": 0.05381076938692854
    },
    {
     "tasks": 30,
     "runs": 12,
     "repeats": 1,
     "trials_per_arm": 360,
-    "se": 5.461918266834254,
-    "mde": 15.736413747059926,
-    "naive_fpr": 0.061772128346550055
+    "se": 5.1992659541526045,
+    "mde": 15.019422326184625,
+    "naive_fpr": 0.05593986405028103
    },
    {
     "tasks": 50,
     "runs": 12,
     "repeats": 1,
     "trials_per_arm": 600,
-    "se": 4.365993757229486,
-    "mde": 12.418222516895876,
-    "naive_fpr": 0.07033848994527926
+    "se": 4.096575226216161,
+    "mde": 11.672862785999195,
+    "naive_fpr": 0.06023280739046583
    },
    {
     "tasks": 100,
     "runs": 12,
     "repeats": 1,
     "trials_per_arm": 1200,
-    "se": 3.314198883457162,
-    "mde": 9.358512669583176,
-    "naive_fpr": 0.09196555377666836
+    "se": 3.0156425808733007,
+    "mde": 8.51453015903784,
+    "naive_fpr": 0.07111355205986002
    },
    {
     "tasks": 200,
     "runs": 12,
     "repeats": 1,
     "trials_per_arm": 2400,
-    "se": 2.6353217288558195,
-    "mde": 7.443540116845417,
-    "naive_fpr": 0.1342091511448584
+    "se": 2.291328429392059,
+    "mde": 6.451421209483805,
+    "naive_fpr": 0.09310906881839641
    },
    {
     "tasks": 500,
     "runs": 12,
     "repeats": 1,
     "trials_per_arm": 6000,
-    "se": 2.126387650420821,
-    "mde": 6.051607739429047,
-    "naive_fpr": 0.2407832709529466
+    "se": 1.7157614778280628,
+    "mde": 4.846131903975156,
+    "naive_fpr": 0.1562565606856674
    },
    {
     "tasks": 10,
     "runs": 13,
     "repeats": 1,
     "trials_per_arm": 130,
-    "se": 9.12169358055646,
-    "mde": 28.500409745669458,
-    "naive_fpr": 0.053094491617669534
+    "se": 8.826574204121126,
+    "mde": 27.68389153229658,
+    "naive_fpr": 0.05157028776893982
    },
    {
     "tasks": 20,
     "runs": 13,
     "repeats": 1,
     "trials_per_arm": 260,
-    "se": 6.5531552675877816,
-    "mde": 19.229953069179018,
-    "naive_fpr": 0.05697258386371205
+    "se": 6.293111678519822,
+    "mde": 18.522091306531614,
+    "naive_fpr": 0.053528359716483544
    },
    {
     "tasks": 30,
     "runs": 13,
     "repeats": 1,
     "trials_per_arm": 390,
-    "se": 5.433540345756439,
-    "mde": 15.660004178290745,
-    "naive_fpr": 0.0608896336756369
+    "se": 5.180238289642469,
+    "mde": 14.967804772184941,
+    "naive_fpr": 0.05549852247743376
    },
    {
     "tasks": 50,
     "runs": 13,
     "repeats": 1,
     "trials_per_arm": 650,
-    "se": 4.334394314231531,
-    "mde": 12.330417461109148,
-    "naive_fpr": 0.0688085792309179
+    "se": 4.076783051476031,
+    "mde": 11.618399116117343,
+    "naive_fpr": 0.059469415337161324
    },
    {
     "tasks": 100,
     "runs": 13,
     "repeats": 1,
     "trials_per_arm": 1300,
-    "se": 3.2763827779965413,
-    "mde": 9.249552175419149,
-    "naive_fpr": 0.08882786775826214
+    "se": 2.9931803374162804,
+    "mde": 8.451273800371915,
+    "naive_fpr": 0.06953116922264428
    },
    {
     "tasks": 200,
     "runs": 13,
     "repeats": 1,
     "trials_per_arm": 2600,
-    "se": 2.5900847720310605,
-    "mde": 7.309264502010833,
-    "naive_fpr": 0.12818366768966627
+    "se": 2.2646440722643475,
+    "mde": 6.374450434120014,
+    "naive_fpr": 0.08990054601958428
    },
    {
     "tasks": 500,
     "runs": 13,
     "repeats": 1,
     "trials_per_arm": 6500,
-    "se": 2.071919915759319,
-    "mde": 5.885474613871271,
-    "naive_fpr": 0.22939808752006752
+    "se": 1.6823505339524258,
+    "mde": 4.7469438905966355,
+    "naive_fpr": 0.14892020370088077
    },
    {
     "tasks": 10,
     "runs": 15,
     "repeats": 1,
     "trials_per_arm": 150,
-    "se": 9.07945398427998,
-    "mde": 28.396162532855186,
-    "naive_fpr": 0.05269401759819914
+    "se": 8.792416181420839,
+    "mde": 27.59123022919268,
+    "naive_fpr": 0.051368132401160914
    },
    {
     "tasks": 20,
     "runs": 15,
     "repeats": 1,
     "trials_per_arm": 300,
-    "se": 6.510039410199375,
-    "mde": 19.117490268875258,
-    "naive_fpr": 0.05606606358972321
+    "se": 6.262251979958747,
+    "mde": 18.439071012385334,
+    "naive_fpr": 0.05307287580009298
    },
    {
     "tasks": 30,
     "runs": 15,
     "repeats": 1,
     "trials_per_arm": 450,
-    "se": 5.387824787943599,
-    "mde": 15.537410013008964,
-    "naive_fpr": 0.05946912555626011
+    "se": 5.149647791667504,
+    "mde": 14.88495564261635,
+    "naive_fpr": 0.054787035359984346
    },
    {
     "tasks": 50,
     "runs": 15,
     "repeats": 1,
     "trials_per_arm": 750,
-    "se": 4.28335034805278,
-    "mde": 12.189310152395855,
-    "naive_fpr": 0.06634595604901425
+    "se": 4.04491413906513,
+    "mde": 11.530902790592123,
+    "naive_fpr": 0.05823949592332302
    },
    {
     "tasks": 100,
     "runs": 15,
     "repeats": 1,
     "trials_per_arm": 1500,
-    "se": 3.2149519278057888,
-    "mde": 9.07379065623148,
-    "naive_fpr": 0.08375965769163621
+    "se": 2.956885845454006,
+    "mde": 8.34943530809267,
+    "naive_fpr": 0.06698191851582704
    },
    {
     "tasks": 200,
     "runs": 15,
     "repeats": 1,
     "trials_per_arm": 3000,
-    "se": 2.5160144564511744,
-    "mde": 7.091320101415678,
-    "naive_fpr": 0.11832558649248741
+    "se": 2.2212824355234244,
+    "mde": 6.250039760865248,
+    "naive_fpr": 0.0847123802470062
    },
    {
     "tasks": 500,
     "runs": 15,
     "repeats": 1,
     "trials_per_arm": 7500,
-    "se": 1.9816600246391367,
-    "mde": 5.612862837868136,
-    "naive_fpr": 0.21007357796343432
+    "se": 1.6274669617402533,
+    "mde": 4.585154222436549,
+    "naive_fpr": 0.13681612823629954
    },
    {
     "tasks": 10,
     "runs": 20,
     "repeats": 1,
     "trials_per_arm": 200,
-    "se": 9.010392323571887,
-    "mde": 28.22661162651911,
-    "naive_fpr": 0.05203542824514401
+    "se": 8.736624563456964,
+    "mde": 27.440159364298733,
+    "naive_fpr": 0.051035012448958035
    },
    {
     "tasks": 20,
     "runs": 20,
     "repeats": 1,
     "trials_per_arm": 400,
-    "se": 6.439360450336412,
-    "mde": 18.93414672314554,
-    "naive_fpr": 0.05457763717130782
+    "se": 6.211777999214966,
+    "mde": 18.30356969851373,
+    "naive_fpr": 0.052323071746168
    },
    {
     "tasks": 30,
     "runs": 20,
     "repeats": 1,
     "trials_per_arm": 600,
-    "se": 5.312698065727177,
-    "mde": 15.337222354327746,
-    "naive_fpr": 0.05713902977568006
+    "se": 5.099546871481976,
+    "mde": 14.749616117189536,
+    "naive_fpr": 0.05361676528879248
    },
    {
     "tasks": 50,
     "runs": 20,
     "repeats": 1,
     "trials_per_arm": 1000,
-    "se": 4.199080723225133,
-    "mde": 11.958218356069585,
-    "naive_fpr": 0.06230849564088283
+    "se": 3.9925846516723995,
+    "mde": 11.387744692974202,
+    "naive_fpr": 0.05621885834120898
    },
    {
     "tasks": 100,
     "runs": 20,
     "repeats": 1,
     "trials_per_arm": 2000,
-    "se": 3.1125419767604123,
-    "mde": 8.7840209695326,
-    "naive_fpr": 0.0754143608921122
+    "se": 2.8969376297249343,
+    "mde": 8.182187895792396,
+    "naive_fpr": 0.06279683030036776
    },
    {
     "tasks": 200,
     "runs": 20,
     "repeats": 1,
     "trials_per_arm": 4000,
-    "se": 2.3907607315586756,
-    "mde": 6.727958742932212,
-    "naive_fpr": 0.10177550398152263
+    "se": 2.1489544772724885,
+    "mde": 6.04429750520016,
+    "naive_fpr": 0.07615508104603809
    },
    {
     "tasks": 500,
     "runs": 20,
     "repeats": 1,
     "trials_per_arm": 10000,
-    "se": 1.8254940335819745,
-    "mde": 5.148839652100317,
-    "naive_fpr": 0.17550686778396
+    "se": 1.5340990757814064,
+    "mde": 4.313172003230639,
+    "naive_fpr": 0.11621384919051876
    }
   ],
   "targets": {
@@ -1349,37 +1502,37 @@
     {
      "runs": 6,
      "repeats": 1,
-     "tasks": null
+     "tasks": 37591
     },
     {
      "runs": 8,
      "repeats": 1,
-     "tasks": null
+     "tasks": 841
     },
     {
      "runs": 10,
      "repeats": 1,
-     "tasks": null
+     "tasks": 545
     },
     {
      "runs": 12,
      "repeats": 1,
-     "tasks": 15077
+     "tasks": 444
     },
     {
      "runs": 13,
      "repeats": 1,
-     "tasks": 2439
+     "tasks": 415
     },
     {
      "runs": 15,
      "repeats": 1,
-     "tasks": 1067
+     "tasks": 376
     },
     {
      "runs": 20,
      "repeats": 1,
-     "tasks": 570
+     "tasks": 326
     }
    ],
    "10": [
@@ -1391,63 +1544,63 @@
     {
      "runs": 2,
      "repeats": 1,
-     "tasks": null
+     "tasks": 340
     },
     {
      "runs": 3,
      "repeats": 1,
-     "tasks": null
+     "tasks": 133
     },
     {
      "runs": 4,
      "repeats": 1,
-     "tasks": 340
+     "tasks": 103
     },
     {
      "runs": 5,
      "repeats": 1,
-     "tasks": 169
+     "tasks": 90
     },
     {
      "runs": 6,
      "repeats": 1,
-     "tasks": 130
+     "tasks": 84
     },
     {
      "runs": 8,
      "repeats": 1,
-     "tasks": 102
+     "tasks": 76
     },
     {
      "runs": 10,
      "repeats": 1,
-     "tasks": 91
+     "tasks": 72
     },
     {
      "runs": 12,
      "repeats": 1,
-     "tasks": 85
+     "tasks": 70
     },
     {
      "runs": 13,
      "repeats": 1,
-     "tasks": 82
+     "tasks": 69
     },
     {
      "runs": 15,
      "repeats": 1,
-     "tasks": 79
+     "tasks": 68
     },
     {
      "runs": 20,
      "repeats": 1,
-     "tasks": 74
+     "tasks": 66
     }
    ]
   },
-  "reference_mde_unpaired": 25.8307936916927
+  "reference_mde_unpaired": 21.619496145758617
  },
- "key": "738dc3e76672e44d",
- "table_sha256": "70863b757a07a3104658dc1b657c7cb3b9e1018d07a0bd0c43c02c63f43e0ddc",
- "seconds": 53.58
+ "key": "2655b3c5e59ac51e",
+ "table_sha256": "7ff868ae3bdc516234e95d8ffc86e88c1bc4dfe55e8dd20b9c8d9d10688fadac",
+ "seconds": 53.16
 }
