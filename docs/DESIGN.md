@@ -34,7 +34,11 @@ y_airk = mu_a + u_i + v_ai + w_ar + g_air + e_airk
 All effects are independent with mean zero, and the variances are common to all arms
 (a working assumption: the study reports per-arm run and item x run estimates, run
 estimates leaving each arm out, and Bartlett's test that the arms share one item x run
-variance). Runs are nested in arms:
+variance). There is no term for groups of items above the cluster: if a run shifts some
+task families more than others, the model reads part of that family x run effect as `run`,
+which would shrink with more families but not with more items per family. Where a table
+names item families the study reports family-clustered pair SEs and run shifts by family.
+Runs are nested in arms:
 run `r1` of arm A has nothing to do with run `r1` of arm B. Scores are analysed on their own
 scale; pass/fail outcomes are 0/1 (or 0/100 for percentage points), which makes the
 components variances of a linear probability model. That is the right scale for the
@@ -46,8 +50,9 @@ simulated binary data.
 - The five variance components above, reported as standard deviations in the score's
   unit, with 95% intervals.
 - `ICC item = item / (item + item_arm + run + item_run + within)`: the correlation between
-  trials of two different arms on the same item. It is large in every dataset here, which is why
-  paired comparisons are so much more efficient than unpaired ones.
+  trials of two different arms on the same item. It ranges from 0.09 (`ruleproof-main`) to
+  0.91 (`mm-arena-replicated`) here; where it is large, paired comparisons are much more
+  efficient than unpaired ones.
 - For a comparison of two arms on `T` items with `R` runs per arm and `K` repeats per item
   per run, the variance of the difference in arm means:
 
@@ -60,8 +65,10 @@ unpaired:  V = 2 (item + item_arm + item_run / R + within / (R K)) / T  +  2 run
   probability `power` by a two-sided level-`alpha` test.
 - The naive false-positive rate: how often a test that estimates only the item-level part
   of `V` (a paired t-test over items, or any clustered SE that ignores runs) declares a
-  difference between two arms that are identical, when each arm has `R` runs:
-  `2 (1 - Phi(z_{1-alpha/2} sqrt(V_items / (V_items + V_run))))`.
+  difference between two arms with equal mean scores, when each arm has `R` runs:
+  `2 (1 - Phi(z_{1-alpha/2} sqrt(V_items / (V_items + V_run))))`. `V_items` keeps
+  `item_arm`: the arms agree on average but not item by item. For two literally identical
+  arms `item_arm` is 0 and the rate is higher.
 
 The run term has no `T` in its denominator: more tasks or repeats never remove it. Only
 more runs per arm do, or a design in which both arms share each run's shock (for example
@@ -84,7 +91,8 @@ handles each case conservatively: a folded component is put where it does not sh
 the planned repeats or runs, so the reported MDE is never smaller than the model implies.
 The run variance is the exception: without replicate runs it is simply unknown, and the
 planner refuses to guess. The user must pass it (`--run-var`, possibly from another
-dataset) or explicitly assume zero, and the study labels every such MDE a lower bound.
+dataset) or explicitly assume zero, and the study says every such MDE assumes no run
+effect (it understates the MDE if runs vary).
 
 ## 5. Estimators
 
@@ -105,10 +113,13 @@ dataset) or explicitly assume zero, and the study labels every such MDE a lower 
    items-only SE, a cluster-robust SE (sums of centred differences per cluster; equal to
    the items-only SE with one item per cluster), the number of items on which the arms
    differ, and the pair's own `item_arm` (half the excess variance of the differences).
-   The study tests each pair over clusters (clusters - 1 df) and, adding `run / R_eff`
-   per arm, with Satterthwaite df using the run term's own df. It also reports the median
-   design effect (clustered over items-only SE, squared) and flags pairs that differ on
-   fewer than 10 items.
+   The study tests each pair over clusters (clusters - 1 df) and, adding `run / R` per arm
+   (`R` its number of runs: the run-adjusted item means average every run's shock equally,
+   so a partial run counts as a whole one), with Satterthwaite df using the run term's own
+   df; and again with the run variance re-estimated without each replicated arm. It also
+   reports the median design effect (clustered over items-only SE, squared), the same for
+   item families where the table names them, and flags pairs that differ on fewer than 10
+   items.
 
 **REML** (`evalnoise.reml`): the same model fitted by restricted maximum likelihood with a
 dense marginal covariance and analytic gradients (L-BFGS-B), as a cross-check. On balanced
@@ -221,13 +232,18 @@ Trials without a verdict (agent errors) are excluded and counted in the manifest
 - Common variances across arms. Pass/fail data violate this (variance `p(1 - p)`): near
   the ceiling a planned drop is detected less often than planned and a gain more often
   (see the binary checks). The mm-arena setups violate it too (item x run SD 5.9 to 18.0).
-- Items are independent in the planner. Clustered items (mm-arena's seeds within games)
-  make its task counts too small by the design effect, which the study reports.
-- MDEs with a run variance borrowed on few df are somewhat optimistic (power 0.76 at a
-  planned 0.80 with 4 df).
+- Items are independent in the planner. Clustered items (mm-arena's seeds within games,
+  and its task families) make its task counts too small by the design effect, which the
+  study reports.
+- MDEs with a run variance borrowed on few df may be slightly optimistic (power 0.76 at a
+  planned 0.80 with 4 df; Monte Carlo interval 0.72 to 0.80 at 400 simulations, so not
+  distinguishable from 0.80).
 - Runs are assumed exchangeable. A run effect that is really a version change (a harness
   update between runs) is a fixed shift, not a draw from a distribution; the model treats
   it as random because nothing records which runs share a version.
-- Normal-theory intervals for the run variance, with very few degrees of freedom.
+- Normal-theory intervals for the run variance, with very few degrees of freedom. The
+  chi-square interval treats the residual as known; it is degenerate (reported as such)
+  when the runs agree more closely than the residual allows, and its upper end is not
+  capped at the largest SD a bounded score allows.
 - The percentile bootstrap undercovers for variance components with few items (see
   `results/validation/`).
