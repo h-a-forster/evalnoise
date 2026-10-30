@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T04:41:56Z",
+ "created": "2026-10-30T05:37:54Z",
  "arms": [
   "haiku",
   "sonnet"
@@ -136,13 +136,18 @@
    "within": null
   }
  },
+ "run_by_arm": {},
  "pair_estimates": {
   "haiku - sonnet": {
    "items": 50,
+   "items_differing": 3,
    "difference": -2.0,
    "se_items": 3.4875873187810575,
    "var_d": 608.1632653061224,
-   "item_arm": 304.0816326530612
+   "item_arm": 304.0816326530612,
+   "clusters": 50,
+   "se_clusters": 3.4875873187810584,
+   "p_items": 0.5689544686260504
   }
  },
  "planning": {
@@ -150,10 +155,14 @@
   "power": 0.8,
   "run_df": null,
   "run_assumption": "zero (not identified)",
+  "few_items_differing": {
+   "haiku - sonnet": 3
+  },
   "notes": [
    "run variance set to 0 (not identified by the data)",
    "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
-   "no repeats or replicate runs: trial noise is folded into the item terms, so repeats are assumed not to help (conservative)"
+   "no repeats or replicate runs: trial noise is folded into the item terms, so repeats are assumed not to help (conservative)",
+   "arms differ on fewer than 10 items (haiku - sonnet: 3): SEs, MDEs and their intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 50,
@@ -766,7 +775,7 @@
   },
   "reference_mde_unpaired": 12.44520915691512
  },
- "key": "adb4b491c7d08495",
+ "key": "8af718618d761504",
  "table_sha256": "e112d08b30680b4e0de790a74201ae7509301cbbf2eaab9152f7787d0cd77d30",
- "seconds": 12.78
+ "seconds": 7.91
 }

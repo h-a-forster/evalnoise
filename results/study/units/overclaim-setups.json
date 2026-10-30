@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T04:42:11Z",
+ "created": "2026-10-30T05:38:03Z",
  "arms": [
   "haiku-high",
   "haiku-low",
@@ -242,48 +242,73 @@
    "within": 217.3913043478261
   }
  },
+ "run_by_arm": {},
  "pair_estimates": {
   "haiku-high - haiku-low": {
    "items": 23,
+   "items_differing": 2,
    "difference": 4.3478260869565215,
    "se_items": 3.0036925204685105,
    "var_d": 207.50988142292488,
-   "item_arm": -59.288537549407096
+   "item_arm": -59.288537549407096,
+   "clusters": 23,
+   "se_clusters": 3.0036925204685105,
+   "p_items": 0.16185962330719791
   },
   "haiku-high - sonnet-high": {
    "items": 23,
+   "items_differing": 2,
    "difference": 0.0,
    "se_items": 3.143473067309657,
    "var_d": 227.27272727272728,
-   "item_arm": -49.407114624505894
+   "item_arm": -49.407114624505894,
+   "clusters": 23,
+   "se_clusters": 3.143473067309657,
+   "p_items": 1.0
   },
   "haiku-high - sonnet-low": {
    "items": 23,
+   "items_differing": 2,
    "difference": 0.0,
    "se_items": 3.143473067309657,
    "var_d": 227.27272727272728,
-   "item_arm": -49.407114624505894
+   "item_arm": -49.407114624505894,
+   "clusters": 23,
+   "se_clusters": 3.143473067309657,
+   "p_items": 1.0
   },
   "haiku-low - sonnet-high": {
    "items": 23,
+   "items_differing": 4,
    "difference": -4.3478260869565215,
    "se_items": 4.3478260869565215,
    "var_d": 434.7826086956522,
-   "item_arm": 54.34782608695656
+   "item_arm": 54.34782608695656,
+   "clusters": 23,
+   "se_clusters": 4.3478260869565215,
+   "p_items": 0.3281832618806708
   },
   "haiku-low - sonnet-low": {
    "items": 23,
+   "items_differing": 4,
    "difference": -4.3478260869565215,
    "se_items": 4.3478260869565215,
    "var_d": 434.7826086956521,
-   "item_arm": 54.3478260869565
+   "item_arm": 54.3478260869565,
+   "clusters": 23,
+   "se_clusters": 4.3478260869565215,
+   "p_items": 0.3281832618806708
   },
   "sonnet-high - sonnet-low": {
    "items": 23,
+   "items_differing": 2,
    "difference": 0.0,
    "se_items": 3.143473067309657,
    "var_d": 227.27272727272728,
-   "item_arm": -49.407114624505894
+   "item_arm": -49.407114624505894,
+   "clusters": 23,
+   "se_clusters": 3.143473067309657,
+   "p_items": 1.0
   }
  },
  "planning": {
@@ -291,9 +316,18 @@
   "power": 0.8,
   "run_df": null,
   "run_assumption": "zero (not identified)",
+  "few_items_differing": {
+   "haiku-high - haiku-low": 2,
+   "haiku-high - sonnet-high": 2,
+   "haiku-high - sonnet-low": 2,
+   "haiku-low - sonnet-high": 4,
+   "haiku-low - sonnet-low": 4,
+   "sonnet-high - sonnet-low": 2
+  },
   "notes": [
    "run variance set to 0 (not identified by the data)",
-   "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)"
+   "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
+   "arms differ on fewer than 10 items (haiku-high - haiku-low: 2; haiku-high - sonnet-high: 2; haiku-high - sonnet-low: 2; haiku-low - sonnet-high: 4; haiku-low - sonnet-low: 4; sonnet-high - sonnet-low: 2): SEs, MDEs and their intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 23,
@@ -906,7 +940,7 @@
   },
   "reference_mde_unpaired": 37.87215902734819
  },
- "key": "ee5c0c25fbbf21cc",
+ "key": "c6a9b9957f0316fe",
  "table_sha256": "5411264a02977cea7301a97ead09dcbee9a74848c8b982ff95bfb884345ff8c6",
- "seconds": 14.52
+ "seconds": 9.2
 }

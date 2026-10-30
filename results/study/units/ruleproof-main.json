@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "Only 5 tasks: item components are very imprecise. Replicate runs exist for the 3 hook arms, on different hook builds.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T04:42:45Z",
+ "created": "2026-10-30T05:38:24Z",
  "arms": [
   "haiku45-long",
   "haiku45-long-hook",
@@ -247,54 +247,140 @@
    "within": 0.0
   }
  },
+ "run_by_arm": {
+  "arms": {
+   "haiku45-long-hook": {
+    "run": 0.0,
+    "run_interval": [
+     0.0,
+     0.0
+    ],
+    "run_df": 1,
+    "item_run": -166.66666666666669,
+    "residual_df": 4
+   },
+   "haiku55-long-hook": {
+    "run": -55.55555555555556,
+    "run_interval": [
+     0.0,
+     0.0
+    ],
+    "run_df": 1,
+    "item_run": 111.11111111111109,
+    "residual_df": 4
+   },
+   "sonnet-long-hook": {
+    "run": -2.842170943040401e-15,
+    "run_interval": [
+     0.0,
+     22605.739327103714
+    ],
+    "run_df": 1,
+    "item_run": -55.5555555555556,
+    "residual_df": 4
+   }
+  },
+  "leave_one_out": {
+   "haiku45-long-hook": {
+    "run": -27.77777777777778,
+    "run_interval": [
+     0.0,
+     399.97655783563516
+    ]
+   },
+   "haiku55-long-hook": {
+    "run": -1.4210854715202005e-15,
+    "run_interval": [
+     0.0,
+     427.7543356134129
+    ]
+   },
+   "sonnet-long-hook": {
+    "run": -27.77777777777778,
+    "run_interval": [
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "residual_homogeneity": {
+   "statistic": null,
+   "df": 2,
+   "p": null
+  }
+ },
  "pair_estimates": {
   "haiku45-long-hook - haiku45-long": {
    "items": 5,
+   "items_differing": 4,
    "difference": 66.66666666666666,
    "se_items": 18.257418583505537,
    "var_d": 1666.6666666666665,
    "item_arm": 736.1111111111111,
+   "clusters": 5,
+   "se_clusters": 18.257418583505533,
+   "p_items": 0.02174297846523663,
    "runs_eff": [
     2.0,
     1.0
    ],
-   "se_with_run": 18.257418583505537
+   "se_with_run": 18.257418583505533,
+   "df_with_run": 4.0,
+   "p_with_run": 0.02174297846523663
   },
   "haiku45-short - haiku45-long": {
    "items": 5,
+   "items_differing": 4,
    "difference": 46.66666666666667,
    "se_items": 16.996731711975947,
    "var_d": 1444.4444444444443,
    "item_arm": 592.5925925925926,
+   "clusters": 5,
+   "se_clusters": 16.996731711975947,
+   "p_items": 0.0516059578111747,
    "runs_eff": [
     1.0,
     1.0
    ],
-   "se_with_run": 16.996731711975947
+   "se_with_run": 16.996731711975947,
+   "df_with_run": 4.0,
+   "p_with_run": 0.0516059578111747
   },
   "haiku55-long-hook - haiku55-long": {
    "items": 5,
+   "items_differing": 3,
    "difference": 6.666666666666666,
    "se_items": 15.45603082582617,
    "var_d": 1194.4444444444441,
    "item_arm": 499.9999999999999,
+   "clusters": 5,
+   "se_clusters": 15.45603082582617,
+   "p_items": 0.6884570897760042,
    "runs_eff": [
     2.0,
     1.0
    ],
-   "se_with_run": 15.45603082582617
+   "se_with_run": 15.45603082582617,
+   "df_with_run": 4.0,
+   "p_with_run": 0.6884570897760042
   },
   "haiku55-short - haiku55-long": {
    "items": 5,
+   "items_differing": 2,
    "difference": 26.666666666666664,
    "se_items": 16.329931618554518,
    "var_d": 1333.333333333333,
    "item_arm": 537.037037037037,
+   "clusters": 5,
+   "se_clusters": 16.329931618554518,
+   "p_items": 0.17780780835622123,
    "runs_eff": [
     1.0,
     1.0
    ],
-   "se_with_run": 16.329931618554518
+   "se_with_run": 16.329931618554518,
+   "df_with_run": 4.0,
+   "p_with_run": 0.17780780835622123
   }
  },
  "planning": {
@@ -302,7 +388,15 @@
   "power": 0.8,
   "run_df": 3.0,
   "run_assumption": "estimated",
-  "notes": [],
+  "few_items_differing": {
+   "haiku45-long-hook - haiku45-long": 4,
+   "haiku45-short - haiku45-long": 4,
+   "haiku55-long-hook - haiku55-long": 3,
+   "haiku55-short - haiku55-long": 2
+  },
+  "notes": [
+   "arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 4; haiku45-short - haiku45-long: 4; haiku55-long-hook - haiku55-long: 3; haiku55-short - haiku55-long: 2): SEs, MDEs and their intervals rest on those few items and are unreliable"
+  ],
   "observed_design": {
    "tasks": 5,
    "runs": 1,
@@ -924,7 +1018,7 @@
   },
   "reference_mde_unpaired": 51.293688541559995
  },
- "key": "ace1d4a6d6a075bb",
+ "key": "09177a5e94ec5f7c",
  "table_sha256": "36b16ad4867ed5d75ccf35248b3de0df198da1dea33487fc45cf7ce71445a5e0",
- "seconds": 24.01
+ "seconds": 11.14
 }

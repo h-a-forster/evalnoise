@@ -26,7 +26,8 @@ table = "mm-arena"
 score = "edge_pp"
 unit = "pp"
 arms = "replicated"
-runs = [1, 2, 3, 5, 10, 20]
+runs = [1, 2, 3, 4, 5, 6, 8, 10, 12, 13, 15, 20]
+repeats = [1]
 targets = [5, 10]
 note = "Episode = item, game = bootstrap cluster. Partial replicate runs are included; the run fit adjusts for which episodes they cover."
 
@@ -43,7 +44,8 @@ pairs = [
   ["claude-cli:claude-opus-5-5@high", "claude-cli:claude-haiku-5-5@high"],
   ["claude-cli:claude-sonnet-5-5@high", "claude-cli:claude-sonnet-5-5@low"],
 ]
-runs = [1, 2, 3, 5, 10, 20]
+runs = [1, 2, 3, 4, 5, 6, 8, 10, 12, 13, 15, 20]
+repeats = [1]
 targets = [5, 10]
 note = "Pools single-run setups with the replicated ones: the residual is assumed equal across setups."
 

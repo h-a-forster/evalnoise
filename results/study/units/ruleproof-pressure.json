@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "Only 5 tasks; opus-long has one repeat per task.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T04:42:55Z",
+ "created": "2026-10-30T05:38:34Z",
  "arms": [
   "haiku45-long",
   "haiku45-long-control",
@@ -188,20 +188,29 @@
    "within": 1333.3333333333333
   }
  },
+ "run_by_arm": {},
  "pair_estimates": {
   "haiku45-long-hook - haiku45-long": {
    "items": 5,
+   "items_differing": 3,
    "difference": 26.666666666666668,
    "se_items": 12.472191289246473,
    "var_d": 777.7777777777778,
-   "item_arm": -55.55555555555543
+   "item_arm": -55.55555555555543,
+   "clusters": 5,
+   "se_clusters": 12.47219128924647,
+   "p_items": 0.09930068321372679
   },
   "haiku45-long-control - haiku45-long": {
    "items": 5,
+   "items_differing": 3,
    "difference": 33.333333333333336,
    "se_items": 14.907119849998598,
    "var_d": 1111.111111111111,
-   "item_arm": 111.1111111111112
+   "item_arm": 111.1111111111112,
+   "clusters": 5,
+   "se_clusters": 14.907119849998598,
+   "p_items": 0.08900934250008567
   }
  },
  "planning": {
@@ -209,9 +218,14 @@
   "power": 0.8,
   "run_df": null,
   "run_assumption": "zero (not identified)",
+  "few_items_differing": {
+   "haiku45-long-hook - haiku45-long": 3,
+   "haiku45-long-control - haiku45-long": 3
+  },
   "notes": [
    "run variance set to 0 (not identified by the data)",
-   "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)"
+   "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
+   "arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 3; haiku45-long-control - haiku45-long: 3): SEs, MDEs and their intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 5,
@@ -824,7 +838,7 @@
   },
   "reference_mde_unpaired": 69.69439863860852
  },
- "key": "5b44fd8c16caef62",
+ "key": "073f858166af864c",
  "table_sha256": "5f4a02c6d45504d5265b8fd915a11889a84e3d8a06b61afdef460c7143be8b7d",
- "seconds": 9.79
+ "seconds": 9.35
 }

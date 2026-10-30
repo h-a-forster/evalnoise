@@ -1,0 +1,55 @@
+{
+ "name": "binary-p90-t50-k3-up",
+ "kind": "binary",
+ "key": "190af1d16d01df9d",
+ "seed": 3945396338,
+ "sims": 500,
+ "design": {
+  "tasks": 50,
+  "runs": 1,
+  "repeats": 3,
+  "paired": true
+ },
+ "components": {
+  "item": 2.0,
+  "item_arm": 0.3,
+  "run": 0.0,
+  "item_run": 0.0,
+  "within": 0.0,
+  "absorbed": {}
+ },
+ "context": {
+  "mde": 0.09600867527624453,
+  "logit_shift": 3.671571807819939,
+  "base_pass": 0.899996691654616,
+  "pilot": {
+   "item": 0.015154063700245756,
+   "item_arm": 0.004156508959776727,
+   "run": NaN,
+   "item_run": NaN,
+   "within": 0.07216666666666667,
+   "absorbed": {
+    "item_run": "item_arm"
+   }
+  }
+ },
+ "rates": {
+  "null": {
+   "rate": 0.048,
+   "mc95": [
+    0.03099316879350537,
+    0.07058079625732981
+   ],
+   "nominal": 0.05
+  },
+  "at_mde": {
+   "rate": 0.984,
+   "mc95": [
+    0.9687179983101469,
+    0.9930676787975165
+   ],
+   "nominal": 0.8
+  }
+ },
+ "seconds": 2.97
+}

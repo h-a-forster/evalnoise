@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T04:41:33Z",
+ "created": "2026-10-30T05:37:39Z",
  "arms": [
   "control",
   "no-tests"
@@ -134,13 +134,18 @@
    "within": 466.66666666666663
   }
  },
+ "run_by_arm": {},
  "pair_estimates": {
   "control - no-tests": {
    "items": 50,
+   "items_differing": 9,
    "difference": 2.666666666666666,
    "se_items": 2.3015325663989663,
    "var_d": 264.8526077097506,
-   "item_arm": 10.204081632653072
+   "item_arm": 10.204081632653072,
+   "clusters": 50,
+   "se_clusters": 2.301532566398966,
+   "p_items": 0.2522153641572941
   }
  },
  "planning": {
@@ -148,9 +153,13 @@
   "power": 0.8,
   "run_df": null,
   "run_assumption": "zero (not identified)",
+  "few_items_differing": {
+   "control - no-tests": 9
+  },
   "notes": [
    "run variance set to 0 (not identified by the data)",
-   "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)"
+   "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
+   "arms differ on fewer than 10 items (control - no-tests: 9): SEs, MDEs and their intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 50,
@@ -763,7 +772,7 @@
   },
   "reference_mde_unpaired": 10.190014238872074
  },
- "key": "4c7d53f3f6d72435",
+ "key": "f5b7fb1ce829bcda",
  "table_sha256": "91cfb1d7a719124da07926186b1d273c64f0d4a5f19405a7f89378d44bcdfe2a",
- "seconds": 11.51
+ "seconds": 7.84
 }

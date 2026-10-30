@@ -1,0 +1,44 @@
+{
+ "name": "borrowed-t120-r1",
+ "kind": "borrowed",
+ "key": "9b71e9bfe07aca9d",
+ "seed": 3424778871,
+ "sims": 400,
+ "design": {
+  "tasks": 120,
+  "runs": 1,
+  "repeats": 1,
+  "paired": true
+ },
+ "components": {
+  "item": 400.0,
+  "item_arm": 60.0,
+  "run": 20.0,
+  "item_run": 100.0,
+  "within": 0.0,
+  "absorbed": {}
+ },
+ "context": {
+  "mde": 23.564519078095906,
+  "run_df": 4.0
+ },
+ "rates": {
+  "null": {
+   "rate": 0.0575,
+   "mc95": [
+    0.0367955195092716,
+    0.08503159529781051
+   ],
+   "nominal": 0.05
+  },
+  "at_mde": {
+   "rate": 0.7625,
+   "mc95": [
+    0.7176896924782318,
+    0.8033774298938208
+   ],
+   "nominal": 0.8
+  }
+ },
+ "seconds": 7.36
+}
