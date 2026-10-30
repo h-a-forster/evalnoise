@@ -99,3 +99,18 @@ Next:
 4. Datasets with repeats but one run per arm cannot identify the run variance. A rerun of
    one agent-ab or overclaim arm would make it estimable there.
 5. Consider a per-arm (heteroscedastic) residual for pass/fail data.
+
+Open audit items (verified, not yet done):
+
+6. The planner counts items as independent; the study only reports design effects
+   (game, family). Add a design effect to `tasks_needed` and a family x run component.
+7. Pass/fail MDEs use the variance at the base rate; use the variance at the shifted
+   rate (optimistic for drops near 0 or 100% now).
+8. `RunTerm.interval` treats the residual as known and is not capped by the score range;
+   consider Burdick-Graybill and a cap for bounded scores.
+9. Validation lacks a coverage check with partial runs and unequal residuals, and a size
+   check of the run-aware pair test (`study._pairs_with_run_term`) on an mm-arena layout.
+10. Bartlett's test is too liberal with heavy-tailed residuals; report Brown-Forsythe,
+    which needs `_run_fit` to return per-arm residuals.
+11. `tests/test_validation_slow.py` allows slack 0.12 for coverage and binary checks;
+    tighten to about 3 Monte Carlo SEs and list the known-liberal checks by name.
