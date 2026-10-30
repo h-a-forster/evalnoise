@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evalnoise"
+version = "0.1.0"
+description = "Variance components of agent-eval scores, and how many tasks, repeats and runs a comparison needs."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "evalnoise contributors" }]
+keywords = [
+    "llm evaluation", "agent evaluation", "variance components", "power analysis",
+    "minimum detectable effect", "mixed models", "statistics",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["numpy>=1.26", "scipy>=1.11", "pandas>=2.1"]
+
+[project.urls]
+Homepage = "https://github.com/h-a-forster/evalnoise"
+Documentation = "https://github.com/h-a-forster/evalnoise/tree/main/docs"
+Issues = "https://github.com/h-a-forster/evalnoise/issues"
+Changelog = "https://github.com/h-a-forster/evalnoise/blob/main/CHANGELOG.md"
+
+[project.scripts]
+evalnoise = "evalnoise.cli:main"
+
+[dependency-groups]
+# statsmodels is only a reference implementation for the REML tests.
+dev = ["pytest>=8", "ruff>=0.6", "statsmodels>=0.14.2"]
+
+[tool.uv]
+# Lock only releases at least two weeks old; move this date deliberately.
+exclude-newer = "2026-10-16T00:00:00Z"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/evalnoise"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/evalnoise", "tests", "docs", "scripts", "results", "README.md", "REPORT.md",
+    "LICENSE", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "CITATION.cff",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["slow: Monte Carlo checks that take more than a few seconds (run with --runslow)"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["tmp", "data", "runs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
