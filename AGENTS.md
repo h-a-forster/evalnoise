@@ -86,10 +86,11 @@ Done:
 
 Next:
 
-1. mm-arena replicate runs were still being generated when the tables were extracted
-   (`fable-5-1@high` r2 and `haiku-5-5@high` r3 partial). When they finish:
-   `uv run evalnoise extract --only mm-arena && uv run evalnoise study`, then update
-   REPORT.md. More runs per setup are the only way to narrow the run-variance interval.
+1. mm-arena: all replicate runs through haiku r4 (2026-10-30) are in the tables and the
+   quick study. Only haiku r3/r4 share a recorded harness version; the model has no
+   harness factor (subset refit in `scripts/derived_numbers.py`). More same-version runs,
+   or a harness term in the model, would separate version from within-version drift. New
+   runs: `uv run evalnoise extract --only mm-arena && uv run evalnoise study`.
 2. Run the full profiles (`evalnoise study --profile full --out results/study-full`,
    `evalnoise validate --profile full --out results/validation-full`), about 1 to 1.5
    hours of CPU in total, with `bash scripts/longrun.sh`; then update REPORT.md from their

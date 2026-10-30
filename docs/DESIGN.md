@@ -51,8 +51,8 @@ simulated binary data.
   unit, with 95% intervals.
 - `ICC item = item / (item + item_arm + run + item_run + within)`: the correlation between
   trials of two different arms on the same item. It ranges from 0.09 (`ruleproof-main`) to
-  0.91 (`mm-arena-replicated`) here; where it is large, paired comparisons are much more
-  efficient than unpaired ones.
+  0.90 (`agent-ab-no-tests-cost`; 0.89 for `mm-arena-replicated`) here; where it is large,
+  paired comparisons are much more efficient than unpaired ones.
 - For a comparison of two arms on `T` items with `R` runs per arm and `K` repeats per item
   per run, the variance of the difference in arm means:
 
@@ -185,11 +185,11 @@ the variance formula against simulated experiments, and the planner's root-findi
 `evalnoise extract` rebuilds `results/trials/*.csv` from the published result directories
 of four studies, all run with Claude models through Claude Code or the Claude CLI
 (`configs/sources.toml`). `MANIFEST.json` records each source's repository, commit,
-per-file sha256 and the files not yet committed upstream (new mm-arena replicate runs).
+per-file sha256 and any source files not tracked by the source repository's git.
 
 | Table | Score | Item / cluster | Runs |
 |---|---|---|---|
-| `mm-arena` | edge captured, pp: `100 xpnl_sd / mean(bayes xpnl_sd)`, so an arm's mean over the suite is its leaderboard number | episode (game, seed) / game | replicate runs `#rN` of three setups |
+| `mm-arena` | edge captured, pp: `100 xpnl_sd / mean(bayes xpnl_sd)`, so an arm's mean over the suite is its leaderboard number | episode (game, seed) / game | replicate runs `#rN` of four setups; harness version per run from trace provenance where recorded |
 | `agent-ab-*` | hidden check passed (0/1); `log_cost` | task | one run per arm |
 | `overclaim-*` | hidden check passed (0/1) | task | one run per arm |
 | `ruleproof-*` | all rules followed (0/1) | task | hook arms run twice (`p2`, `p3`), on different hook builds |
@@ -223,7 +223,8 @@ Trials without a verdict (agent errors) are excluded and counted in the manifest
 - Yunbei Zhang et al., "Stop Comparing LLM Agents Without Disclosing the Harness", 2026.
   <https://arxiv.org/abs/2605.23950>. Harness-induced variance can exceed model-induced
   variance; proposes disclosure and a variance-decomposition protocol. In the data here,
-  harness version is recorded only for new mm-arena runs and is confounded with run.
+  harness version is recorded only for newer mm-arena runs and is confounded with run;
+  one setup has two runs on one recorded version, too few for a harness factor.
 - Variance-component methods: S. R. Searle, G. Casella, C. E. McCulloch, *Variance
   Components* (Wiley, 1992), for Henderson's method III and REML; R. K. Burdick and
   F. A. Graybill, *Confidence Intervals on Variance Components* (Dekker, 1992); F. E.
@@ -234,7 +235,7 @@ Trials without a verdict (agent errors) are excluded and counted in the manifest
 
 - Common variances across arms. Pass/fail data violate this (variance `p(1 - p)`): near
   the ceiling a planned drop is detected less often than planned and a gain more often
-  (see the binary checks). The mm-arena setups violate it too (item x run SD 5.9 to 18.0).
+  (see the binary checks). The mm-arena setups violate it too (item x run SD 7.6 to 18.3).
 - Items are independent in the planner. Clustered items (mm-arena's seeds within games,
   and its task families) make its task counts too small by the design effect, which the
   study reports.

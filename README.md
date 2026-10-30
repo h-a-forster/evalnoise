@@ -27,20 +27,24 @@ survey; treat the numbers as examples of what the tool shows.
 
 - **Run-to-run shifts dominated the one benchmark with replicate runs of unchanged
   setups.** In mm-arena
-  (120 market-making episodes, three Claude setups run two or three times each) the run
-  SD pooled over the setups was 4.2 pp of edge captured (95% CI 2.2 to 12.6), mostly from
-  one setup (fitted alone: 0.9, 2.6 and 5.6 pp). For a pair of setups with the pooled
-  variances, compared from one run each, the estimated SE is 6.3 pp, not the 2.1 pp an
+  (120 market-making episodes, four Claude setups run two to four times each) the run
+  SD pooled over the setups was 2.9 pp of edge captured (95% CI 1.6 to 6.4), mostly from
+  one setup (fitted alone: 1.3, 1.7, 1.5 and 4.0 pp). For a pair of setups with the pooled
+  variances, compared from one run each, the estimated SE is 4.7 pp, not the 2.3 pp an
   item-level interval reports, and a run-blind paired test calls two setups with equal
-  mean scores different about half the time (50%, CI 27% to 81%; 38% with the noisiest
+  mean scores different a third of the time (33%, CI 17% to 62%; 19% with the noisiest
   setup left out). Both treat episodes as independent; with the episodes' clustering the
   item-level SE is larger, so the run term's share and that rate are upper-end figures.
+  The one pair of runs on the same recorded Claude Code version (Haiku runs 3 and 4)
+  agreed within episode noise (1.4 pp apart), which hints that version or date changes
+  drive much of the run term; one pair cannot settle it, and the model has no harness
+  factor.
 - **More episodes cannot fix that; more runs can,** as far as run shifts are shared by
   every episode. With the pooled estimates and episodes counted as independent, a 10 pp
-  difference needs 4 runs per setup with 95 episodes, or 5 with 45; 5 pp needs 20 runs
-  with 118 episodes (13 runs need 526). Episodes pair up within games, so multiply these
-  counts by at least 1.3, which puts 4 runs at 10 pp and 20 runs at 5 pp beyond the 120
-  episodes available. Run shifts
+  difference needs 3 runs per setup with 56 episodes, or 4 with 41; 5 pp needs 20 runs
+  with 107 episodes (10 runs need 188). Episodes pair up within games, so multiply these
+  counts by at least 1.24, which puts 20 runs at 5 pp beyond the 120 episodes available.
+  Run shifts
   also differed by task family (one setup: +1.7 to +22.8 pp), so part of the run term
   may shrink with more task families.
 - **Pass/fail evals with one run per arm cannot identify the run term at all.** For
@@ -176,7 +180,7 @@ validation plan are in [docs/DESIGN.md](docs/DESIGN.md), with prior work. In sho
 
 - The study covers four small projects, all on Claude models through Claude Code or the
   Claude CLI; only mm-arena has replicate runs of unchanged setups (ruleproof's replicate
-  runs changed the hook build), and its run variance rests on 4 degrees of freedom.
+  runs changed the hook build), and its run variance rests on 7 degrees of freedom.
 - Variances are assumed common to all arms; the study reports per-arm run terms and tests
   the item x run variance for equality (the mm-arena setups fail it).
 - Pass/fail outcomes are analysed on the 0/1 scale, which makes planned MDEs optimistic
@@ -184,8 +188,10 @@ validation plan are in [docs/DESIGN.md](docs/DESIGN.md), with prior work. In sho
 - The planner treats items as independent; when items share a cluster (mm-arena: two
   seeds per game) or a family (mm-arena: five task families), the study reports design
   effects and clustered pair SEs, and breaks run shifts down by family.
-- Runs are treated as exchangeable draws; a harness update between runs is really a fixed
-  shift, which the data here cannot tell apart.
+- Runs are treated as exchangeable draws and there is no harness-version factor; a
+  harness update between runs is really a fixed shift. Trial tables keep the harness
+  version per run where the source records it, but only one mm-arena setup has two runs
+  on one recorded version, too few to estimate the split.
 - More in [REPORT.md](REPORT.md#limitations).
 
 ## Related work

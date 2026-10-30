@@ -29,6 +29,12 @@ All notable changes are listed here. The format follows
 
 ### Changed
 
+- Data: the mm-arena table now holds every replicate run, complete (fable r2, haiku r3 and
+  r4, opus r3, sonnet r2; 1920 trials), read from mm-arena's `results/core-v1` only. The
+  quick study and REPORT.md follow: pooled run SD 2.9 pp [1.6, 6.4] on 7 df (was 4.2 on
+  4), naive false-positive rate 33% (was 50%), one-run MDE 14.4 pp (was 21.9).
+- `scripts/derived_numbers.py` also refits each setup's run term on its runs that share a
+  recorded harness version (haiku r3 and r4 on Claude Code 2.1.308).
 - The mm-arena planning grid covers every run count where the plan changes (1 to 20).
 - Negative moment estimates are shown as `<0` in the study summary instead of 0; the
   label for a negative bootstrap upper bound says `upper bound < 0` (it was `all draws <
