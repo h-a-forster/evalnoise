@@ -1,0 +1,61 @@
+cff-version: 1.2.0
+message: "If you use evalnoise, please cite it as below."
+title: evalnoise
+abstract: >-
+  Variance components of agent-eval scores (item, item x arm, run, item x run and
+  within-run noise) from per-trial results, with honest intervals, and a planner for the
+  number of tasks, repeats and runs a comparison needs to detect a given difference,
+  validated by simulation.
+type: software
+authors:
+  - name: h-a-forster
+repository-code: "https://github.com/h-a-forster/evalnoise"
+license: MIT
+version: 0.1.0
+date-released: "2026-10-30"
+keywords:
+  - llm evaluation
+  - agent evaluation
+  - variance components
+  - power analysis
+  - minimum detectable effect
+references:
+  - type: article
+    authors:
+      - family-names: Miller
+        given-names: Evan
+    title: "Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations"
+    year: 2024
+    notes: arXiv:2411.00640
+  - type: article
+    authors:
+      - family-names: Bjarnason
+        given-names: Bjarni Haukur
+      - family-names: Silva
+        given-names: André
+      - family-names: Monperrus
+        given-names: Martin
+    title: "On Randomness in Agentic Evals"
+    year: 2026
+    notes: arXiv:2602.07150
+  - type: article
+    authors:
+      - family-names: Chandrahas
+        given-names: Shreyas K
+    title: "evalci: A Python Library for Statistically Rigorous Comparison of Language Model Evaluations"
+    year: 2026
+    notes: arXiv:2607.04429
+  - type: article
+    authors:
+      - family-names: Messing
+        given-names: Solomon
+    title: "Hidden Measurement Error in LLM Pipelines Distorts Annotation, Evaluation, and Benchmarking"
+    year: 2026
+    notes: arXiv:2604.11581
+  - type: article
+    authors:
+      - family-names: Zhang
+        given-names: Yunbei
+    title: "Stop Comparing LLM Agents Without Disclosing the Harness"
+    year: 2026
+    notes: arXiv:2605.23950
