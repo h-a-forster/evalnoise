@@ -6,7 +6,7 @@ import pytest
 
 from evalnoise.data import DataError
 from evalnoise.extract import run_extract
-from evalnoise.sources import agent_ab, mm_arena, ruleproof
+from evalnoise.sources import agent_ab, mm_arena, ruleproof, sha256
 
 
 def _trace(agent, gid, seed, xpnl, status="ok", prior_std=2.0):
@@ -256,3 +256,15 @@ def test_manifest_keeps_files_from_same_named_roots_apart(tmp_path, arena):
         "../runs/core-v1/bayes.jsonl",
         "../runs/core-v1/claude-cli_m@high.jsonl",
     ]
+
+
+def test_sha256_ignores_crlf_line_endings(tmp_path):
+    # Lines placed so one CRLF straddles the 1 MiB read boundary.
+    lines = [b"x" * ((1 << 20) - 1), b'{"a": 1}', b""]
+    lf, crlf = tmp_path / "lf.jsonl", tmp_path / "crlf.jsonl"
+    lf.write_bytes(b"\n".join(lines))
+    crlf.write_bytes(b"\r\n".join(lines))
+    assert sha256(crlf) == sha256(lf)
+    other = tmp_path / "other.jsonl"
+    other.write_bytes(b"\n".join(lines).replace(b"1", b"2"))
+    assert sha256(other) != sha256(lf)

@@ -39,10 +39,20 @@ class Extract:
 
 
 def sha256(path: Path) -> str:
+    """sha256 of a text file with CRLF line endings read as LF.
+
+    Every input hashed here (JSON, JSONL, CSV) is text, so a CRLF checkout and an LF
+    checkout of the same commit give the same digest.
+    """
     h = hashlib.sha256()
+    carry = b""
     with path.open("rb") as fh:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
-            h.update(chunk)
+            chunk = carry + chunk
+            # Hold back a trailing CR: its LF may start the next chunk.
+            carry = b"\r" if chunk.endswith(b"\r") else b""
+            h.update(chunk[: len(chunk) - len(carry)].replace(b"\r\n", b"\n"))
+    h.update(carry)
     return h.hexdigest()
 
 
