@@ -11,7 +11,10 @@ the shards are then pooled into ``<out>/units/<check>.json``. Checks:
 - ``naive-*``: one run per arm with a run effect, analysed by the paired t-test that ignores
   runs; the rejection rate at effect 0 should match :func:`naive_false_positive_rate`.
 - ``binary-*``: pass/fail data from a logistic model, planned from a large pilot on the
-  probability scale, analysed by the paired t-test (checks the linear approximation).
+  probability scale, analysed by the paired t-test (checks the linear approximation),
+  including near the ceiling with the effect in either direction.
+- ``borrowed-*``: one run per arm, with the run variance borrowed from a small pilot (its
+  own few run df), analysed by the Satterthwaite t-test the study's MDEs assume.
 - ``coverage-*``: coverage of the bootstrap and chi-square intervals for the components.
 """
 
@@ -88,6 +91,23 @@ CHECKS = [
         Design(30, 1, 1),
         {"mean": 0.5},
     ),
+    # About 90% pass (logit mean 2.97 with logit variance 2.3): gains vs losses.
+    Check(
+        "binary-p90-t50-k3-up",
+        "binary",
+        Components(item=2.0, item_arm=0.3, run=0.0, item_run=0.0, within=0.0),
+        Design(50, 1, 3),
+        {"mean": 2.97, "direction": 1},
+    ),
+    Check(
+        "binary-p90-t50-k3-down",
+        "binary",
+        Components(item=2.0, item_arm=0.3, run=0.0, item_run=0.0, within=0.0),
+        Design(50, 1, 3),
+        {"mean": 2.97, "direction": -1},
+    ),
+    # Pilot of 2 arms x 3 runs (4 run df), then a 120-task, one-run-per-arm comparison.
+    Check("borrowed-t120-r1", "borrowed", RUNNY, Design(120, 1, 1), {"pilot_runs": 3}),
     Check("coverage-t40-a2-k3", "coverage", BASE, Design(40, 1, 3)),
     Check("coverage-t60-a3-r3", "coverage", RUNNY, Design(60, 3, 1), {"arms": 3}),
 ]
@@ -262,12 +282,14 @@ def _prep_binary(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
     )
     est = estimate(pilot).components
     target = mde(resolve(est, run=0.0), d)
-    # Logit shift whose average effect on the pass probability equals the target.
+    # Logit shift whose average effect on the pass probability equals the target, in the
+    # check's direction (+1: arm 1 passes more often, -1: less often).
+    sign = float(chk.params.get("direction", 1))
     eta = mean + rng.normal(0, math.sqrt(chk.comps.item + chk.comps.item_arm), 200_000)
     base = float(np.mean(1 / (1 + np.exp(-eta))))
 
     def gap(s: float) -> float:
-        return float(np.mean(1 / (1 + np.exp(-(eta + s))))) - base - target
+        return sign * (float(np.mean(1 / (1 + np.exp(-(eta + sign * s))))) - base) - target
 
     lo, hi = 0.0, 1.0
     while gap(hi) < 0:
@@ -277,7 +299,8 @@ def _prep_binary(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
         lo, hi = (mid, hi) if gap(mid) < 0 else (lo, mid)
     return {
         "mde": target,
-        "logit_shift": (lo + hi) / 2,
+        "logit_shift": sign * (lo + hi) / 2,
+        "base_pass": base,
         "pilot": est.to_dict(),
         "nominal": {"null": 0.05, "at_mde": 0.8},
     }
@@ -296,6 +319,38 @@ def _count_binary(chk, ctx, sims, rng, prof) -> dict[str, int]:  # type: ignore[
             means = df.groupby(["arm", "item"])["score"].mean().unstack("item")
             diff = (means.loc["arm1"] - means.loc["arm0"]).to_numpy()[None, :]
             rej += int(_paired_t_reject(diff, 0.05)[0])
+        out[q] = rej
+    return out
+
+
+# --------------------------------------------------------------------------- borrowed
+
+
+def _pilot_runs(chk: Check) -> int:
+    return int(chk.params["pilot_runs"])
+
+
+def _prep_borrowed(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
+    run_df = 2.0 * (_pilot_runs(chk) - 1)  # two pilot arms
+    target = mde(resolve(chk.comps, run_df=run_df), chk.design)
+    return {"mde": target, "run_df": run_df, "nominal": {"null": 0.05, "at_mde": 0.8}}
+
+
+def _count_borrowed(chk, ctx, sims, rng, prof) -> dict[str, int]:  # type: ignore[no-untyped-def]
+    """Pilot estimate of the run variance, then a test of a fresh one-run-per-arm experiment."""
+    d = chk.design
+    out = {}
+    for q, eff in (("null", 0.0), ("at_mde", ctx["mde"])):
+        diffs = _item_differences(chk.comps, d, eff, sims, rng)
+        rej = 0
+        for row in diffs:
+            pilot = estimate(simulate(chk.comps, tasks=d.tasks, runs=_pilot_runs(chk), seed=rng))
+            v_items = float(np.var(row, ddof=1)) / d.tasks
+            v_run = 2.0 * max(pilot.components.run, 0.0) / d.runs
+            terms = [(v_items, d.tasks - 1), (v_run, float(pilot.run_term.df))]
+            denom = sum(v * v / k for v, k in terms if v > 0)
+            dof = (v_items + v_run) ** 2 / denom
+            rej += int(abs(row.mean()) > stats.t.ppf(0.975, dof) * math.sqrt(v_items + v_run))
         out[q] = rej
     return out
 
@@ -335,6 +390,7 @@ RUNNERS: dict[str, tuple[Prepare, Count, str]] = {
     "naive": (_prep_naive, _count_naive, "sims"),
     "runs": (_prep_power, _count_runs, "run_sims"),
     "binary": (_prep_binary, _count_binary, "binary_sims"),
+    "borrowed": (_prep_borrowed, _count_borrowed, "run_sims"),
     "coverage": (_prep_coverage, _count_coverage, "coverage_sims"),
 }
 
