@@ -57,6 +57,11 @@ def component_cell(unit: dict[str, Any], name: str, digits: int = 1) -> str:
         lo, hi = unit["run_interval"]
     else:
         lo, hi = unit["bootstrap"]["components"][name]
+    if v < 0:
+        # No SD exists; say so rather than print an exact-looking 0.
+        if hi is not None and hi < 0:
+            return "<0 [all draws < 0]"
+        return f"<0 {fmt_ci(sd(lo), sd(hi), digits)}"
     return f"{fmt(sd(v), digits)} {fmt_ci(sd(lo), sd(hi), digits)}"
 
 
@@ -70,7 +75,9 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "Standard deviations (square roots of the variance components) in each dataset's",
         "unit, with 95% intervals: percentile bootstrap over clusters for item-level",
         "components, a chi-square interval for the run component. `n/i`: not identified by",
-        "the layout; `(in X)`: folded into component X. Negative estimates are shown as 0.",
+        "the layout; `(in X)`: folded into component X. `<0`: the moment estimate is",
+        "negative (planning uses 0); `all draws < 0`: so was every bootstrap draw, a sign that",
+        "the model overstates the noise of cell means there.",
         "",
         "## Datasets",
         "",
@@ -104,7 +111,55 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
     parts += [
         "",
         "ICC item: the item component's share of one trial's variance within an arm (the",
-        "correlation between two trials on the same item); it cancels in paired comparisons.",
+        "correlation between trials of two different arms on the same item); it cancels in",
+        "paired comparisons.",
+        "",
+        "## Run term by arm",
+        "",
+    ]
+    rows = []
+    for u in units:
+        by_arm = u.get("run_by_arm") or {}
+        loo = by_arm.get("leave_one_out", {})
+        dg = u.get("digits", 1)
+        for arm, x in (by_arm.get("arms") or {}).items():
+            rest = loo.get(arm)
+            rows.append(
+                [
+                    f"`{u['id']}`",
+                    arm,
+                    f"{fmt(sd(x['run']), dg)} {fmt_ci(*_sds(x['run_interval']), dg)}",
+                    str(x["run_df"]),
+                    f"{fmt(sd(x['item_run']), dg)}",
+                    str(x["residual_df"]),
+                    f"{fmt(sd(rest['run']), dg)} {fmt_ci(*_sds(rest['run_interval']), dg)}"
+                    if rest
+                    else "-",
+                ]
+            )
+        hom = by_arm.get("residual_homogeneity")
+        if hom:
+            p = "-" if hom["p"] is None else f"{hom['p']:.2g}"
+            rows.append([f"`{u['id']}`", "Bartlett test, equal item x run", f"p = {p}"] + [""] * 4)
+    parts.append(
+        table(
+            [
+                "dataset",
+                "arm",
+                "run SD [chi-square]",
+                "df",
+                "item x run SD",
+                "df",
+                "run SD without this arm",
+            ],
+            rows,
+            "llrrrrr",
+        )
+    )
+    parts += [
+        "",
+        "Arms with two or more runs, each fitted alone. The pooled run and item x run terms",
+        "assume these arms share one variance; the Bartlett test checks that for item x run.",
         "",
         "## Moment estimates vs REML (SD)",
         "",
@@ -184,6 +239,14 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
         "",
         "`never`: the run term alone exceeds the target at that number of runs.",
         "",
+        "## Planning notes",
+        "",
+    ]
+    for u in units:
+        notes = (u["planning"] or {}).get("notes") or []
+        parts += [f"- `{u['id']}`: {n}" for n in notes]
+    parts += [
+        "",
         "## Pairwise differences",
         "",
     ]
@@ -198,7 +261,12 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
                     name,
                     f"{fmt(pe['difference'], dg)} {fmt_ci(*b.get('difference', [None, None]), dg)}",
                     fmt(pe["se_items"], dg),
+                    fmt(pe.get("se_clusters"), dg),
+                    _p(pe.get("p_items")),
                     fmt(pe.get("se_with_run"), dg),
+                    f"{fmt(pe.get('df_with_run'), 1)} / {_p(pe.get('p_with_run'))}"
+                    if pe.get("se_with_run") is not None
+                    else "-",
                     f"{fmt(sd(pe['item_arm']), dg)} {fmt_ci(*_sds(b.get('item_arm')), dg)}",
                 ]
             )
@@ -209,21 +277,33 @@ def study_markdown(units: list[dict[str, Any]], profile: str) -> str:
                 "pair",
                 "difference [item bootstrap]",
                 "SE, items only",
+                "SE, clusters",
+                "p, clusters",
                 "SE with run term",
+                "df / p with run term",
                 "item x arm SD",
             ],
             rows,
-            "llrrrr",
+            "llrrrrrrr",
         )
     )
     parts += [
         "",
-        "The bootstrap interval and the items-only SE ignore run-to-run variation. Where the",
-        "run variance is identified, the SE with run term adds run / R_eff for each arm",
-        "(R_eff: trials / (items x repeats), so a partial replicate run counts fractionally).",
+        "The bootstrap interval and the item-level SEs ignore run-to-run variation. SE,",
+        "clusters: cluster-robust, tested with clusters - 1 df (equals the items-only SE when",
+        "each item is its own cluster). Where the run variance is identified, the SE with run",
+        "term adds run / R_eff for each arm (R_eff: trials / (items x repeats), so a partial",
+        "replicate run counts fractionally), tested with Satterthwaite df using the run",
+        "term's own df.",
         "",
     ]
     return "\n".join(parts)
+
+
+def _p(x: float | None) -> str:
+    if x is None or not math.isfinite(x):
+        return "-"
+    return "<0.001" if x < 0.001 else f"{x:.3f}"
 
 
 def _sds(pair: Sequence[float | None] | None) -> list[float]:

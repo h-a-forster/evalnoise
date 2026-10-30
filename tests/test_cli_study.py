@@ -1,5 +1,6 @@
 import json
 
+import pandas as pd
 import pytest
 
 from evalnoise import study
@@ -146,3 +147,51 @@ def test_validation_shards_resume(tmp_path, monkeypatch):
     log = (out / "progress.log").read_text(encoding="utf-8")
     assert log.count("shard 2/3 done") == 2 and log.count("shard 1/3 done") == 1
     assert again[0]["rates"] == first[0]["rates"]  # shard seeds are fixed
+
+
+DATASET = {"id": "x", "name": "x", "table": "x", "score": "score", "targets": []}
+PROFILE = {"bootstrap": 20, "seed": 0}
+
+
+def test_analyse_reports_per_arm_run_terms_and_unequal_residuals():
+
+    a = simulate(Components(4.0, 1.0, 0.5, 0.2, 0.0), tasks=60, arms=1, runs=3, seed=1)
+    b = simulate(Components(4.0, 1.0, 0.5, 3.0, 0.0), tasks=60, arms=1, runs=3, seed=2)
+    df = pd.concat([a, b.assign(arm="arm1")], ignore_index=True)
+    res = study.analyse(df, DATASET, PROFILE, {})
+    by_arm = res["run_by_arm"]
+    assert by_arm["residual_homogeneity"]["p"] < 0.001
+    assert any("do not share one item x run variance" in n for n in res["planning"]["notes"])
+    # With two arms, leaving one out leaves the other arm's own estimate.
+    assert by_arm["leave_one_out"]["arm0"]["run"] == pytest.approx(by_arm["arms"]["arm1"]["run"])
+    p = res["pair_estimates"]["arm0 - arm1"]
+    # The run term has 4 df: the test with it has far fewer df than the 59 of the items.
+    assert 1 < p["df_with_run"] < 59 and p["p_with_run"] > p["p_items"]
+
+
+def test_analyse_flags_pairs_that_differ_on_few_items():
+
+    items = [f"t{j}" for j in range(30)]
+    base = pd.DataFrame({"item": items, "run": "r0", "repeat": 0, "cluster": items})
+    s0 = [1.0] * 25 + [0.0] * 5
+    s1 = list(s0)
+    s1[0] = s1[1] = 0.0
+    s1[29] = 1.0
+    df = pd.concat(
+        [base.assign(arm="a", score=s0), base.assign(arm="b", score=s1)], ignore_index=True
+    )
+    res = study.analyse(df, DATASET, PROFILE, {})
+    assert res["pair_estimates"]["a - b"]["items_differing"] == 3
+    assert res["planning"]["few_items_differing"] == {"a - b": 3}
+
+
+def test_binary_check_direction(tmp_path, monkeypatch):
+    from evalnoise import validate
+
+    tiny = dict(validate.PROFILES["quick"], binary_sims=10)
+    monkeypatch.setitem(validate.PROFILES, "tiny", tiny)
+    up, down = validate.run_validation(
+        tmp_path, "tiny", only=["binary-p90-t50-k3-up", "binary-p90-t50-k3-down"]
+    )
+    assert abs(up["context"]["base_pass"] - 0.9) < 0.01
+    assert up["context"]["logit_shift"] > 0 > down["context"]["logit_shift"]

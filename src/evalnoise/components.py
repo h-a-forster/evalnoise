@@ -22,7 +22,7 @@ ANOVA on run-adjusted item means for items) and are cheap enough to bootstrap.
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
@@ -92,13 +92,34 @@ class RunTerm:
     df_res: int = 0
     n_harmonic: float = NAN  # harmonic mean trials per cell in those arms
 
+    @classmethod
+    def pool(cls, terms: Iterable[RunTerm]) -> RunTerm:
+        """Sum the quantities of several arms (``n_harmonic`` is left unset)."""
+        out = cls()
+        for t in terms:
+            out.ss += t.ss
+            out.df += t.df
+            out.k += t.k
+            out.rss += t.rss
+            out.df_res += t.df_res
+        return out
+
+    def identified(self) -> bool:
+        return self.df >= 1 and self.df_res >= 1 and self.k > 0
+
+    def variance(self) -> float:
+        """Moment estimate of the run variance; nan when not identified."""
+        if not self.identified():
+            return NAN
+        return (self.ss - self.df * self.rss / self.df_res) / self.k
+
     def interval(self, level: float = 0.95) -> tuple[float, float]:
         """Interval for the run variance, treating the residual variance as known.
 
         Uses ss / E[ms] ~ chi2(df) / df, which is exact for balanced normal data; the
         residual variance has many more degrees of freedom than the run term here.
         """
-        if self.df < 1 or self.df_res < 1 or self.k <= 0:
+        if not self.identified():
             return (NAN, NAN)
         s2 = self.rss / self.df_res
         alpha = 1.0 - level
@@ -120,6 +141,8 @@ class Estimate:
     arm_means: dict[str, float]
     per_arm: dict[str, dict[str, float]]
     pairs: dict[str, dict[str, float]]
+    # Run term of each arm with two or more runs; ``run_term`` pools them.
+    run_terms: dict[str, RunTerm] = field(default_factory=dict)
 
 
 class _Coded:
@@ -145,6 +168,9 @@ class _Coded:
         self.n_items = len(self.item_names)
         self.n_runs = len(run_names)
         self.n_clusters = int(self.cluster_codes.max()) + 1
+        # The data layer guarantees one cluster per item.
+        self.item_cluster = np.empty(self.n_items, dtype=np.int64)
+        self.item_cluster[self.item_codes] = self.cluster_codes
 
 
 def _cells(a: np.ndarray, i: np.ndarray, r: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, ...]:
@@ -206,11 +232,14 @@ def estimate(
 ) -> Estimate:
     """Moment estimates of the variance components of a validated trial table."""
     coded = _Coded(df, arms)
-    return _estimate_coded(coded, coded.item_codes, list(pairs))
+    return _estimate_coded(coded, coded.item_codes, list(pairs), coded.item_cluster)
 
 
 def _estimate_coded(
-    coded: _Coded, item_codes: np.ndarray, pairs: list[tuple[str, str]]
+    coded: _Coded,
+    item_codes: np.ndarray,
+    pairs: list[tuple[str, str]],
+    item_cluster: np.ndarray | None = None,
 ) -> Estimate:
     a_all, r_all, y = coded.a, coded.run_codes, coded.y
     n_arms = len(coded.arm_names)
@@ -221,7 +250,7 @@ def _estimate_coded(
     within = float(np.sum(css) / dfw) if dfw > 0 else NAN
 
     # Run term, pooled over arms with >= 2 runs.
-    rt = RunTerm()
+    run_terms: dict[str, RunTerm] = {}
     run_effect: dict[int, float] = {}
     inv_n: list[float] = []
     for arm in range(n_arms):
@@ -229,17 +258,15 @@ def _estimate_coded(
         if len(np.unique(cr[sel])) < 2:
             continue
         ss, dfr, k, rss, dfe, eff = _run_fit(ci[sel], cr[sel], cm[sel])
-        rt.ss += ss
-        rt.df += dfr
-        rt.k += k
-        rt.rss += rss
-        rt.df_res += dfe
+        n_h = 1.0 / float(np.mean(1.0 / cn[sel]))
+        run_terms[coded.arm_names[arm]] = RunTerm(ss, dfr, k, rss, dfe, n_h)
         run_effect.update(eff)
         inv_n.extend((1.0 / cn[sel]).tolist())
+    rt = RunTerm.pool(run_terms.values())
     absorbed: dict[str, str] = {}
-    if rt.df >= 1 and rt.df_res >= 1 and rt.k > 0:
+    if rt.identified():
         s2_cell = rt.rss / rt.df_res
-        run = (rt.ss - rt.df * s2_cell) / rt.k
+        run = rt.variance()
         rt.n_harmonic = 1.0 / float(np.mean(inv_n))
         if math.isfinite(within):
             item_run = s2_cell - within / rt.n_harmonic
@@ -336,12 +363,23 @@ def _estimate_coded(
         var_d = float(np.var(d, ddof=1))
         pair_out[f"{left} - {right}"] = {
             "items": nd,
+            "items_differing": int(np.count_nonzero(np.abs(d) > 1e-9 * (1.0 + np.abs(d).max()))),
             "difference": float(d.mean()),
             "se_items": math.sqrt(var_d / nd),
             "var_d": var_d,
             # Per-arm item x arm variance implied by this pair (half the difference variance).
             "item_arm": (var_d - noise_d) / 2.0,
         }
+        if item_cluster is not None:
+            # Cluster-robust SE of the mean difference (equals se_items with one item per
+            # cluster): items in one cluster may share more than the model's item effect.
+            _, g = np.unique(item_cluster[both], return_inverse=True)
+            n_g = int(g.max()) + 1
+            s = np.bincount(g, weights=d - d.mean())
+            pair_out[f"{left} - {right}"]["clusters"] = n_g
+            pair_out[f"{left} - {right}"]["se_clusters"] = (
+                math.sqrt(n_g / (n_g - 1) * float(s @ s)) / nd if n_g > 1 else NAN
+            )
 
     runs = {name: int(len(np.unique(cr[ca == j]))) for j, name in enumerate(coded.arm_names)}
     return Estimate(
@@ -354,6 +392,7 @@ def _estimate_coded(
         arm_means=arm_means,
         per_arm=per_arm,
         pairs=pair_out,
+        run_terms=run_terms,
     )
 
 
@@ -449,4 +488,5 @@ def _subset(coded: _Coded, rows: np.ndarray) -> _Coded:
     sub.n_items = coded.n_items
     sub.n_runs = coded.n_runs
     sub.n_clusters = coded.n_clusters
+    sub.item_cluster = coded.item_cluster
     return sub

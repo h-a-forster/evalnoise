@@ -22,9 +22,10 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 from evalnoise import __version__
-from evalnoise.components import Components, bootstrap, estimate
+from evalnoise.components import Components, Estimate, RunTerm, bootstrap, estimate
 from evalnoise.data import DataError, describe, load_trials
 from evalnoise.power import (
     Design,
@@ -40,7 +41,9 @@ from evalnoise.sources import sha256
 
 COMPONENTS = ("item", "item_arm", "run", "item_run", "within")
 # Bump when the unit format or any computation in analyse() changes, so cached units rerun.
-SCHEMA = 4
+SCHEMA = 5
+# Pairs whose arms differ on fewer items than this get a reliability note.
+MIN_ITEMS_DIFFERING = 10
 
 
 def load_study(path: Path) -> tuple[Path, dict[str, Any]]:
@@ -139,15 +142,17 @@ def analyse(
     grid_reps = d.get("repeats", defaults.get("repeats", [1, 3]))
     targets = d.get("targets", defaults.get("targets", []))
     run_identified = math.isfinite(comps.run)
+    # The analysis borrows the run variance estimated here, with its degrees of freedom.
+    run_df = float(est.run_term.df) if run_identified else math.inf
+    by_arm = _run_by_arm(est)
+    pair_est = _pairs_with_run_term(est.pairs, pairs, df, comps, run_df)
     planning: dict[str, Any] = {"alpha": alpha, "power": target_power}
     paired_ok = len(arms) >= 2
     if paired_ok:
-        # The analysis borrows the run variance estimated here, with its degrees of freedom.
-        run_df = float(est.run_term.df) if run_identified else math.inf
         planning["run_df"] = run_df
         res_est = resolve(comps, run=None if run_identified else 0.0, run_df=run_df)
         planning["run_assumption"] = "estimated" if run_identified else "zero (not identified)"
-        planning["notes"] = list(res_est.notes)
+        planning["notes"] = list(res_est.notes) + _data_notes(by_arm, pair_est, planning)
         # Reference design: the observed tasks and repeats with one run per arm, which is
         # how the source studies compared arms. Its SE includes the run variance estimated
         # here, as an analyst who knows it from this study would.
@@ -229,7 +234,8 @@ def analyse(
         "reml": rm,
         "shares": _shares(clipped),
         "per_arm": est.per_arm,
-        "pair_estimates": _pairs_with_run_term(est.pairs, pairs, df, comps),
+        "run_by_arm": by_arm,
+        "pair_estimates": pair_est,
         "planning": planning,
     }
 
@@ -239,16 +245,16 @@ def _pairs_with_run_term(
     pairs: list[tuple[str, str]],
     df: pd.DataFrame,
     comps: Components,
+    run_df: float,
 ) -> dict[str, dict[str, float]]:
-    """Add the SE of each pair's difference including the run variance, when identified.
+    """Add t-tests of each pair's difference: over clusters, and with the run variance.
 
-    Each arm contributes run / R_eff, with R_eff its trials divided by (items x median
-    repeats per cell), so a half-finished replicate run counts as half a run.
+    The item-level part uses the cluster-robust SE with clusters - 1 df. Where the run
+    variance is identified, each arm adds run / R_eff, with R_eff its trials divided by
+    (items x median repeats per cell), so a half-finished replicate run counts as half a
+    run; the df are Satterthwaite's, with ``run_df`` for the run term.
     """
     out = {k: dict(v) for k, v in pair_est.items()}
-    if not math.isfinite(comps.run):
-        return out
-    run_v = max(comps.run, 0.0)
     cells = df.groupby(["arm", "run", "item"]).size()
     eff = {}
     for arm, sub in df.groupby("arm"):
@@ -256,9 +262,114 @@ def _pairs_with_run_term(
         eff[arm] = len(sub) / (sub["item"].nunique() * reps)
     for a, b in pairs:
         p = out[f"{a} - {b}"]
+        se_i, df_i = p["se_clusters"], p["clusters"] - 1
+        p["p_items"] = _t_p(p["difference"], [(se_i**2, df_i)])
+        if not math.isfinite(comps.run):
+            continue
+        v_run = max(comps.run, 0.0) * (1 / eff[a] + 1 / eff[b])
+        terms = [(se_i**2, df_i), (v_run, run_df)]
         p["runs_eff"] = [eff[a], eff[b]]
-        p["se_with_run"] = math.sqrt(p["se_items"] ** 2 + run_v * (1 / eff[a] + 1 / eff[b]))
+        p["se_with_run"] = math.sqrt(se_i**2 + v_run)
+        p["df_with_run"] = _satterthwaite(terms)
+        p["p_with_run"] = _t_p(p["difference"], terms)
     return out
+
+
+def _satterthwaite(terms: list[tuple[float, float]]) -> float:
+    denom = sum(v * v / k for v, k in terms if v > 0)
+    total = sum(v for v, _ in terms)
+    return math.inf if denom == 0 else total * total / denom
+
+
+def _t_p(diff: float, terms: list[tuple[float, float]]) -> float:
+    """Two-sided p-value of diff / sqrt(sum of variances), Satterthwaite t."""
+    se = math.sqrt(sum(v for v, _ in terms))
+    if se == 0:
+        return math.nan
+    return float(2 * stats.t.sf(abs(diff) / se, _satterthwaite(terms)))
+
+
+def _run_by_arm(est: Estimate) -> dict[str, Any]:
+    """Run and item x run estimates per replicated arm, leave-one-arm-out run estimates,
+    and Bartlett's test that the arms share one item x run (residual) variance."""
+    terms = est.run_terms
+    if not terms:
+        return {}
+    within = est.components.within
+    arms: dict[str, Any] = {}
+    for arm, t in terms.items():
+        s2 = t.rss / t.df_res if t.df_res >= 1 else math.nan
+        arms[arm] = {
+            "run": t.variance(),
+            "run_interval": list(t.interval()),
+            "run_df": t.df,
+            "item_run": s2 - within / t.n_harmonic if math.isfinite(within) else s2,
+            "residual_df": t.df_res,
+        }
+    out: dict[str, Any] = {"arms": arms}
+    if len(terms) >= 2:
+        loo = {}
+        for arm in terms:
+            rest = RunTerm.pool(t for a, t in terms.items() if a != arm)
+            loo[arm] = {"run": rest.variance(), "run_interval": list(rest.interval())}
+        out["leave_one_out"] = loo
+        out["residual_homogeneity"] = _bartlett(
+            [(t.rss / t.df_res, t.df_res) for t in terms.values() if t.df_res >= 1]
+        )
+    return out
+
+
+def _bartlett(groups: list[tuple[float, int]]) -> dict[str, float]:
+    """Bartlett's test of equal variances from (variance, df) pairs."""
+    v = np.array([g[0] for g in groups], dtype=float)
+    nu = np.array([g[1] for g in groups], dtype=float)
+    n, k = nu.sum(), len(nu)
+    if k < 2 or np.any(v <= 0):
+        return {"statistic": math.nan, "df": k - 1, "p": math.nan}
+    pooled = float(nu @ v / n)
+    corr = 1 + (np.sum(1 / nu) - 1 / n) / (3 * (k - 1))
+    stat = float((n * math.log(pooled) - nu @ np.log(v)) / corr)
+    return {"statistic": stat, "df": k - 1, "p": float(stats.chi2.sf(stat, k - 1))}
+
+
+def _data_notes(
+    by_arm: dict[str, Any], pair_est: dict[str, dict[str, float]], planning: dict[str, Any]
+) -> list[str]:
+    """Warnings about assumptions the data contradict."""
+    notes = []
+    hom = by_arm.get("residual_homogeneity")
+    if hom and hom["p"] < 0.05:
+        sds = ", ".join(
+            f"{a} {math.sqrt(max(x['item_run'], 0)):.3g}" for a, x in by_arm["arms"].items()
+        )
+        notes.append(
+            f"the replicated arms do not share one item x run variance (Bartlett p = "
+            f"{hom['p']:.2g}; SD by arm: {sds}): pooled components describe an average arm"
+        )
+    ratios = [
+        (p["se_clusters"] / p["se_items"]) ** 2
+        for p in pair_est.values()
+        if p["clusters"] < p["items"] and p["se_items"] > 0
+    ]
+    if ratios:
+        deff = float(np.median(ratios))
+        planning["design_effect"] = deff
+        if deff > 1.05:
+            notes.append(
+                f"items are clustered (median design effect {deff:.2f} over pairs): the "
+                f"planner treats items as independent, so its task counts are about "
+                f"{deff:.2f}x too small"
+            )
+    few = {k: p["items_differing"] for k, p in pair_est.items()}
+    few = {k: n for k, n in few.items() if n < MIN_ITEMS_DIFFERING}
+    if few:
+        planning["few_items_differing"] = few
+        listed = "; ".join(f"{k}: {n}" for k, n in few.items())
+        notes.append(
+            f"arms differ on fewer than {MIN_ITEMS_DIFFERING} items ({listed}): SEs, MDEs and "
+            "their intervals rest on those few items and are unreliable"
+        )
+    return notes
 
 
 def _select_arms(df: pd.DataFrame, spec: Any) -> list[str]:

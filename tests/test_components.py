@@ -155,3 +155,37 @@ def test_errors():
         estimate(df, arms=["nope"])
     with pytest.raises(DataError, match="fewer than 2 items"):
         estimate(df[df["item"] == "t0"])
+
+
+def test_cluster_se_tracks_clustered_item_effects():
+    # Pairs of items share an extra item x arm effect, so the 40 items are 20 clusters.
+    # The cluster SE should match the spread of the difference; the item SE understates it.
+    diffs, se_items, se_clusters = [], [], []
+    rng = np.random.default_rng(3)
+    for _ in range(400):
+        df = simulate(Components(1.0, 0.2, 0.0, 0.0, 0.5), tasks=40, seed=rng)
+        shared = rng.normal(0, 2.0, 20)
+        cl = df["item"].str[1:].astype(int) // 2
+        df["cluster"] = "c" + cl.astype(str)
+        df.loc[df["arm"] == "arm1", "score"] += shared[cl[df["arm"] == "arm1"]]
+        p = estimate(df, pairs=[("arm1", "arm0")]).pairs["arm1 - arm0"]
+        diffs.append(p["difference"])
+        se_items.append(p["se_items"])
+        se_clusters.append(p["se_clusters"])
+        assert p["clusters"] == 20 and p["items_differing"] == 40
+    true_sd = np.std(diffs, ddof=1)
+    assert abs(np.sqrt(np.mean(np.square(se_clusters))) / true_sd - 1) < 0.12
+    assert np.sqrt(np.mean(np.square(se_items))) / true_sd < 0.8
+    # One item per cluster: the two SEs coincide.
+    p = estimate(simulate(TRUE, tasks=15, seed=0), pairs=[("arm1", "arm0")]).pairs["arm1 - arm0"]
+    assert p["se_clusters"] == pytest.approx(p["se_items"])
+
+
+def test_run_terms_per_arm_and_pooled():
+    df = simulate(TRUE, tasks=30, arms=3, runs=3, seed=4)
+    est = estimate(df)
+    assert set(est.run_terms) == {"arm0", "arm1", "arm2"}
+    for arm, t in est.run_terms.items():
+        alone = estimate(df[df["arm"] == arm]).run_term
+        assert t.variance() == pytest.approx(alone.variance())
+    assert est.components.run == pytest.approx(est.run_term.variance())
