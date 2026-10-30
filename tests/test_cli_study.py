@@ -7,6 +7,7 @@ import pytest
 from evalnoise import study
 from evalnoise.cli import main
 from evalnoise.components import Components
+from evalnoise.data import DataError
 from evalnoise.simulate import simulate
 
 
@@ -146,6 +147,14 @@ def test_study_resumes_and_invalidates_on_schema_change(tmp_path, table, monkeyp
     monkeypatch.setattr(study, "SCHEMA", study.SCHEMA + 1)
     study.run_study(cfg, out)
     assert (out / "progress.log").read_text(encoding="utf-8").count("done in") == 2
+
+
+def test_study_refuses_ids_that_escape_the_output_dir(tmp_path, table):
+    repo, cfg = _study_files(tmp_path, table)
+    cfg.write_text(cfg.read_text(encoding="utf-8").replace('id = "sim"', 'id = "../x"'))
+    with pytest.raises(DataError, match="alphanumeric"):
+        study.run_study(cfg, repo / "results" / "study")
+    assert not (repo / "results" / "study" / "x.json").exists()
 
 
 def test_study_cli_writes_summary(tmp_path, table, capsys):

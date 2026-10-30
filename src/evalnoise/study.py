@@ -62,6 +62,11 @@ def load_study(path: Path) -> tuple[Path, dict[str, Any]]:
         for key in ("id", "name", "table", "score"):
             if key not in d:
                 raise DataError(f"{path}: dataset {d.get('id')!r} missing {key!r}")
+        # Both name files under the output and trials directories.
+        for key in ("id", "table"):
+            v = d[key]
+            if not isinstance(v, str) or not all(ch.isalnum() or ch in "-_" for ch in v):
+                raise DataError(f"{path}: dataset {key} {v!r} must be alphanumeric, - or _")
     return path.resolve().parent.parent, cfg
 
 
