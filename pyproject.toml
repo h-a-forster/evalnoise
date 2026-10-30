@@ -53,8 +53,9 @@ packages = ["src/evalnoise"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "src/evalnoise", "tests", "docs", "scripts", "results", "README.md", "REPORT.md",
-    "LICENSE", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "CITATION.cff",
+    "src/evalnoise", "tests", "docs", "configs", "scripts", "results", "uv.lock",
+    "README.md", "REPORT.md", "LICENSE", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md",
+    "CITATION.cff",
 ]
 
 [tool.pytest.ini_options]

@@ -29,7 +29,7 @@ overclaim, ruleproof).
   (validation: per shard) atomically, skip finished units on rerun and append to
   `progress.log`. Bump `SCHEMA` in `study.py` / `validate.py` when results would change.
   Commands here should stay under about 8 minutes; longer runs (the `full` profiles) go
-  through a resumable launcher script with a retry loop.
+  through `scripts/longrun.sh` (resumable, retries each stage; log in `tmp/longrun.log`).
 - Planning must never understate the MDE: unidentified components are folded where they
   do not shrink, and an unidentified run variance must be supplied or explicitly set to 0.
 - Validate inputs before writing; raise `DataError` with a clear message; count every
@@ -92,8 +92,8 @@ Next:
    REPORT.md. More runs per setup are the only way to narrow the run-variance interval.
 2. Run the full profiles (`evalnoise study --profile full --out results/study-full`,
    `evalnoise validate --profile full --out results/validation-full`), about 1 to 1.5
-   hours of CPU in total, through a resumable launcher with a retry loop; then update
-   REPORT.md from their summaries.
+   hours of CPU in total, with `bash scripts/longrun.sh`; then update REPORT.md from their
+   summaries (`results/*-full/` is gitignored until then).
 3. The percentile bootstrap undercovers `item_arm` with about 40 items (quick validation);
    evaluate BCa or a parametric bootstrap.
 4. Datasets with repeats but one run per arm cannot identify the run variance. A rerun of

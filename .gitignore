@@ -18,3 +18,5 @@ data/
 .cache/
 # Run logs (units and summaries are committed)
 results/**/progress.log
+# Full-profile output until a finished run is meant to be committed
+results/*-full/

@@ -57,6 +57,8 @@ jobs:
         run: uv run pytest
 
       - name: CLI smoke
+        # bash on every OS: pwsh would only fail on the last line's exit code.
+        shell: bash
         run: |
           uv run evalnoise --version
           uv run evalnoise power --components item=400,item_arm=60,run=20,item_run=100,within=300 --tasks 20,50 --runs 1,4 --mde 12
