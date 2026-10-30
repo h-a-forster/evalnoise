@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "Only 5 tasks; opus-long has one repeat per task.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T08:01:17Z",
+ "created": "2026-10-30T09:25:50Z",
  "arms": [
   "haiku45-long",
   "haiku45-long-control",
@@ -225,7 +225,7 @@
   "notes": [
    "run variance set to 0 (not identified by the data)",
    "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
-   "arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 3; haiku45-long-control - haiku45-long: 3): SEs, MDEs and their intervals rest on those few items and are unreliable"
+   "arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 3; haiku45-long-control - haiku45-long: 3): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 5,
@@ -840,5 +840,5 @@
  },
  "key": "e803100578fe186e",
  "table_sha256": "5f4a02c6d45504d5265b8fd915a11889a84e3d8a06b61afdef460c7143be8b7d",
- "seconds": 11.59
+ "seconds": 12.65
 }

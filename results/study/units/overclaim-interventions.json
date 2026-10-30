@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T08:00:44Z",
+ "created": "2026-10-30T09:25:23Z",
  "arms": [
   "ask-verify",
   "control",
@@ -237,7 +237,7 @@
   "notes": [
    "run variance set to 0 (not identified by the data)",
    "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
-   "arms differ on fewer than 10 items (stop-hook - control: 3; stop-audit - control: 5; ask-verify - control: 3): SEs, MDEs and their intervals rest on those few items and are unreliable"
+   "arms differ on fewer than 10 items (stop-hook - control: 3; stop-audit - control: 5; ask-verify - control: 3): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 18,
@@ -852,5 +852,5 @@
  },
  "key": "df3f9f97ddd0df21",
  "table_sha256": "80b78c2e2c32231a7152773abae418c175fbeec83d879aa3468d5cca1258e0bc",
- "seconds": 22.17
+ "seconds": 14.98
 }

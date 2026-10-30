@@ -8,7 +8,7 @@
  "scale": 1.0,
  "note": "Pools single-run setups with the replicated ones: the residual is assumed equal across setups.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T07:59:08Z",
+ "created": "2026-10-30T09:24:03Z",
  "arms": [
   "claude-cli:claude-fable-5-1@high",
   "claude-cli:claude-fable-5-1@low",
@@ -1449,5 +1449,5 @@
  },
  "key": "738dc3e76672e44d",
  "table_sha256": "70863b757a07a3104658dc1b657c7cb3b9e1018d07a0bd0c43c02c63f43e0ddc",
- "seconds": 72.62
+ "seconds": 53.58
 }

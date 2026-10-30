@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T08:00:22Z",
+ "created": "2026-10-30T09:25:08Z",
  "arms": [
   "haiku-high",
   "haiku-low",
@@ -327,7 +327,7 @@
   "notes": [
    "run variance set to 0 (not identified by the data)",
    "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
-   "arms differ on fewer than 10 items (haiku-high - haiku-low: 2; haiku-high - sonnet-high: 2; haiku-high - sonnet-low: 2; haiku-low - sonnet-high: 4; haiku-low - sonnet-low: 4; sonnet-high - sonnet-low: 2): SEs, MDEs and their intervals rest on those few items and are unreliable"
+   "arms differ on fewer than 10 items (haiku-high - haiku-low: 2; haiku-high - sonnet-high: 2; haiku-high - sonnet-low: 2; haiku-low - sonnet-high: 4; haiku-low - sonnet-low: 4; sonnet-high - sonnet-low: 2): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 23,
@@ -942,5 +942,5 @@
  },
  "key": "698a8025e884d380",
  "table_sha256": "5411264a02977cea7301a97ead09dcbee9a74848c8b982ff95bfb884345ff8c6",
- "seconds": 16.46
+ "seconds": 17.33
 }

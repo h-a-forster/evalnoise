@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "Only 5 tasks: item components are very imprecise. Replicate runs exist for the 3 hook arms, on different hook builds.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T08:01:06Z",
+ "created": "2026-10-30T09:25:38Z",
  "arms": [
   "haiku45-long",
   "haiku45-long-hook",
@@ -418,7 +418,7 @@
    "haiku55-short - haiku55-long": 2
   },
   "notes": [
-   "arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 4; haiku45-short - haiku45-long: 4; haiku55-long-hook - haiku55-long: 3; haiku55-short - haiku55-long: 2): SEs, MDEs and their intervals rest on those few items and are unreliable"
+   "arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 4; haiku45-short - haiku45-long: 4; haiku55-long-hook - haiku55-long: 3; haiku55-short - haiku55-long: 2): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 5,
@@ -1043,5 +1043,5 @@
  },
  "key": "fae5fb169f8014a2",
  "table_sha256": "36b16ad4867ed5d75ccf35248b3de0df198da1dea33487fc45cf7ce71445a5e0",
- "seconds": 21.42
+ "seconds": 14.98
 }

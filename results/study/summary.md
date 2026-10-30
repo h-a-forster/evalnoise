@@ -185,23 +185,23 @@ use the other arms, but that pair's numbers stay unreliable (see the planning no
 - `mm-arena-all`: items are also clustered by family (median design effect 2.66 over pairs, from only 5 families, so rough): counting items as independent, or only clusters as dependent, overstates the information
 - `agent-ab-no-tests`: run variance set to 0 (not identified by the data)
 - `agent-ab-no-tests`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
-- `agent-ab-no-tests`: arms differ on fewer than 10 items (control - no-tests: 9): SEs, MDEs and their intervals rest on those few items and are unreliable
+- `agent-ab-no-tests`: arms differ on fewer than 10 items (control - no-tests: 9): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable
 - `agent-ab-no-tests-cost`: run variance set to 0 (not identified by the data)
 - `agent-ab-no-tests-cost`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
 - `agent-ab-haiku-vs-sonnet`: run variance set to 0 (not identified by the data)
 - `agent-ab-haiku-vs-sonnet`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
 - `agent-ab-haiku-vs-sonnet`: no repeats or replicate runs: trial noise is folded into the item terms, so repeats are assumed not to help (conservative)
-- `agent-ab-haiku-vs-sonnet`: arms differ on fewer than 10 items (haiku - sonnet: 3): SEs, MDEs and their intervals rest on those few items and are unreliable
+- `agent-ab-haiku-vs-sonnet`: arms differ on fewer than 10 items (haiku - sonnet: 3): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable
 - `overclaim-setups`: run variance set to 0 (not identified by the data)
 - `overclaim-setups`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
-- `overclaim-setups`: arms differ on fewer than 10 items (haiku-high - haiku-low: 2; haiku-high - sonnet-high: 2; haiku-high - sonnet-low: 2; haiku-low - sonnet-high: 4; haiku-low - sonnet-low: 4; sonnet-high - sonnet-low: 2): SEs, MDEs and their intervals rest on those few items and are unreliable
+- `overclaim-setups`: arms differ on fewer than 10 items (haiku-high - haiku-low: 2; haiku-high - sonnet-high: 2; haiku-high - sonnet-low: 2; haiku-low - sonnet-high: 4; haiku-low - sonnet-low: 4; sonnet-high - sonnet-low: 2): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable
 - `overclaim-interventions`: run variance set to 0 (not identified by the data)
 - `overclaim-interventions`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
-- `overclaim-interventions`: arms differ on fewer than 10 items (stop-hook - control: 3; stop-audit - control: 5; ask-verify - control: 3): SEs, MDEs and their intervals rest on those few items and are unreliable
-- `ruleproof-main`: arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 4; haiku45-short - haiku45-long: 4; haiku55-long-hook - haiku55-long: 3; haiku55-short - haiku55-long: 2): SEs, MDEs and their intervals rest on those few items and are unreliable
+- `overclaim-interventions`: arms differ on fewer than 10 items (stop-hook - control: 3; stop-audit - control: 5; ask-verify - control: 3): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable
+- `ruleproof-main`: arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 4; haiku45-short - haiku45-long: 4; haiku55-long-hook - haiku55-long: 3; haiku55-short - haiku55-long: 2): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable
 - `ruleproof-pressure`: run variance set to 0 (not identified by the data)
 - `ruleproof-pressure`: item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)
-- `ruleproof-pressure`: arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 3; haiku45-long-control - haiku45-long: 3): SEs, MDEs and their intervals rest on those few items and are unreliable
+- `ruleproof-pressure`: arms differ on fewer than 10 items (haiku45-long-hook - haiku45-long: 3; haiku45-long-control - haiku45-long: 3): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable
 
 ## Pairwise differences
 

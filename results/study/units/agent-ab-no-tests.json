@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T07:59:29Z",
+ "created": "2026-10-30T09:24:20Z",
  "arms": [
   "control",
   "no-tests"
@@ -159,7 +159,7 @@
   "notes": [
    "run variance set to 0 (not identified by the data)",
    "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
-   "arms differ on fewer than 10 items (control - no-tests: 9): SEs, MDEs and their intervals rest on those few items and are unreliable"
+   "arms differ on fewer than 10 items (control - no-tests: 9): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 50,
@@ -774,5 +774,5 @@
  },
  "key": "92025fb4404d217a",
  "table_sha256": "91cfb1d7a719124da07926186b1d273c64f0d4a5f19405a7f89378d44bcdfe2a",
- "seconds": 20.66
+ "seconds": 16.51
 }

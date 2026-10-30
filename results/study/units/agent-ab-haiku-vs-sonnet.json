@@ -8,7 +8,7 @@
  "scale": 100.0,
  "note": "",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T08:00:05Z",
+ "created": "2026-10-30T09:24:50Z",
  "arms": [
   "haiku",
   "sonnet"
@@ -162,7 +162,7 @@
    "run variance set to 0 (not identified by the data)",
    "item x run noise is folded into item_arm: extra runs are assumed not to reduce it (conservative)",
    "no repeats or replicate runs: trial noise is folded into the item terms, so repeats are assumed not to help (conservative)",
-   "arms differ on fewer than 10 items (haiku - sonnet: 3): SEs, MDEs and their intervals rest on those few items and are unreliable"
+   "arms differ on fewer than 10 items (haiku - sonnet: 3): those pairs' SEs, MDEs and intervals rest on those few items and are unreliable"
   ],
   "observed_design": {
    "tasks": 50,
@@ -777,5 +777,5 @@
  },
  "key": "36cb88d661d69cc2",
  "table_sha256": "e112d08b30680b4e0de790a74201ae7509301cbbf2eaab9152f7787d0cd77d30",
- "seconds": 17.79
+ "seconds": 15.54
 }

@@ -8,7 +8,7 @@
  "scale": 1.0,
  "note": "Episode = item, game = bootstrap cluster. Partial replicate runs are included; the run fit adjusts for which episodes they cover.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T07:57:56Z",
+ "created": "2026-10-30T09:23:10Z",
  "arms": [
   "claude-cli:claude-fable-5-1@high",
   "claude-cli:claude-haiku-5-5@high",
@@ -1352,5 +1352,5 @@
  },
  "key": "eff823b06724b330",
  "table_sha256": "70863b757a07a3104658dc1b657c7cb3b9e1018d07a0bd0c43c02c63f43e0ddc",
- "seconds": 32.48
+ "seconds": 35.9
 }

@@ -455,8 +455,8 @@ def _data_notes(
         planning["few_items_differing"] = few
         listed = "; ".join(f"{k}: {n}" for k, n in few.items())
         notes.append(
-            f"arms differ on fewer than {MIN_ITEMS_DIFFERING} items ({listed}): SEs, MDEs and "
-            "their intervals rest on those few items and are unreliable"
+            f"arms differ on fewer than {MIN_ITEMS_DIFFERING} items ({listed}): those pairs' "
+            "SEs, MDEs and intervals rest on those few items and are unreliable"
         )
     return notes
 
