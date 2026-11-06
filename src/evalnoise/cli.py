@@ -14,7 +14,7 @@ from typing import Any
 import pandas as pd
 
 from evalnoise import __version__
-from evalnoise.data import DataError, describe, read_table, to_trials
+from evalnoise.data import DataError, describe, read_table, to_trials, validate
 from evalnoise.report import LABELS, fmt, fmt_ci, pct, sd, study_markdown, table
 
 EXIT_USAGE = 2
@@ -130,7 +130,7 @@ def _load(args: argparse.Namespace) -> pd.DataFrame:
                     f"{f1.name} and {f2.name} have no run column but share arm(s) "
                     f"{', '.join(sorted(a1 & a2))}; add a run column (or --run-col)"
                 )
-        df = pd.concat(frames, ignore_index=True)
+        df = validate(pd.concat(frames, ignore_index=True))
     if args.arms:
         keep = [a.strip() for a in args.arms.split(",") if a.strip()]
         missing = sorted(set(keep) - set(df["arm"]))

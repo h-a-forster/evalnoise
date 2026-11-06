@@ -579,13 +579,17 @@ def _mde_boot_ci(
     vals = []
     n = len(samples["item"])
     for j in range(n):
+        item_run, within = float(samples["item_run"][j]), float(samples["within"][j])
+        # A draw without the few replicated items folds that noise into item_arm.
+        noise = {"item_run": item_run, "within": within}
         c = Components(
             item=float(samples["item"][j]),
             item_arm=float(samples["item_arm"][j]),
             run=comps.run,
-            item_run=float(samples["item_run"][j]) if len(samples["item_run"]) else math.nan,
-            within=float(samples["within"][j]) if len(samples["within"]) else math.nan,
-            absorbed=comps.absorbed,
+            item_run=item_run,
+            within=within,
+            absorbed=comps.absorbed
+            | {k: "item_arm" for k, v in noise.items() if not math.isfinite(v)},
         )
         r = resolve(c, run=None if run_identified else 0.0, run_df=run_df, **rate_kw)
         vals.append(mde(r, d, alpha=alpha, power=power))

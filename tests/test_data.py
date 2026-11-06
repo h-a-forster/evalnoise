@@ -35,6 +35,10 @@ def test_jsonl_and_default_arm(tmp_path):
             {"item": ["a", "a"], "arm": ["x", "x"], "cluster": ["c1", "c2"], "score": [1, 0]},
             "more than one cluster",
         ),
+        (
+            {"item": ["a", "a"], "arm": ["x", "x"], "repeat": [0, 0], "score": [1, 0]},
+            "same arm, run, item and repeat",
+        ),
     ],
 )
 def test_validation_fails_loudly(rows, message):
@@ -55,3 +59,8 @@ def test_unsupported_file(tmp_path):
     p.write_bytes(b"x")
     with pytest.raises(DataError, match="unsupported"):
         load_trials(p)
+
+
+def test_unlabelled_repeats_are_not_duplicates():
+    rows = {"item": ["a", "a"], "arm": ["x", "x"], "repeat": ["", ""], "score": [1, 0]}
+    assert len(to_trials(pd.DataFrame(rows))) == 2

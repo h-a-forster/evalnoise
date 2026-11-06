@@ -122,6 +122,18 @@ def test_pass_fail_mde_uses_the_variance_at_the_shifted_rate():
     assert mde(resolve(c, pass_rate=0.5, pass_score=100.0), d) == pytest.approx(mde(resolve(c), d))
     with pytest.raises(ValueError, match="pass_rate"):
         resolve(c, pass_rate=1.0)
+    # pp variances need pass_score=100: with 1, every shift lands on a bound and the
+    # variance scale never applies.
+    with pytest.raises(ValueError, match="pass_score"):
+        resolve(c, pass_rate=0.9)
+    with pytest.raises(ValueError, match="pass_score"):
+        resolve(c, pass_score=100.0)
+
+
+def test_mde_needs_power_above_alpha():
+    r = resolve(C)
+    with pytest.raises(ValueError, match="power must exceed alpha"):
+        mde(r, Design(20), alpha=0.9, power=0.5)
 
 
 def test_naive_false_positive_rate():

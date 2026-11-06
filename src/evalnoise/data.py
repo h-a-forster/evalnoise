@@ -121,6 +121,12 @@ def validate(df: pd.DataFrame) -> pd.DataFrame:
         )
     out["score"] = scores.astype(float)
     out["repeat"] = pd.to_numeric(out["repeat"], errors="coerce").fillna(-1).astype(int)
+    # A repeat label names one trial: the same label twice is a table read twice, and would
+    # pass as two repeats that agree exactly. -1: no label.
+    labelled = out[out["repeat"] >= 0]
+    twice = labelled.duplicated(["arm", "run", "item", "repeat"])
+    if twice.any():
+        raise DataError(f"{int(twice.sum())} row(s) repeat the same arm, run, item and repeat")
     # An item must sit in exactly one cluster, or resampling clusters would split it.
     per_item = out.groupby("item")["cluster"].nunique()
     if (per_item > 1).any():

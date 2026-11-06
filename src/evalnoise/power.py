@@ -152,6 +152,16 @@ def resolve(
         raise ValueError("pass_rate must be strictly between 0 and 1")
     if not (math.isfinite(pass_score) and pass_score > 0):
         raise ValueError("pass_score must be positive")
+    if pass_rate is None and pass_score != 1.0:
+        raise ValueError("pass_score applies only with pass_rate")
+    # Scores of 0 or pass_score vary by at most (pass_score / 2)^2. Without this check, pp
+    # variances with the default pass_score would skip the scaling: every shift would land
+    # on a bound, where the variance scale is 1.
+    if pass_rate is not None and item + item_arm + run_v + item_run + within > pass_score**2:
+        raise ValueError(
+            f"these variances are too large for pass/fail scores worth {pass_score:g}: set "
+            "pass_score to the score of a pass (e.g. 100 for percentage points)"
+        )
     if design_effect > 1:
         notes.append(f"item-level variance multiplied by a design effect of {design_effect:.3g}")
     if pass_rate is not None:
@@ -270,6 +280,8 @@ def mde(
         raise ValueError("direction must be -1, 0 or 1")
     _check_level(alpha, "alpha")
     _check_level(power, "power")
+    if power <= alpha:
+        raise ValueError("power must exceed alpha (the rejection rate of a zero effect)")
     se = se_difference(r, d)
     z = stats.norm.ppf(1 - alpha / 2) + stats.norm.ppf(power)
     if se == 0:

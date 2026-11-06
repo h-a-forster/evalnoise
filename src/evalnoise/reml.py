@@ -24,6 +24,11 @@ from evalnoise.data import DataError
 MAX_TRIALS = 6000
 
 
+def _joined(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Pair two label columns (object strings on pandas 2, where np.char.add refuses them)."""
+    return (pd.Series(a) + "\x1f" + pd.Series(b)).to_numpy()
+
+
 def reml(df: pd.DataFrame, arms: Sequence[str] | None = None) -> Components:
     """REML point estimates (not bootstrapped)."""
     if arms is not None:
@@ -36,11 +41,11 @@ def reml(df: pd.DataFrame, arms: Sequence[str] | None = None) -> Components:
     y = df["score"].to_numpy(float)
     arm = df["arm"].astype(str).to_numpy()
     item = df["item"].astype(str).to_numpy()
-    run = np.char.add(np.char.add(arm, "\x1f"), df["run"].astype(str).to_numpy())
+    run = _joined(arm, df["run"].astype(str).to_numpy())
     n_arms = len(np.unique(arm))
     runs_per_arm = pd.Series(run).groupby(arm).nunique()
     has_runs = bool((runs_per_arm >= 2).any())
-    cell = np.char.add(np.char.add(run, "\x1f"), item)
+    cell = _joined(run, item)
     has_reps = len(np.unique(cell)) < n
 
     if n_arms == 1 and not (has_runs or has_reps):
@@ -50,11 +55,11 @@ def reml(df: pd.DataFrame, arms: Sequence[str] | None = None) -> Components:
         )
     factors = {"item": item}
     if n_arms > 1 and (has_runs or has_reps):
-        factors["item_arm"] = np.char.add(np.char.add(item, "\x1f"), arm)
+        factors["item_arm"] = _joined(item, arm)
     if has_runs:
         factors["run"] = run
     if has_runs and has_reps:
-        factors["item_run"] = np.char.add(np.char.add(item, "\x1f"), run)
+        factors["item_run"] = _joined(item, run)
     names = list(factors)
     codes = [pd.factorize(factors[k])[0] for k in names]
     zz = [c[:, None] == c[None, :] for c in codes]

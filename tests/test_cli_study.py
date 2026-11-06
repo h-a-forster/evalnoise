@@ -99,6 +99,10 @@ def test_power_cli_requires_run_variance_for_single_run_data(tmp_path, capsys):
         ["power", "--components", "item_arm=70,run=17", "--tasks", "120"],
         ["power", "--components", "item_arm=1,run=0,item_run=0,within=1", "--design-effect", "0.5"],
         ["power", "--components", "item_arm=1,run=0,item_run=0,within=1", "--pass-rate", "1"],
+        # Regression: without --pass-rate, --pass-score was silently ignored.
+        ["power", "--components", "item_arm=1,run=0,item_run=0,within=1", "--pass-score", "100"],
+        # Regression: pp variances with the default pass score gave the base-rate MDE silently.
+        ["power", "--components", "item_arm=9,run=0,item_run=0,within=500", "--pass-rate", "0.9"],
         ["components", "missing.csv"],
     ],
 )
@@ -132,6 +136,19 @@ def test_cli_refuses_merging_runs_from_files_without_run_column(tmp_path, capsys
     df[df["arm"] == "arm0"].drop(columns="run").to_csv(paths[0], index=False)
     df[df["arm"] == "arm1"].drop(columns="run").to_csv(paths[1], index=False)
     assert main(["components", *paths, "--bootstrap", "0", "--json"]) == 0
+
+
+def test_cli_validates_the_table_merged_from_several_files(tmp_path):
+    df = simulate(Components(4.0, 1.0, 0.0, 0.0, 2.0), tasks=10, arms=2, repeats=2, seed=0)
+    paths = [tmp_path / "a.csv", tmp_path / "b.csv"]
+    # Regression: the same trials in two files counted as repeats, with zero noise between.
+    df.to_csv(paths[0], index=False)
+    df.to_csv(paths[1], index=False)
+    assert main(["components", *map(str, paths), "--bootstrap", "0"]) == 2
+    # Regression: an item in a different cluster in each file reached the estimators.
+    df[df["arm"] == "arm0"].to_csv(paths[0], index=False)
+    df[df["arm"] == "arm1"].assign(cluster="other").to_csv(paths[1], index=False)
+    assert main(["components", *map(str, paths), "--bootstrap", "0"]) == 2
 
 
 def test_cli_routes_eval_logs_to_the_inspect_reader(tmp_path, capsys):
@@ -339,6 +356,23 @@ def test_binary_check_direction(tmp_path, monkeypatch):
     )
     assert abs(up["context"]["base_pass"] - 0.9) < 0.01
     assert up["context"]["logit_shift"] > 0 > down["context"]["logit_shift"]
+    # Regression: nan in the pilot's components made the unit files invalid JSON.
+    for r in (up, down):
+        text = (tmp_path / "units" / f"{r['name']}.json").read_text()
+        json.loads(text, parse_constant=pytest.fail)
+
+
+@pytest.mark.parametrize("sparse", ["repeats", "replicate runs"])
+def test_analyse_survives_draws_without_the_sparse_replicates(sparse):
+    # Regression: a bootstrap draw missing the few repeated or replicated items has no
+    # within or item x run estimate; the study's MDE interval stopped with a ValueError.
+    df = simulate(Components(4.0, 1.0, 0.5, 0.7, 2.0), tasks=8, arms=2, seed=0)
+    copied = df[(df["arm"] == "arm0") & df["item"].isin(["t0", "t1"])]
+    extra = copied.assign(score=copied["score"] + 1.0)
+    extra = extra.assign(repeat=1) if sparse == "repeats" else extra.assign(run="r9")
+    res = study.analyse(pd.concat([df, extra], ignore_index=True), DATASET, PROFILE, {})
+    lo, hi = res["planning"]["reference_mde_bootstrap_ci"]
+    assert 0 < lo <= hi
 
 
 def test_pair_run_term_counts_partial_runs_as_whole_runs():

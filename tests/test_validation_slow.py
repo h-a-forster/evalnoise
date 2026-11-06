@@ -13,6 +13,8 @@ KNOWN = {
     ("binary-t50-k3", "at_mde"): (1, 0.1),
     ("binary-t30-k1", "at_mde"): (1, 0.1),
     ("binary-p90-t50-k3-up", "at_mde"): (1, 0.2),
+    # A loss near 90% pass planned from the base-rate variance: power falls short.
+    ("binary-p90-t50-k3-down-base", "at_mde"): (-1, 0.2),
     # Satterthwaite t with three runs per arm: somewhat liberal.
     ("runs-t60-r3", "null"): (1, 0.05),
     # Percentile bootstrap undercovers with 40 items, and item x run with 60 items, 3 runs.

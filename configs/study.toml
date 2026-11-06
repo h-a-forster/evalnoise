@@ -31,7 +31,7 @@ arms = "replicated"
 runs = [1, 2, 3, 4, 5, 6, 8, 10, 12, 13, 15, 20]
 repeats = [1]
 targets = [5, 10]
-note = "Episode = item, game = bootstrap cluster. Partial replicate runs are included; the run fit adjusts for which episodes they cover."
+note = "Episode = item, game = bootstrap cluster. Every run covers all 120 episodes."
 
 [[dataset]]
 id = "mm-arena-all"

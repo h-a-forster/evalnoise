@@ -111,6 +111,14 @@ CHECKS = [
         Design(50, 1, 3),
         {"mean": 2.97, "direction": -1},
     ),
+    # The same loss planned from the base-rate variance: what the shifted rate corrects.
+    Check(
+        "binary-p90-t50-k3-down-base",
+        "binary",
+        Components(item=2.0, item_arm=0.3, run=0.0, item_run=0.0, within=0.0),
+        Design(50, 1, 3),
+        {"mean": 2.97, "direction": -1, "base_rate": True},
+    ),
     # Pilot of 7 arms x 2 runs (7 run df, as mm-arena's pooled run term), then a 120-task,
     # one-run-per-arm comparison.
     Check(
@@ -302,11 +310,11 @@ def _prep_binary(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
         chk.comps, tasks=3000, repeats=max(d.repeats, 2), mean=mean, binary=True, seed=rng
     )
     est = estimate(pilot).components
-    # Planned at the pilot's pass rate, with the variance at the shifted rate, for the
-    # check's direction (+1: arm 1 passes more often, -1: less often).
+    # Planned at the pilot's pass rate, with the variance at the shifted rate (unless
+    # ``base_rate``), for the check's direction (+1: arm 1 passes more often, -1: less often).
     sign = int(chk.params.get("direction", 1))
-    r = resolve(est, run=0.0, pass_rate=float(pilot["score"].mean()))
-    target = mde(r, d, direction=sign)
+    rate = None if chk.params.get("base_rate") else float(pilot["score"].mean())
+    target = mde(resolve(est, run=0.0, pass_rate=rate), d, direction=sign)
     # Logit shift whose average effect on the pass probability equals the target.
     eta = mean + rng.normal(0, math.sqrt(chk.comps.item + chk.comps.item_arm), 200_000)
     base = float(np.mean(1 / (1 + np.exp(-eta))))
@@ -327,7 +335,8 @@ def _prep_binary(chk: Check, rng: np.random.Generator) -> dict[str, Any]:
         "mde_base_rate": mde(resolve(est, run=0.0), d),
         "logit_shift": sign * (lo + hi) / 2,
         "base_pass": base,
-        "pilot": est.to_dict(),
+        # Not-identified components are nan, which JSON cannot hold.
+        "pilot": {k: v for k, v in est.to_dict().items() if v == v},
         "nominal": {"null": 0.05, "at_mde": 0.8},
     }
 

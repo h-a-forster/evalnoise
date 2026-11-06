@@ -56,6 +56,13 @@ jobs:
       - name: Test
         run: uv run pytest
 
+      - name: Test on the lowest declared dependencies
+        if: matrix.python == '3.11'
+        run: |
+          uv venv .venv-lowest
+          uv pip install --python .venv-lowest --resolution lowest-direct . "pytest>=8" "statsmodels>=0.14.2"
+          .venv-lowest/bin/python -m pytest
+
       - name: CLI smoke
         # bash on every OS: pwsh would only fail on the last line's exit code.
         shell: bash
