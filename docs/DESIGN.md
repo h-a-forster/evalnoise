@@ -254,6 +254,13 @@ without them.
   F. A. Graybill, *Confidence Intervals on Variance Components* (Dekker, 1992); F. E.
   Satterthwaite, "An approximate distribution of estimates of variance components",
   *Biometrics Bulletin* 2(6), 1946.
+- Zairah Mustahsan, Abel Lim, Megna Anand, Saahil Jain, Bryan McCann, "Stochasticity in
+  Agentic Evaluations: Quantifying Inconsistency with Intraclass Correlation", 2025.
+  <https://arxiv.org/abs/2512.06710>, <https://github.com/youdotcom-oss/stochastic-agent-evals>.
+  The closest published decomposition: intraclass correlation splits observed variance into
+  between-query (task difficulty) and within-query (agent inconsistency) parts on GAIA and
+  FRAMES. evalnoise adds the run term, a shift shared by all items in one run, and carries
+  the components into standard errors and a planner.
 
 ## 10. Limitations of the design
 

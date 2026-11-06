@@ -214,7 +214,8 @@ Miller (2024), [arXiv:2411.00640](https://arxiv.org/abs/2411.00640); Bjarnason, 
 Monperrus (2026), [arXiv:2602.07150](https://arxiv.org/abs/2602.07150); Chandrahas (2026),
 evalci, [arXiv:2607.04429](https://arxiv.org/abs/2607.04429); Messing (2026),
 [arXiv:2604.11581](https://arxiv.org/abs/2604.11581); Zhang et al. (2026),
-[arXiv:2605.23950](https://arxiv.org/abs/2605.23950). How evalnoise relates to each:
+[arXiv:2605.23950](https://arxiv.org/abs/2605.23950); Mustahsan et al. (2025),
+[arXiv:2512.06710](https://arxiv.org/abs/2512.06710). How evalnoise relates to each:
 [docs/DESIGN.md](docs/DESIGN.md#9-prior-art).
 
 ## Licence
