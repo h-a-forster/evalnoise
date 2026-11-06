@@ -17,12 +17,13 @@ uv run evalnoise --version
 
 ```sh
 uv run pytest              # fast suite, offline
-uv run pytest --runslow    # plus the quick Monte Carlo validation (about 3 minutes)
+uv run pytest --runslow    # plus the quick Monte Carlo validation (about 7 minutes)
 uv run ruff check .
 uv run ruff format --check .
 ```
 
-CI runs lint and the fast suite on Ubuntu (Python 3.11) and Windows (Python 3.13). Tests
+CI runs lint and the fast suite on Ubuntu (Python 3.11, locked and lowest declared
+dependencies) and Windows (Python 3.13). Tests
 must run offline, write only under pytest's `tmp_path`, use fixed seeds and pass on
 Windows. Statistical assertions state their tolerance in Monte Carlo standard errors. Mark
 tests that take more than a few seconds `@pytest.mark.slow`. A bug fix comes with a test
@@ -49,7 +50,7 @@ that fails without it.
 ## Pull requests
 
 - One change per pull request, with tests and docs.
-- Add an entry under "Unreleased" in [CHANGELOG.md](CHANGELOG.md) for user-visible changes.
-- Keep the "Status and next steps" section of [AGENTS.md](AGENTS.md) current.
+- Describe user-visible changes in `docs/release-notes-<version>.md`, not in the changelog.
+- Keep [backlog.md](backlog.md) current.
 
 Security issues: see [SECURITY.md](SECURITY.md).

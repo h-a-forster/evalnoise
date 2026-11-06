@@ -5,6 +5,23 @@ First release. It covers the `[0.1.0]` and `[Unreleased]` sections of
 profile) and trace to `results/study/summary.md`, `results/validation/summary.md` or
 `scripts/derived_numbers.py`.
 
+## Changes since the 2026-10-30 draft of these notes
+
+- `power` refuses `--pass-score` without `--pass-rate`, and `resolve` refuses pass/fail
+  planning when the variances are too large for the pass score (percentage-point variances
+  with the default score used to give the base-rate MDE with no warning).
+- Trial tables refuse two rows with the same arm, run, item and repeat, and the CLI
+  validates the table merged from several files (duplicates read as repeats that agree
+  exactly, and an item could sit in two clusters).
+- `study` no longer stops when a bootstrap draw misses the few repeated or replicated items.
+- `mde` says so when power does not exceed alpha, instead of a root-finder error.
+- The REML cross-check, and so `study` and `components --reml`, works on pandas 2, which
+  the declared `pandas>=2.1` allows; CI now also tests the lowest declared dependencies.
+- Validation units are valid JSON (no `NaN`), and a new check records the power of a loss
+  near 90% pass planned from the base-rate variance.
+- REPORT.md gives the item SDs and MDEs without tasks no trial passed, and the agents'
+  setups. `backlog.md` replaces the status section of `AGENTS.md`.
+
 ## What it does
 
 evalnoise splits the variance of per-trial agent-eval scores into item, item x arm, run,
@@ -49,7 +66,9 @@ how large run effects are for agent evals in general.
 
 In simulation the planner's size and power match nominal where its assumptions hold
 (paired t over items: size 0.043 to 0.057, power 0.793 to 0.806). Planned from the
-variance at the shifted rate, a loss near a 90% pass rate was detected with power 0.788.
+variance at the shifted rate, a loss near a 90% pass rate was detected with power 0.788
+(0.708 from the base-rate variance, in the committed `binary-p90-t50-k3-down-base` check;
+the 0.67 in the changelog came from an earlier trial run).
 In an mm-arena-like layout the study's run-aware pair test had size 0.062 and the MLS run
 interval covered 0.950. Known gaps, named in `tests/test_validation_slow.py`: the
 run-aware t-test is somewhat liberal with three runs (size 0.077) and with a run variance
@@ -64,14 +83,16 @@ gains near the ceiling; the percentile bootstrap undercovers item x arm with 40 
 - The planning grid and one-run MDEs count items as independent; only the tasks-needed
   tables apply the game design effect.
 - Full-profile runs (10,000 bootstrap draws, about 10x the simulations) are prepared but
-  not yet run; see `AGENTS.md` for the remaining next steps.
+  not yet run; see `backlog.md` for the remaining next steps.
+- The pass/fail tables keep tasks no trial passed, which make up most of their item SDs
+  (REPORT.md, Data); overclaim's agents saw the host's user-level instructions.
 
 ## Install and reproduce
 
 ```sh
 uv sync --group dev
 uv run pytest --runslow
-uv run evalnoise study      # quick study, about 4 minutes
-uv run evalnoise validate   # quick validation, about 3 to 4 minutes
+uv run evalnoise study      # quick study, about 3 minutes
+uv run evalnoise validate   # quick validation, about 7 minutes
 uv run python scripts/derived_numbers.py
 ```

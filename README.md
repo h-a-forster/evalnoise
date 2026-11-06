@@ -48,7 +48,7 @@ survey; treat the numbers as examples of what the tool shows.
   may shrink with more task families.
 - **Pass/fail evals with one run per arm cannot identify the run term at all.** For
   agent-ab and overclaim (18 to 50 coding tasks) the MDEs of the published designs are
-  8.3 to 13.3 pp before any run effect, which understates them if runs vary. Near a 94%
+  8.3 to 14.7 pp before any run effect, which understates them if runs vary. Near a 94%
   pass rate a loss is harder to detect than a gain (the variance grows towards 50%), and
   the planner takes the larger. Trial noise within a run was large (SD 18 to 22 pp of
   pass rate), so repeats helped there: 5 pp on agent-ab needs 326 tasks with one repeat
@@ -74,7 +74,7 @@ uv sync
 uv run evalnoise --version
 ```
 
-or `pip install git+https://github.com/h-a-forster/evalnoise` once you have access.
+or `pip install git+https://github.com/h-a-forster/evalnoise`.
 
 ## Quick start
 
@@ -188,6 +188,11 @@ validation plan are in [docs/DESIGN.md](docs/DESIGN.md), with prior work. In sho
 - The study covers four small projects, all on Claude models through Claude Code or the
   Claude CLI; only mm-arena has replicate runs of unchanged setups (ruleproof's replicate
   runs changed the hook build), and its run variance rests on 7 degrees of freedom.
+- The pass/fail tables keep tasks no trial passed (overclaim's impossible tasks and a
+  check that probably conflicted with its prompt). These make up most of the item SDs
+  there and lower the pooled pass rates; on overclaim's 18 solvable tasks the MDE is
+  18.4 pp, not 11.5. The source setups also differ: overclaim's agents saw the host's
+  user-level instructions. See [REPORT.md](REPORT.md#data).
 - Variances are assumed common to all arms; the study reports per-arm run terms and tests
   the item x run variance for equality (Brown-Forsythe; the mm-arena setups fail it).
 - Pass/fail outcomes are analysed on the 0/1 scale. The planner takes the shifted arm's

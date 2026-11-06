@@ -130,7 +130,7 @@ data with interior estimates REML and the moment estimators coincide; the tests 
 and check the REML code against statsmodels' MixedLM on small unbalanced tables.
 statsmodels itself is not used at runtime: its single-group crossed fit did not finish
 within two minutes on a simulated 720-trial table (40 items, 3 arms, 3 runs, 2 repeats)
-that the dense fit handles in about 5 seconds.
+that the dense fit handles in about a second.
 
 Negative moment estimates are kept for bootstrapping, used as 0 in planning and shown as
 `<0` in the study summary.
@@ -193,7 +193,7 @@ more precision than another repeat of an old one.
 | `power-*` | Gaussian, no run effect | paired t-test over items | alpha at 0; 80% at the MDE |
 | `runs-*` | Gaussian, run effect, 3 or 6 runs | moment estimates + Satterthwaite t | alpha at 0; 80% at the MDE |
 | `naive-*` | Gaussian, run effect, 1 run | paired t-test over items | the naive false-positive rate |
-| `binary-*` | logistic pass/fail, 60 to 70% and 90% pass, gains and losses | paired t-test over items, planned from a pilot for the check's direction | alpha at 0; 80% at the MDE |
+| `binary-*` | logistic pass/fail, 60 to 70% and 90% pass, gains and losses | paired t-test over items, planned from a pilot for the check's direction (`-base`: from the base-rate variance, to show the shortfall) | alpha at 0; 80% at the MDE |
 | `borrowed-*` | Gaussian, run effect, 1 run per arm | run variance from a 7-df pilot (7 arms x 2 runs) + Satterthwaite t | alpha at 0; 80% at the MDE |
 | `coverage-*` | Gaussian | bootstrap / MLS intervals | 95% coverage |
 | `pairs-*` | Gaussian, 4 setups with 2, 2, 2, 4 runs, one partial run, item x run variances 50 to 300, items in clusters of 2 | the study's run-aware pair test; pooled MLS run interval | alpha; 95% coverage |
@@ -215,7 +215,10 @@ per-file sha256 and any source files not tracked by the source repository's git.
 | `overclaim-*` | hidden check passed (0/1) | task | one run per arm |
 | `ruleproof-*` | all rules followed (0/1) | task | hook arms run twice (`p2`, `p3`), on different hook builds |
 
-Trials without a verdict (agent errors) are excluded and counted in the manifest.
+Trials without a verdict (agent errors) are excluded and counted in the manifest. Trials
+with a verdict stay, including those on tasks no trial can pass (overclaim's impossible
+tasks, and `feature-uri-resolve` before its check was fixed); REPORT.md gives the item SDs
+without them.
 
 ## 9. Prior art
 
@@ -256,7 +259,7 @@ Trials without a verdict (agent errors) are excluded and counted in the manifest
 
 - Common variances across arms. Pass/fail data violate this (variance `p(1 - p)`); the
   planner takes the shifted arm's variance at its own rate where that is larger, which
-  brought power for a loss near 90% pass from 0.67 to the target (binary checks), but the
+  brought power for a loss near 90% pass from 0.71 to the target (binary checks), but the
   fitted components still come from a linear model. The mm-arena setups violate it too
   (item x run SD 7.6 to 18.3).
 - Items are independent in the grid and reference-design MDEs. The tasks-needed tables

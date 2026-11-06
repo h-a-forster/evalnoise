@@ -2,7 +2,7 @@
 
 Quick profile, 2026-10-30. All numbers come from `results/study/summary.md` and
 `results/validation/summary.md` (or the unit files next to them), which
-`uv run evalnoise study` and `uv run evalnoise validate` regenerate (about 4 minutes each
+`uv run evalnoise study` and `uv run evalnoise validate` regenerate (about 3 and 7 minutes
 on a laptop CPU), except the few marked as derived, which
 `uv run python scripts/derived_numbers.py` prints. Intervals are 95%. Model, estimators and interval methods: [docs/DESIGN.md](docs/DESIGN.md).
 
@@ -61,10 +61,11 @@ on a laptop CPU), except the few marked as derived, which
   noise within a run was SD 18 to 22 pp of pass rate (36 pp on ruleproof's pressure
   tasks), far larger than the item x arm SD, so repeats there buy real precision. Most of
   these pairs differ on fewer than 10 tasks (agent-ab Haiku vs Sonnet: 3 of 50), so their
-  SEs and MDEs rest on a handful of tasks.
+  SEs and MDEs rest on a handful of tasks. These tables also keep tasks no trial passed,
+  which make up most of their item SDs and hold their pooled pass rates down (see Data).
 - The planner reproduces its nominal power and size in simulation when its assumptions
   hold. With the variance at the shifted rate, a planned loss near a 90% pass rate was
-  detected with power 0.79 (0.67 with the base-rate variance; CHANGELOG). In an mm-arena-like layout
+  detected with power 0.79 (0.71 with the base-rate variance). In an mm-arena-like layout
   (setups with 2 to 4 runs, a partial run, sixfold unequal item x run variances) the
   study's run-aware pair test had size 0.062 and the run-variance interval covered 0.95.
   Known gaps: the run-aware t-test is somewhat liberal with three runs per arm,
@@ -101,6 +102,21 @@ mm-arena's `results/core-v1`, where all replicate runs are now committed (on its
 for fable r2, haiku r3 and r4, opus r3 and sonnet r2; runs 1 and 2 did not record it
 (mm-arena's README gives 2.1.296 for opus and haiku r2 and an earlier version for r1). In ruleproof, the replicate runs of the three hook arms used different hook builds,
 so their run term includes a code change.
+
+Some tasks in these tables cannot be passed. overclaim study 1 has 18 solvable tasks and 5
+impossible ones, built to fail. `feature-uri-resolve` failed every trial in the agent-ab and
+overclaim tables: its hidden check probably conflicted with its prompt, and agent-ab fixed
+the check after these runs. The tables keep both as published. Without them the item SDs
+fall sharply and trial noise changes little (derived): overclaim study 1 goes from 43.0 to
+22.7 without the impossible tasks and 2.8 without `feature-uri-resolve` too (17 tasks, 96%
+pass, within-run SD 21.0), overclaim study 2 from 22.8 to 5.3, and agent-ab no-tests from
+13.9 to 2.8. So those item SDs and ICCs mostly describe a few always-failing tasks.
+
+The agents' setups differ too. overclaim's agents loaded the host's user-level `CLAUDE.md`,
+skills and plugins despite `--setting-sources project`; agent-ab's runs used the same flag,
+and its later re-run (not used here) loaded that file. mm-arena's agents ran with no tools,
+settings or `CLAUDE.md`, and ruleproof's benchmark excluded user-level configuration. These
+numbers describe those setups, not a clean room.
 
 ## Variance components
 
@@ -155,7 +171,8 @@ Observations:
   boundary. In overclaim study 2 even the upper end of the item x arm bootstrap interval
   is negative, a hint that the moment noise model overstates the noise of the cell means
   there; with 3 to 5 tasks on which the arms differ, the draws resample the same few tasks.
-  overclaim study 1 (pass rates 67 to 72%) has a much larger task SD (43 pp).
+  overclaim study 1 (pass rates 67 to 72%) has a much larger task SD (43 pp), which comes
+  from its six tasks that no trial passed (see Data).
 - **ruleproof has only 5 tasks**, so its item components are barely informative; its run
   estimate (hook arms, two builds) is 0 with an upper bound of 8.7 pp.
 - **Cost** (agent-ab, log USD): tasks explain most of the variance (ICC 0.90); trial noise
@@ -224,7 +241,11 @@ loss, with the variance at the shifted rate where larger; K repeats per task):
 | `overclaim-interventions` | 10 pp | 108 | 38 | 38 | 24 |
 
 Their arms differ on only 9 (agent-ab) and 3 to 5 (overclaim) tasks, so these counts are
-rough.
+rough. Tasks no trial passes also lower the pooled pass rate, so the variance scaling is
+milder than on the tasks an effect could move: on overclaim's 18 solvable tasks (90% pass)
+the published 18 x 2 design has an MDE of 18.4 pp, not the 11.5 of the full table, and on
+the 17 tasks some trial passed 26.5 pp (derived, as is 17.4 for overclaim study 2 and 9.5
+for agent-ab without `feature-uri-resolve`).
 
 ## Pairwise differences, with and without the run term
 
@@ -272,6 +293,7 @@ Monte Carlo intervals there):
 | same | power at planned MDE | 0.854 / 0.866 | 0.80 |
 | pass/fail near 90% pass, 50 x 3, gain / loss | size | 0.048 / 0.046 | 0.05 |
 | same | power at planned MDE, variance at the shifted rate | 0.984 / 0.788 | 0.80 |
+| same, loss planned from the base-rate variance | power at planned MDE | 0.708 [0.666, 0.748] | 0.80 |
 | run variance borrowed from a pilot (7 run df), 120 tasks, 1 run | size / power | 0.068 / 0.795 | 0.05 / 0.80 |
 | bootstrap, 40 tasks x 2 arms x 3 repeats | coverage: item / item x arm / within | 0.89 / 0.85 / 0.93 | 0.95 |
 | bootstrap and MLS, 60 tasks x 3 arms x 3 runs | coverage: item / item x arm / item x run / run | 0.93 / 0.94 / 0.88 / 0.96 | 0.95 |
@@ -307,10 +329,15 @@ against simulated experiments, and the REML code against statsmodels.
   planning grid and one-run MDEs count episodes as independent. Run shifts differ by
   family, and the model has no family x run term: part of the run term may shrink with
   more families, which the planner does not credit.
+- **Tasks that never pass.** overclaim's impossible tasks and `feature-uri-resolve` stay in
+  the tables as published. They inflate the item SDs and ICCs and lower pooled pass rates;
+  they tie in every pairing, so they do not bias the differences (see Data).
+- **Setups are not clean rooms.** Agents in overclaim, and possibly in agent-ab, saw the
+  host's user-level instructions (see Data), so their scores are conditional on them.
 - **Linear model for pass/fail outcomes.** The components come from a linear model on
   0/1 scores. The planner takes the shifted arm's variance at its own pass rate where that
-  is larger, which brought the power for a loss near 90% pass to 0.79 (0.67 with the
-  base-rate variance, as the CHANGELOG records); it keeps the base-rate variance otherwise, which was conservative
+  is larger, which brought the power for a loss near 90% pass to 0.79 (0.71 with the
+  base-rate variance); it keeps the base-rate variance otherwise, which was conservative
   at 60 to 70% pass (power 0.85 and 0.87) and for gains near 90% (0.98). Component
   estimates near those rates sit on the boundary, and most pass/fail pairs here differ on
   fewer than 10 tasks.
