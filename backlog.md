@@ -4,6 +4,7 @@
 
 ## Waiting on me
 
+- Branch `polish-2026-10-30` (pushed, 3 commits ahead of `main`) merged into `main` after reading the review notes in `docs/release-notes-0.1.0.md`.
 - mm-arena's `polish-2026-10-30` merged into its public `main` before evalnoise goes public: 5 of the 17 source files behind `results/trials/mm-arena.csv` exist only on that branch.
 - agent-ab, overclaim and ruleproof polish branches merged by merge commit or fast-forward, then `uv run evalnoise extract` committed, so every commit in `results/trials/MANIFEST.json` is public (all four sources now point at unpushed commits; the agent-ab, overclaim and ruleproof data files already match `origin/main`).
 - CI green from one manual dispatch (it has never run on GitHub, including the SHA-pinned actions).
