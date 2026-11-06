@@ -26,8 +26,6 @@
   "pilot": {
    "item": 0.07814838279426475,
    "item_arm": 0.012196232077359148,
-   "run": NaN,
-   "item_run": NaN,
    "within": 0.15433333333333332,
    "absorbed": {
     "item_run": "item_arm"
@@ -52,5 +50,5 @@
    "nominal": 0.8
   }
  },
- "seconds": 3.14
+ "seconds": 0.62
 }

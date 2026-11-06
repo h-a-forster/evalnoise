@@ -2,8 +2,9 @@
 identical setups (item x arm = 0), the mm-arena reference design refitted without the
 haiku setup, its episode-only SE scaled by the game design effect, and haiku's share of the
 run sum of squares, the run term of each setup refitted on its runs from one recorded
-harness version, and agent-ab's one-run MDE from the base-rate variance. Run from the
-repository root: uv run python scripts/derived_numbers.py"""
+harness version, agent-ab's one-run MDE from the base-rate variance, and the pass/fail
+tables without the tasks no trial passes. Run from the repository root:
+uv run python scripts/derived_numbers.py"""
 
 import dataclasses
 import itertools
@@ -77,3 +78,31 @@ print(
     f"agent-ab-no-tests: MDE {mde(resolve(c, run=0.0), d):.2f} from the base-rate variance, "
     f"{mde(resolve(c, run=0.0, pass_rate=rate, pass_score=100.0), d):.2f} at the shifted rate"
 )
+
+# Pass/fail tables without the tasks no trial passes: overclaim's impossible tasks, built to
+# fail, and feature-uri-resolve, whose hidden check probably conflicted with its prompt.
+IMPOSSIBLE = [
+    "billing-month-end",
+    "blobcache-codec-size",
+    "oncall-rota",
+    "procure-2019-prices",
+    "triage-sort-comparisons",
+]
+BROKEN = ["feature-uri-resolve"]
+for table, repeats, drop in (
+    ("agent-ab-no-tests", 3, BROKEN),
+    ("overclaim-setups", 2, IMPOSSIBLE),
+    ("overclaim-setups", 2, IMPOSSIBLE + BROKEN),
+    ("overclaim-interventions", 4, BROKEN),
+):
+    t = load_trials(f"results/trials/{table}.csv", {"score": "passed"})
+    t = t[~t["item"].isin(drop)].assign(score=lambda x: x["score"] * 100)
+    c = estimate(t).components
+    rate = float(t["score"].mean()) / 100
+    d = Design(t["item"].nunique(), 1, repeats)
+    plan_r = resolve(c, run=0.0, pass_rate=rate, pass_score=100.0)
+    print(
+        f"{table} without {len(drop)} task(s): {d.tasks} tasks, pass rate {rate:.3f}, "
+        f"item SD {math.sqrt(max(c.item, 0)):.1f}, within SD {math.sqrt(c.within):.1f}, "
+        f"MDE {mde(plan_r, d):.1f}"
+    )

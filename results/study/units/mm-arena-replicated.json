@@ -6,9 +6,9 @@
  "unit": "pp",
  "digits": 1,
  "scale": 1.0,
- "note": "Episode = item, game = bootstrap cluster. Partial replicate runs are included; the run fit adjusts for which episodes they cover.",
+ "note": "Episode = item, game = bootstrap cluster. Every run covers all 120 episodes.",
  "evalnoise": "0.1.0",
- "created": "2026-10-30T22:43:58Z",
+ "created": "2026-11-06T19:17:55Z",
  "arms": [
   "claude-cli:claude-fable-5-1@high",
   "claude-cli:claude-haiku-5-5@high",
@@ -1652,7 +1652,7 @@
   },
   "reference_mde_unpaired": 23.126573915508185
  },
- "key": "276ecbe5fbbcc9e3",
+ "key": "fec9d8597c64a3a8",
  "table_sha256": "7ff868ae3bdc516234e95d8ffc86e88c1bc4dfe55e8dd20b9c8d9d10688fadac",
- "seconds": 42.72
+ "seconds": 43.92
 }
