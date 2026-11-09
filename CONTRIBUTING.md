@@ -51,6 +51,5 @@ that fails without it.
 
 - One change per pull request, with tests and docs.
 - Describe user-visible changes in `docs/release-notes-<version>.md`, not in the changelog.
-- Keep [backlog.md](backlog.md) current.
 
 Security issues: see [SECURITY.md](SECURITY.md).

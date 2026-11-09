@@ -20,3 +20,4 @@ data/
 results/**/progress.log
 # Full-profile output until a finished run is meant to be committed
 results/*-full/
+backlog.md
