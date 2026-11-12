@@ -1,6 +1,6 @@
 {
   "agent-ab-haiku-vs-sonnet": {
-    "commit": "e02aa1bbae856b1964420f8f3a8ce7280a0d417a",
+    "commit": "b96eea23e4c767027f05b5ecb6abd3dcf3454c18",
     "description": "Claude Code, Haiku 5.5 vs Sonnet 5.5, 50 tasks x 1 repeat",
     "excluded": {},
     "extractor": "agent-ab",
@@ -16,7 +16,7 @@
     "untracked_files": []
   },
   "agent-ab-no-tests": {
-    "commit": "e02aa1bbae856b1964420f8f3a8ce7280a0d417a",
+    "commit": "b96eea23e4c767027f05b5ecb6abd3dcf3454c18",
     "description": "Claude Code on Haiku 5.5, control vs no-tests instruction, 50 tasks x 3 repeats",
     "excluded": {},
     "extractor": "agent-ab",
@@ -32,7 +32,7 @@
     "untracked_files": []
   },
   "mm-arena": {
-    "commit": "76f335b3595a881d5def7bedcc57f5ef838d2f9d",
+    "commit": "5b2e91e142e7db07c7fab775af7f83b9ec83156c",
     "description": "core-v1 suite: 60 games x 2 seeds, LLM market makers, edge captured (pp) per episode",
     "excluded": {},
     "extractor": "mm-arena",
@@ -66,7 +66,7 @@
     "untracked_files": []
   },
   "overclaim-interventions": {
-    "commit": "c877e463bdf5f1c15235279108b4c8b94e68fe3d",
+    "commit": "d8d9bb907100f524bb30f4356897a02cd2b1f566",
     "description": "Claude Code on Haiku 5.5, four completion-check interventions, 18 tasks x 4 repeats",
     "excluded": {},
     "extractor": "agent-ab",
@@ -82,7 +82,7 @@
     "untracked_files": []
   },
   "overclaim-setups": {
-    "commit": "c877e463bdf5f1c15235279108b4c8b94e68fe3d",
+    "commit": "d8d9bb907100f524bb30f4356897a02cd2b1f566",
     "description": "Claude Code, Haiku/Sonnet 5.5 at low/high effort, 23 tasks x 2 repeats",
     "excluded": {},
     "extractor": "agent-ab",
@@ -98,7 +98,7 @@
     "untracked_files": []
   },
   "ruleproof-main": {
-    "commit": "beed533cbfe7ad7b7be276159b1aa79e18922aab",
+    "commit": "2d7dc13a8db142aed6eb2a3f8450167acf1a3c1a",
     "description": "AGENTS.md compliance, 9 arms x 5 tasks x 3 repeats; hook arms run twice (p2, p3) on different hook builds",
     "excluded": {
       "copy outside its run directory": 105
@@ -295,7 +295,7 @@
     "untracked_files": []
   },
   "ruleproof-pressure": {
-    "commit": "beed533cbfe7ad7b7be276159b1aa79e18922aab",
+    "commit": "2d7dc13a8db142aed6eb2a3f8450167acf1a3c1a",
     "description": "AGENTS.md compliance under pressure tasks, 6 arms x 5 tasks x 3 repeats (opus 1 repeat)",
     "excluded": {},
     "extractor": "ruleproof",
