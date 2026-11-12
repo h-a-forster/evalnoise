@@ -35,8 +35,7 @@ overclaim, ruleproof).
 - Validate inputs before writing; raise `DataError` with a clear message; count every
   excluded trial in the manifest.
 - Scratch files go in `tmp/` (gitignored). Do not create `.bak` copies; use git.
-- The repository is private for now; CI runs only on pull requests and manual dispatch
-  (metered minutes).
+- The repository is public; CI runs on pushes to main, pull requests and manual dispatch.
 - Release hygiene: no personal names, local user paths or machine details in committed
   files, outputs or logs. `MANIFEST.json` paths are relative to the repository root.
 - Statistical honesty: report sizes, seeds and intervals; say when a component is not
@@ -75,4 +74,4 @@ uv run evalnoise validate     # quick validation, about 7 minutes
 
 ## Status
 
-v0.1.0, private repository. Open work is in `backlog.md`.
+v0.1.0, public repository. Open work is in `backlog.md` (gitignored, local only).
