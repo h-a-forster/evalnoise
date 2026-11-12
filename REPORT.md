@@ -11,8 +11,8 @@ on a laptop CPU), except the few marked as derived, which
 - In mm-arena, the only dataset with replicate runs of unchanged setups (four Claude
   setups at high effort run two to four times on all 120 episodes; ruleproof's replicate
   runs changed the hook build), the run SD pooled over the four setups was **2.9 pp** of
-  edge captured (**1.6 to 6.4**, Burdick-Graybill MLS interval, 7 df). Most of it is one setup: fitted alone,
-  the run SDs are 1.3 (`fable-5-1@high`), 1.7 (`opus-5-5@high`), 1.5 (`sonnet-5-5@high`)
+  edge captured (**1.6 to 6.4**, Burdick-Graybill MLS interval, 7 df). Most of it is one
+  setup, haiku (81% of the run sum of squares, derived): fitted alone, the run SDs are 1.3 (`fable-5-1@high`), 1.7 (`opus-5-5@high`), 1.5 (`sonnet-5-5@high`)
   and 4.0 (`haiku-5-5@high`, four runs), and re-estimated without haiku the run SD is 1.6
   (0.5 to 5.2). The setups also differ in item x run SD (7.6, 10.8, 13.2 and 18.3;
   Brown-Forsythe p < 0.001, which does not assume normal residuals), so the
@@ -29,6 +29,15 @@ on a laptop CPU), except the few marked as derived, which
   fits the haiku run term coming mostly from version or date changes, but one pair on
   1 df cannot show it: the model has no harness factor, so the study's run term still
   mixes both.
+- **Reruns of a fixed setup show almost no run term.** [trialnoise](https://github.com/h-a-forster/trialnoise)
+  applies the same estimators to public Terminal-Bench 2 trials: replicate jobs of 20
+  multi-vendor submissions give a pooled run variance on 72 df that estimates below zero,
+  with an upper limit of 0.9 points of run SD. That is not a contradiction of the 2.9 pp
+  here but a different question: its replicate jobs rerun one fixed submission a median of
+  two days apart (and submitters chose which jobs to publish), while mm-arena's runs mixed
+  Claude Code versions and dates, on a different score (edge captured, not pass rate). Take
+  trialnoise's run term for reruns of an unchanged setup, and mm-arena's 2.9 pp as what a
+  harness or version change can add.
 - For a hypothetical pair of setups with the pooled variances, compared from one run
   each, the estimated SE of the difference is **4.7 pp** instead of the **2.3 pp** the
   episodes alone give (2.6, derived, once the two seeds of a game are treated as correlated
@@ -95,8 +104,7 @@ establish how large run effects are for agent evals in general.
 
 mm-arena episodes are items and games are bootstrap clusters (each game has two seeds that
 share a hidden structure). Every mm-arena run is complete (120 episodes) and read from
-mm-arena's `results/core-v1`, where all replicate runs are now committed (on its branch
-`polish-2026-10-30`, not yet merged into the public main branch);
+mm-arena's `results/core-v1`, where all replicate runs are committed on its main branch;
 `results/trials/MANIFEST.json` records that commit and each file's sha256 (CRLF read as LF). The table's
 `harness` column carries the Claude Code version from each trace's provenance: 2.1.308
 for fable r2, haiku r3 and r4, opus r3 and sonnet r2; runs 1 and 2 did not record it

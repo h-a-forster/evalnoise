@@ -13,9 +13,8 @@ and turns them into a plan: the minimum detectable effect (MDE) of a design, the
 tasks needed for a target MDE, and how often a test that ignores run effects will report
 a difference between two configurations with equal mean scores.
 
-Item-level confidence intervals, paired or clustered, cannot see the run term. In the one
-dataset here with replicate runs of unchanged setups it dominates: see
-[Findings](#findings).
+Item-level confidence intervals, paired or clustered, cannot see the run term. How large it
+is depends on what changes between runs: see [Findings](#findings).
 
 Python 3.11+, depends on numpy, scipy and pandas. No model calls, no network.
 
@@ -25,27 +24,35 @@ From [REPORT.md](REPORT.md), a quick-profile study of per-trial data published b
 small agent-eval projects, all on Claude models. These are a handful of datasets, not a
 survey; treat the numbers as examples of what the tool shows.
 
-- **Run-to-run shifts dominated the one benchmark with replicate runs of unchanged
-  setups.** In mm-arena
-  (120 market-making episodes, four Claude setups run two to four times each) the run
-  SD pooled over the setups was 2.9 pp of edge captured (95% CI 1.6 to 6.4), mostly from
-  one setup (fitted alone: 1.3, 1.7, 1.5 and 4.0 pp). For a pair of setups with the pooled
-  variances, compared from one run each, the estimated SE is 4.7 pp, not the 2.3 pp an
-  item-level interval reports, and a run-blind paired test calls two setups with equal
-  mean scores different a third of the time (33%, CI 17% to 62%; 19% with the noisiest
-  setup left out). Both treat episodes as independent; with the episodes' clustering the
-  item-level SE is larger, so the run term's share and that rate are upper-end figures.
-  The one pair of runs on the same recorded Claude Code version (Haiku runs 3 and 4)
-  agreed within episode noise (1.4 pp apart), which hints that version or date changes
-  drive much of the run term; one pair cannot settle it, and the model has no harness
-  factor.
-- **More episodes cannot fix that; more runs can,** as far as run shifts are shared by
-  every episode. With the pooled estimates, and allowing for the seeds that pair up
-  within games (design effect 1.24), a 10 pp difference needs 3 runs per setup with 70
-  episodes, or 4 with 51; 5 pp needs 20 runs with 133 episodes (10 runs need 234), beyond
-  the 120 episodes available. Run shifts
-  also differed by task family (one setup: +1.7 to +22.8 pp), so part of the run term
-  may shrink with more task families.
+- **In mm-arena, run-to-run shifts came mostly from one setup across Claude Code
+  versions.** mm-arena has 120 market-making episodes and four Claude setups run two to
+  four times each. The run SD pooled over the setups was 2.9 pp of edge captured (95% CI
+  1.6 to 6.4) on 7 df, and 81% of its sum of squares is the Haiku setup (fitted alone:
+  4.0 pp, against 1.3, 1.7 and 1.5 for the others), whose runs span Claude Code versions.
+  Its one pair of runs on the same recorded version (runs 3 and 4) agreed within episode
+  noise (1.4 pp apart); the model has no harness factor, so it cannot separate version
+  changes from drift. With the pooled variances, a pair of setups compared from one run
+  each has an estimated SE of 4.7 pp, not the 2.3 pp an item-level interval reports, and
+  a run-blind paired test calls two setups with equal mean scores different 33% of the
+  time (CI 17% to 62%). Without Haiku the run SD is 1.6 pp (0.5 to 5.2) and that rate
+  19%. Both rates treat episodes as independent; with the episodes' clustering the
+  item-level SE is larger, so they are upper-end figures.
+- **Reruns of a fixed setup barely shift scores.** [trialnoise](https://github.com/h-a-forster/trialnoise),
+  which reuses these estimators on 46,830 public Terminal-Bench 2 trials, found that
+  replicate jobs of 20 multi-vendor submissions (72 df) give a run variance that
+  estimates below zero, with an upper limit of 0.9 points of run SD. The two results
+  measure different things: trialnoise's replicate jobs rerun one fixed submission a
+  median of two days apart (and submitters chose which to publish), while mm-arena's
+  runs changed the Claude Code version and date, on a different score. Use trialnoise's
+  run term for reruns of an unchanged setup, and mm-arena's as an example of what a
+  harness or version change can add.
+- **Where runs do shift, more episodes cannot fix it; more runs can,** as far as run
+  shifts are shared by every episode. With mm-arena's pooled estimates, and allowing for
+  the seeds that pair up within games (design effect 1.24), a 10 pp difference needs 3
+  runs per setup with 70 episodes, or 4 with 51; 5 pp needs 20 runs with 133 episodes (10
+  runs need 234), beyond the 120 episodes available. Run shifts also differed by task
+  family (one setup: +1.7 to +22.8 pp), so part of the run term may shrink with more task
+  families.
 - **Pass/fail evals with one run per arm cannot identify the run term at all.** For
   agent-ab and overclaim (18 to 50 coding tasks) the MDEs of the published designs are
   8.3 to 14.7 pp before any run effect, which understates them if runs vary. Near a 94%
