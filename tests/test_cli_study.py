@@ -1,5 +1,7 @@
 import json
 import math
+import shutil
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -12,6 +14,7 @@ from evalnoise.components import Components
 from evalnoise.data import DataError
 from evalnoise.report import study_markdown
 from evalnoise.simulate import simulate
+from evalnoise.validate import run_validation
 
 
 @pytest.fixture
@@ -445,3 +448,14 @@ def test_component_cell_marks_negative_estimates():
     assert component_cell(unit(-4.0, -9.0, -1.0), "item_arm") == "<0 [upper bound < 0]"
     assert component_cell(unit(-4.0, -9.0, 4.0), "item_arm").startswith("<0 [")
     assert component_cell(unit(4.0, 1.0, 9.0), "item_arm") == "2.0 [1.0, 3.0]"
+
+
+def test_validation_rerun_from_finished_shards_leaves_the_pooled_unit_untouched(tmp_path):
+    name = "naive-t30-r1"
+    committed = Path(__file__).resolve().parents[1] / "results" / "validation" / "units"
+    units = tmp_path / "units"
+    shutil.copytree(committed / name, units / name)
+    shutil.copy(committed / f"{name}.json", units / f"{name}.json")
+    before = (units / f"{name}.json").read_bytes()
+    run_validation(tmp_path, "quick", only=[name])
+    assert (units / f"{name}.json").read_bytes() == before

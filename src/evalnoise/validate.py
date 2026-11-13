@@ -178,6 +178,7 @@ def run_validation(
         shard_dir.mkdir(exist_ok=True)
         hits: dict[str, int] = {}
         done = 0
+        computed = False
         for k, size in enumerate(sizes):
             spath = shard_dir / f"shard-{k}.json"
             rec = None
@@ -191,6 +192,7 @@ def run_validation(
                 tmp = spath.with_suffix(".json.tmp")
                 tmp.write_text(json.dumps(rec) + "\n", encoding="utf-8")
                 os.replace(tmp, spath)
+                computed = True
                 _log(out, f"[{n}/{len(checks)}] {chk.name}: shard {k + 1}/{shards} done")
             for q, h in rec["hits"].items():
                 hits[q] = hits.get(q, 0) + int(h)
@@ -212,9 +214,17 @@ def run_validation(
             "seconds": round(time.perf_counter() - t0, 2),
         }
         path = units / f"{chk.name}.json"
-        tmp = path.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(res, indent=1) + "\n", encoding="utf-8")
-        os.replace(tmp, path)
+        prev = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+        if not computed and prev is not None and prev.get("key") == key:
+            # Every shard came from disk, so the pooled unit is unchanged; keep the file and
+            # the seconds it recorded when its shards ran, rather than this run's pooling time.
+            res["seconds"] = prev["seconds"]
+            if prev != res:
+                raise RuntimeError(f"{path} does not match its own shards; rerun with force")
+        else:
+            tmp = path.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(res, indent=1) + "\n", encoding="utf-8", newline="\n")
+            os.replace(tmp, path)
         _log(out, f"[{n}/{len(checks)}] {chk.name}: pooled {done} sims")
         results.append(res)
     return results

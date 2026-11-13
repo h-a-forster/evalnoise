@@ -57,6 +57,15 @@ jobs:
       - name: Test
         run: uv run pytest
 
+      - name: Summaries and report tables rebuild from the committed results
+        # Finished units are skipped, so this re-renders the summaries offline in seconds.
+        shell: bash
+        run: |
+          uv run evalnoise study
+          uv run evalnoise validate
+          uv run python scripts/published_tables.py
+          git diff --exit-code -- results/
+
       - name: Test on the lowest declared dependencies
         if: matrix.python == '3.11'
         run: |

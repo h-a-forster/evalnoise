@@ -38,6 +38,10 @@ overclaim, ruleproof).
 - The repository is public; CI runs on pushes to main, pull requests and manual dispatch.
 - Release hygiene: no personal names, local user paths or machine details in committed
   files, outputs or logs. `MANIFEST.json` paths are relative to the repository root.
+- REPORT tables are copies of rows in `results/published.md`, and the README's examples are the
+  CLI's output; never type a number into a table. `tests/test_published.py` and CI (which reruns
+  `study`, `validate` and the script, then diffs `results/`) check them. Numbers REPORT marks
+  "derived" come from `scripts/derived_numbers.py` and are not checked automatically.
 - Statistical honesty: report sizes, seeds and intervals; say when a component is not
   identified or a number is a lower bound; these are a handful of Claude-only datasets, so
   do not generalise beyond them.
@@ -59,6 +63,7 @@ overclaim, ruleproof).
 | `configs/sources.toml`, `configs/study.toml` | source tables; study datasets, pairs, targets, profiles |
 | `results/trials/` | committed per-trial tables + `MANIFEST.json` |
 | `results/study/`, `results/validation/` | committed quick-profile outputs (`summary.md`, units) |
+| `scripts/published_tables.py` | `results/published.md`: every REPORT table, reshaped from the summaries and units |
 
 ## How to test
 
