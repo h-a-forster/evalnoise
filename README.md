@@ -193,8 +193,9 @@ validation plan are in [docs/DESIGN.md](docs/DESIGN.md), with prior work. In sho
 ## Limitations
 
 - The study covers four small projects, all on Claude models through Claude Code or the
-  Claude CLI; only mm-arena has replicate runs of unchanged setups (ruleproof's replicate
-  runs changed the hook build), and its run variance rests on 7 degrees of freedom.
+  Claude CLI; only mm-arena has replicate runs that keep model and effort fixed, and even
+  those changed the Claude Code version between runs (ruleproof's replicate runs changed
+  the hook build); its run variance rests on 7 degrees of freedom.
 - The pass/fail tables keep tasks no trial passed (overclaim's impossible tasks and a
   check that probably conflicted with its prompt). These make up most of the item SDs
   there and lower the pooled pass rates; on overclaim's 18 solvable tasks the MDE is

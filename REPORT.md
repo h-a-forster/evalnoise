@@ -8,9 +8,9 @@ on a laptop CPU), except the few marked as derived, which
 
 ## Summary
 
-- In mm-arena, the only dataset with replicate runs of unchanged setups (four Claude
-  setups at high effort run two to four times on all 120 episodes; ruleproof's replicate
-  runs changed the hook build), the run SD pooled over the four setups was **2.9 pp** of
+- In mm-arena, the only dataset with replicate runs that keep model and effort fixed (four
+  Claude setups at high effort run two to four times on all 120 episodes, across Claude
+  Code versions; ruleproof's replicate runs changed the hook build), the run SD pooled over the four setups was **2.9 pp** of
   edge captured (**1.6 to 6.4**, Burdick-Graybill MLS interval, 7 df). Most of it is one
   setup, haiku (81% of the run sum of squares, derived): fitted alone, the run SDs are 1.3 (`fable-5-1@high`), 1.7 (`opus-5-5@high`), 1.5 (`sonnet-5-5@high`)
   and 4.0 (`haiku-5-5@high`, four runs), and re-estimated without haiku the run SD is 1.6
@@ -315,9 +315,10 @@ against simulated experiments, and the REML code against statsmodels.
 ## Limitations
 
 - **Few, similar datasets.** Four projects, one model family, one set of harnesses. Only
-  mm-arena has replicate runs of unchanged setups (ruleproof's replicates changed the
-  hook build), and its run variance rests on 7 degrees of freedom; its
-  interval spans a factor of four in SD.
+  mm-arena has replicate runs that keep model and effort fixed, and those changed the
+  Claude Code version between runs (ruleproof's replicates changed the hook build), so
+  no dataset here reruns an unchanged setup. mm-arena's run variance rests on 7 degrees
+  of freedom, and its interval spans a factor of four in SD.
 - **Run effects may be version effects.** The model has no harness-version factor, so it
   cannot split the run term into version and within-version parts. In mm-arena runs 1
   and 2 did not record the harness version, and only one setup has two runs on one

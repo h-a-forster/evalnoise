@@ -50,7 +50,8 @@ Python 3.11+, numpy, scipy and pandas only; no model or network calls.
 
 ## Headline results (quick profile)
 
-- mm-arena, the only dataset with replicate runs of unchanged setups: pooled run SD
+- mm-arena, the only dataset with replicate runs that keep model and effort fixed (the
+  Claude Code version changed between runs): pooled run SD
   2.9 pp of edge captured [1.6, 6.4] on 7 df, mostly from one setup; for a one-run
   comparison the SE is 4.7 pp instead of the 2.3 pp episodes alone give, and a run-blind
   paired test calls setups with equal means different 33% of the time [17%, 62%].
