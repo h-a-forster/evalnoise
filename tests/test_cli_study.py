@@ -455,7 +455,16 @@ def test_validation_rerun_from_finished_shards_leaves_the_pooled_unit_untouched(
     committed = Path(__file__).resolve().parents[1] / "results" / "validation" / "units"
     units = tmp_path / "units"
     shutil.copytree(committed / name, units / name)
-    shutil.copy(committed / f"{name}.json", units / f"{name}.json")
-    before = (units / f"{name}.json").read_bytes()
+    unit = json.loads((committed / f"{name}.json").read_text(encoding="utf-8"))
+    # Written on another platform: scipy's interval can differ in the last bit.
+    mc95 = unit["rates"]["null"]["mc95"]
+    mc95[0] = float(np.nextafter(mc95[0], 1.0))
+    path = units / f"{name}.json"
+    path.write_text(json.dumps(unit, indent=1) + "\n", encoding="utf-8", newline="\n")
+    before = path.read_bytes()
     run_validation(tmp_path, "quick", only=[name])
-    assert (units / f"{name}.json").read_bytes() == before
+    assert path.read_bytes() == before
+    unit["rates"]["null"]["rate"] += 0.001  # a unit whose counts its shards do not give
+    path.write_text(json.dumps(unit, indent=1) + "\n", encoding="utf-8", newline="\n")
+    with pytest.raises(RuntimeError, match="does not match its own shards"):
+        run_validation(tmp_path, "quick", only=[name])

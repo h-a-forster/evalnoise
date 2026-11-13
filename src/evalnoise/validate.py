@@ -216,11 +216,13 @@ def run_validation(
         path = units / f"{chk.name}.json"
         prev = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
         if not computed and prev is not None and prev.get("key") == key:
-            # Every shard came from disk, so the pooled unit is unchanged; keep the file and
-            # the seconds it recorded when its shards ran, rather than this run's pooling time.
-            res["seconds"] = prev["seconds"]
-            if prev != res:
+            # Every shard came from disk, so the pooled unit is unchanged: keep the file, with
+            # the seconds it recorded when its shards ran. Its counts must match the shards; the
+            # floats derived from them (intervals, nominal rates, context) are not compared,
+            # since scipy can differ in their last bit between platforms.
+            if _pooled_counts(prev) != _pooled_counts(res):
                 raise RuntimeError(f"{path} does not match its own shards; rerun with force")
+            res = prev
         else:
             tmp = path.with_suffix(".json.tmp")
             tmp.write_text(json.dumps(res, indent=1) + "\n", encoding="utf-8", newline="\n")
@@ -228,6 +230,12 @@ def run_validation(
         _log(out, f"[{n}/{len(checks)}] {chk.name}: pooled {done} sims")
         results.append(res)
     return results
+
+
+def _pooled_counts(unit: dict) -> tuple:
+    """What a pooled unit takes from its shards: the design and the hit rate per question."""
+    rates = {q: r["rate"] for q, r in unit["rates"].items()}
+    return (unit["name"], unit["kind"], unit["key"], unit["seed"], unit["sims"], rates)
 
 
 def _mc_interval(k: int, n: int) -> list[float]:
